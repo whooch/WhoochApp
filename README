@@ -1,0 +1,13 @@
+Whooch Android App
+
+Eclipse Setup:
+
+ 1) Get ActionBarSherlock (http://actionbarsherlock.com/)
+    a) Right click on the project -> Properties.
+    b) Select "Android" from the lefthand side.
+    c) Add ActionBarSherlock as a required project
+
+ 2) Set Compiler Compliance Level to 1.6
+    a) Right click on the project -> Properties.
+    b) Select "Java Compiler" from the lefthand side.
+    c) Set Compiler Compliance level to 1.6
