@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tabhost"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+  
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dip"
+            android:layout_marginTop="3dip" >
+            <Button
+                android:id="@+id/lists_leading_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="3dip"
+                android:layout_weight="1.0"
+                android:background="@drawable/lists_button_selector"
+                android:text="Leading"
+                android:textColor="@color/white"
+                android:textSize="15dip" />
+            <Button
+                android:id="@+id/lists_contributing_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="3dip"
+                android:layout_marginRight="3dip"
+                android:layout_weight="1.0"
+                android:background="@drawable/lists_button_selector"
+                android:text="Contributing"
+                android:textColor="@color/white"
+                android:textSize="15dip" />
+            <Button
+                android:id="@+id/lists_trailing_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dip"
+                android:layout_weight="1.0"
+                android:background="@drawable/lists_button_selector"
+                android:text="Trailing"
+                android:textColor="@color/white"
+                android:textSize="15dip" />
+
+        </LinearLayout>
+    
+        <TabWidget android:id="@android:id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+        
+        <FrameLayout android:id="@android:id/tabcontent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ListView
+                android:id="@+id/lists_leading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+            </ListView>
+
+            <ListView
+                android:id="@+id/lists_contributing"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+            </ListView>
+
+            <ListView
+                android:id="@+id/lists_trailing"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+            </ListView>
+                
+        </FrameLayout>
+        
+    </LinearLayout>
+
+</TabHost>

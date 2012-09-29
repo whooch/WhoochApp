@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="3dip"
+        android:layout_marginBottom="3dip" >    
+        <ImageView
+            android:id="@+id/alerts_entry_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="3dip"
+            android:src="@drawable/ic_launcher" />
+    
+        <TextView
+            android:id="@+id/alerts_entry_message_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="3dip"
+            android:layout_weight="1.0"
+            android:text="Alerts Message"
+            android:textStyle="bold" />
+        <ImageButton
+            android:id="@+id/alerts_entry_accept_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="15dip"
+            android:layout_gravity="center_vertical"
+            android:background="@null"
+            android:src="@drawable/ic_accept_bl" />
+        
+        <ImageButton
+            android:id="@+id/alerts_entry_decline_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="6dip"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_decline_bl"
+            android:background="@null" />
+    
+    </LinearLayout>
+
+</LinearLayout>

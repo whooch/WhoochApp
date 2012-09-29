@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="3dip"
+    android:layout_marginRight="3dip"
+    android:orientation="vertical" >
+
+    <!-- Post, React -->
+    <LinearLayout
+        android:id="@+id/post_user_search_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Search for Users"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    
+        <AutoCompleteTextView
+            android:id="@+id/post_search_users"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:text="" />
+    </LinearLayout>
+    
+    <!-- Post -->
+    <LinearLayout
+        android:id="@+id/post_select_whooch_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select a Whooch"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        
+        <Spinner
+            android:id="@+id/post_whooch_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/lists_entry_whooch_title" />
+    </LinearLayout>
+        
+    <!-- React -->
+    <TextView
+        android:id="@+id/post_reacting_to"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="post content" />
+    
+    <!-- Feedback -->
+    <RelativeLayout
+        android:id="@+id/post_whooch_feedback_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="3dip"
+        android:layout_marginTop="3dip" >
+
+        <ImageView
+            android:id="@+id/post_whooch_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="3dip"
+            android:src="@drawable/ic_launcher" />
+
+        <TextView
+            android:id="@+id/post_whooch_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:layout_toRightOf="@id/post_whooch_image"
+            android:text="Whooch Name"
+            android:textStyle="bold" />
+    </RelativeLayout>
+    
+    <EditText
+        android:id="@+id/post_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:maxLength="151" >
+
+        <requestFocus />
+    </EditText>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <!-- Post, Feedback -->
+        <Button
+            android:id="@+id/post_camera_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Camera" />
+
+        <TextView
+            android:id="@+id/post_char_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/MAX_POST_LENGTH" />
+
+        <Button
+            android:id="@+id/post_submit_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Submit" />
+    </LinearLayout>
+
+</LinearLayout>
