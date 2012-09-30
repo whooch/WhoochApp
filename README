@@ -2,12 +2,16 @@ Whooch Android App
 
 Eclipse Setup:
 
- 1) Get ActionBarSherlock (http://actionbarsherlock.com/)
-    a) Right click on the project -> Properties.
-    b) Select "Android" from the lefthand side.
-    c) Add ActionBarSherlock as a required project
+ 1) Get ActionBarSherlock (http://actionbarsherlock.com/) and create a project
+    for it in Eclipse.
+    
+ 2) Create a project for WhoochApp and add ActionBarSherlock as a requirement.
+    a) Create the WhoochApp project in Eclipse
+    b) Right click on the project -> Properties
+    c) Select "Android" from the lefthand side
+    d) Add ActionBarSherlock as a required project
 
- 2) Set Compiler Compliance Level to 1.6
-    a) Right click on the project -> Properties.
-    b) Select "Java Compiler" from the lefthand side.
+ 3) Set Compiler Compliance Level to 1.6
+    a) Right click on the project -> Properties
+    b) Select "Java Compiler" from the lefthand side
     c) Set Compiler Compliance level to 1.6
