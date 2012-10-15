@@ -55,7 +55,7 @@ public class StreamArrayAdapter extends ArrayAdapter<StreamEntry> {
     
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-                
+        
         View view = convertView;
         if (view == null)
         {
@@ -71,29 +71,40 @@ public class StreamArrayAdapter extends ArrayAdapter<StreamEntry> {
         StreamEntry whoochEntry = mData.get(position);
         
         ImageView iv1 = (ImageView) view.findViewById(R.id.entry_whooch_image);
-        // TODO: figure out what's up with this preloading
-        //UrlImageViewHelper.setUrlDrawable(iv1, whoochEntry.whoochImageUriLarge, R.drawable.ic_whooch_transparent);
-        UrlImageViewHelper.setUrlDrawable(iv1, whoochEntry.whoochImageUriLarge);
-        
         TextView tv1 = (TextView) view.findViewById(R.id.entry_whooch_title);
         if (mIsSingleWhooch) {
             tv1.setVisibility(View.GONE);
+            
+
+            // TODO: figure out what's up with this preloading
+            //UrlImageViewHelper.setUrlDrawable(iv1, whoochEntry.whoochImageUriLarge, R.drawable.ic_whooch_transparent);
+            UrlImageViewHelper.setUrlDrawable(iv1, whoochEntry.userImageUriLarge);
         } else {
             tv1.setText(whoochEntry.whoochName);
+            
+            // TODO: figure out what's up with this preloading
+            //UrlImageViewHelper.setUrlDrawable(iv1, whoochEntry.whoochImageUriLarge, R.drawable.ic_whooch_transparent);
+            UrlImageViewHelper.setUrlDrawable(iv1, whoochEntry.whoochImageUriLarge);
         }
         
         TextView tv2 = (TextView) view.findViewById(R.id.entry_posted_user);
         tv2.setText(whoochEntry.userName);
         
         TextView tv3 = (TextView) view.findViewById(R.id.entry_whooch_content);
-        UrlImageGetter imageGetter = new UrlImageGetter(tv3, mContext);
+        UrlImageGetter imageGetter = new UrlImageGetter(tv3, mContext); 
+        
         Spanned htmlSpan = Html.fromHtml(whoochEntry.content.replaceAll(">\\s+<", "><"), imageGetter, null);
+       
+        while(imageGetter.isImageLoaded())
+        {
+        }
         tv3.setText(htmlSpan);
 
         if (getItemViewType(position) == TYPE_FEEDBACK) {
             
             TextView tv5 = (TextView) view.findViewById(R.id.entry_feedback_content);
             imageGetter = new UrlImageGetter(tv5, mContext);
+            
             htmlSpan = Html.fromHtml(whoochEntry.feedbackInfo.content.replaceAll(">\\s+<", "><"), imageGetter, null);
             tv5.setText(htmlSpan);
             
@@ -105,6 +116,18 @@ public class StreamArrayAdapter extends ArrayAdapter<StreamEntry> {
         
         TextView tv4 = (TextView) view.findViewById(R.id.entry_whooch_foot);
         tv4.setText(WhoochHelperFunctions.toRelativeTime(Long.parseLong(whoochEntry.timestamp)));
+        
+        if(whoochEntry.image.equals("null"))
+        {
+        	ImageView iv3 = (ImageView) view.findViewById(R.id.imagePicture);
+        	iv3.setVisibility(View.GONE);
+        }
+        
+        if(!whoochEntry.reactionType.equals("whooch"))
+        {
+        	ImageView iv4 = (ImageView) view.findViewById(R.id.imagePlus);
+        	iv4.setVisibility(View.GONE);
+        }
         
         return view;
     }

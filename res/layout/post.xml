@@ -97,11 +97,12 @@
         android:layout_height="wrap_content" >
 
         <!-- Post, Feedback -->
-        <Button
-            android:id="@+id/post_camera_button"
+
+        <ImageButton
+            android:id="@+id/imageButton1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Camera" />
+            android:src="@android:drawable/ic_menu_camera" />
 
         <TextView
             android:id="@+id/post_char_count"

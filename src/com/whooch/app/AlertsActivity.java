@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.whooch.app.helpers.ActionBarHelper;
@@ -36,7 +37,7 @@ public class AlertsActivity extends SherlockListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.alerts);
         
-        ActionBarHelper.setupActionBar(getSupportActionBar(), new ActionBarHelper.TabListener(getApplicationContext()), 3);
+        ActionBarHelper.setupActionBar(getSupportActionBar(), new ActionBarHelper.TabListener(getApplicationContext()), 4);
         
         mAdapter = new AlertsArrayAdapter(this, mAlertsArray);
         setListAdapter(mAdapter);
@@ -46,7 +47,7 @@ public class AlertsActivity extends SherlockListActivity {
     public void onResume() {
         super.onResume();
         
-        ActionBarHelper.selectTab(getSupportActionBar(), 3);
+        ActionBarHelper.selectTab(getSupportActionBar(), 4);
         
         WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new AlertsInitiate(), true);
         task.execute();

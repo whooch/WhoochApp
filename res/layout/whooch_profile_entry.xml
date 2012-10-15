@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="3dip"
+        android:layout_marginTop="3dip"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/wprofile_whoochimage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_launcher" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/wprofile_whoochname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Whooch Name"
+                android:textColor="@color/darkblue"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/wprofile_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Description" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dip"
+        android:layout_marginLeft="3dip"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
+            android:orientation="vertical" >
+            
+            <TextView
+                android:id="@+id/wprofile_leader_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Leader"
+                android:textColor="@color/gray1" />
+
+            <TextView
+                android:id="@+id/wprofile_leader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Leader"
+                android:textColor="@color/darkblue"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/wprofile_inviteuser"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Invite" 
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/wprofile_updatephoto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Update Photo" 
+        android:visibility="gone"/>
+    
+    <Button
+        android:id="@+id/wprofile_trailwhooch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Trail Whooch" 
+        android:visibility="gone"/>
+
+    
+</LinearLayout>

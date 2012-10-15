@@ -18,6 +18,8 @@ import android.widget.TabHost;
 import android.widget.TabHost.TabContentFactory;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.helpers.ActionBarHelper;
 import com.whooch.app.helpers.Settings;
@@ -44,6 +46,24 @@ public class ListsActivity extends SherlockActivity {
     private Button mLeadingButton;
     private Button mContributingButton;
     private Button mTrailingButton;
+    
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+
+	//	SubMenu sub = menu.addSubMenu("Settings");
+	//	sub.setIcon(R.drawable.abs__ic_menu_moreoverflow_holo_dark);
+
+		menu.add(Menu.NONE, 1, 0, "Leading")
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+		menu.add(Menu.NONE, 2, 0, "Contributing")
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		
+		menu.add(Menu.NONE, 3, 0, "Trailing")
+		.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		
+		return true;
+	}
     
     @Override
     public void onCreate(Bundle savedInstanceState) {

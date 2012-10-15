@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_weight="1.0"
-        android:text="Loading More Updates"
+        android:text="Loading"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </LinearLayout>

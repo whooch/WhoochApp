@@ -26,9 +26,16 @@ public class StreamEntry {
     public String whoochImage = null;
     public String whoochName = null;
     public String whoochNumber = null;
-    public FeedbackInfo feedbackInfo = null;
+    public FeedbackEntry feedbackInfo = null;
     
     // derived attributes
+    
+    public String userImageUriSmall = null;
+    public String userImageUriMedium = null;
+    public String userImageUriLarge = null;
+    
+    public String userImageUriDefault = null;
+    
     public String whoochImageUriSmall = null;
     public String whoochImageUriMedium = null;
     public String whoochImageUriLarge = null;
@@ -133,10 +140,35 @@ public class StreamEntry {
         // get feedback info if this post is a reaction
         if (!reactionTo.equals("null")) {
             try {
-                feedbackInfo = new FeedbackInfo(json.getJSONObject("feedbackInfo"), windowMgr);
+                feedbackInfo = new FeedbackEntry(json.getJSONObject("feedbackInfo"), windowMgr);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
+        
+        // determine the URLs for the user image
+        if (userImage != null && userId != null) {
+            if (userImage.equals("defaultUser.png")) {
+                userImageUriSmall = Settings.cdnUrl + "s_" + userImage;
+                userImageUriMedium = Settings.cdnUrl + "m_" + userImage;
+                userImageUriLarge = Settings.cdnUrl + "l_" + userImage;
+            } else {
+                userImageUriSmall = Settings.cdnUrl + "u" + userId + "_s" + userImage;
+                userImageUriMedium = Settings.cdnUrl + "u" + userId + "_m" + userImage;
+                userImageUriLarge = Settings.cdnUrl + "u" + userId + "_l" + userImage;
+            }
+        }
+        
+        // determine proper image to use based on the current screen resolution
+        DisplayMetrics metrics = new DisplayMetrics();
+        windowMgr.getDefaultDisplay().getMetrics(metrics);
+        switch(metrics.densityDpi){
+        case DisplayMetrics.DENSITY_LOW:
+            userImageUriDefault = userImageUriSmall;
+        case DisplayMetrics.DENSITY_MEDIUM:
+            userImageUriDefault = userImageUriMedium;
+        case DisplayMetrics.DENSITY_HIGH:
+            userImageUriDefault = userImageUriLarge;
         }
         
         // determine the URLs for the whooch image
@@ -153,7 +185,7 @@ public class StreamEntry {
         }
         
         // determine proper image to use based on the current screen resolution
-        DisplayMetrics metrics = new DisplayMetrics();
+
         windowMgr.getDefaultDisplay().getMetrics(metrics);
         switch(metrics.densityDpi){
         case DisplayMetrics.DENSITY_LOW:

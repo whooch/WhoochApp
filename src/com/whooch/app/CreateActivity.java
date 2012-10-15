@@ -28,98 +28,115 @@ import com.whooch.app.helpers.WhoochApiCallInterface;
 import com.whooch.app.helpers.WhoochApiCallTask;
 
 public class CreateActivity extends SherlockActivity {
-    
-    private EditText mWhoochNameText;
-    private Spinner mSpinner;
-    private Button mSubmitButton;
-    
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.create);
-        
-        ActionBarHelper.setupActionBar(getSupportActionBar(), new ActionBarHelper.TabListener(getApplicationContext()), 2);
-    
-        mWhoochNameText = (EditText) findViewById(R.id.create_whooch_name);
-        mSpinner = (Spinner) findViewById(R.id.create_spinner);
-        
-        mSubmitButton = (Button) findViewById(R.id.create_button);
-        mSubmitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new CreateWhooch(), true);
-                task.execute();
-            }
-        });
-    }
-    
-    @Override
-    public void onResume() {
-        super.onResume();
 
-        ActionBarHelper.selectTab(getSupportActionBar(), 2);
-    }
-    
-    private Context getActivityContext() {
-        return this;
-    }
-    
-    private class CreateWhooch implements WhoochApiCallInterface {
-        
-        private String mResponseString = null;
-                
-        public HttpRequestBase getHttpRequest() {
-            HttpPost request = new HttpPost(Settings.apiUrl + "/whooch");
-            
-            // Add data
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-            nameValuePairs.add(new BasicNameValuePair("action", "add"));
-            nameValuePairs.add(new BasicNameValuePair("whoochName", mWhoochNameText.getText().toString()));
-            nameValuePairs.add(new BasicNameValuePair("type", mSpinner.getSelectedItem().toString().toLowerCase()));
-            try {
-                request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                // TODO error handling
-            }
-            
-            return request;
-        }
-        
-        public void handleResponse(String responseString) {
-            mResponseString = responseString;
-        }
-        
-        public void postExecute(int statusCode) {
-            
-            if (statusCode == 404) {
-                Toast.makeText(getActivityContext(), "You already have a whooch by that name", Toast.LENGTH_LONG).show();
-                return;
-            } else if (statusCode == 409) {
-                Toast.makeText(getActivityContext(), "Whooch names can only contain letters, numbers, and whitespace", Toast.LENGTH_LONG).show();
-                return;
-            }
+	private EditText mWhoochNameText;
+	private Spinner mSpinner;
+	private Button mSubmitButton;
 
-            if (!mResponseString.equals("null")) {                
-                String createdWhoochId = null;
-                try {
-                    JSONObject jsonObject = new JSONObject(mResponseString);
-                    createdWhoochId = jsonObject.getString("whoochId");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    // TODO: error handling
-                }
-                
-                if (createdWhoochId != null) {
-                    Intent i = new Intent(getApplicationContext(), WhoochActivity.class);
-                    i.putExtra("WHOOCH_ID", createdWhoochId);
-                    startActivity(i);
-                } else {
-                    // TODO: error handling
-                }
-            } else {
-                // TODO: error handling
-            }
-        }
-    }
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.create);
+
+		ActionBarHelper.setupActionBar(getSupportActionBar(),
+				new ActionBarHelper.TabListener(getApplicationContext()), 1);
+
+		mWhoochNameText = (EditText) findViewById(R.id.create_whooch_name);
+		mSpinner = (Spinner) findViewById(R.id.create_spinner);
+
+		mSubmitButton = (Button) findViewById(R.id.create_button);
+		mSubmitButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				if(mWhoochNameText.getText().toString().length() != 0)
+				{	
+					WhoochApiCallTask task = new WhoochApiCallTask(
+					getActivityContext(), new CreateWhooch(), true);
+					task.execute();
+				}
+			}
+		});
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		ActionBarHelper.selectTab(getSupportActionBar(), 1);
+	}
+
+	private Context getActivityContext() {
+		return this;
+	}
+
+	private class CreateWhooch implements WhoochApiCallInterface {
+
+		private String mResponseString = null;
+
+		public HttpRequestBase getHttpRequest() {
+
+				HttpPost request = new HttpPost(Settings.apiUrl + "/whooch");
+
+				// Add data
+				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+				nameValuePairs.add(new BasicNameValuePair("action", "add"));
+				nameValuePairs.add(new BasicNameValuePair("whoochName",
+						mWhoochNameText.getText().toString()));
+				nameValuePairs.add(new BasicNameValuePair("type", mSpinner
+						.getSelectedItem().toString().toLowerCase()));
+				
+			
+				
+				try {
+					request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+					// TODO error handling
+				}
+
+				return request;
+		}
+
+		public void handleResponse(String responseString) {
+			mResponseString = responseString;
+		}
+
+		public void postExecute(int statusCode) {
+
+			if (statusCode == 404) {
+				Toast.makeText(getActivityContext(),
+						"You already have a whooch by that name",
+						Toast.LENGTH_LONG).show();
+				return;
+			} else if (statusCode == 409) {
+				Toast.makeText(
+						getActivityContext(),
+						"Whooch names can only contain letters, numbers, and whitespace",
+						Toast.LENGTH_LONG).show();
+				return;
+			}
+
+			if (!mResponseString.equals("null")) {
+				String createdWhoochId = null;
+				try {
+					JSONObject jsonObject = new JSONObject(mResponseString);
+					createdWhoochId = jsonObject.getString("whoochId");
+				} catch (JSONException e) {
+					e.printStackTrace();
+					// TODO: error handling
+				}
+
+				if (createdWhoochId != null) {
+					Intent i = new Intent(getApplicationContext(),
+							WhoochActivity.class);
+					i.putExtra("WHOOCH_ID", createdWhoochId);
+					startActivity(i);
+				} else {
+					// TODO: error handling
+				}
+			} else {
+				// TODO: error handling
+			}
+		}
+	}
 }

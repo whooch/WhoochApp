@@ -27,7 +27,8 @@ import android.view.View;
 public class UrlImageGetter implements ImageGetter {
     Context c;
     View container;
-
+    private boolean mImageLoaded = false;
+    
     /***
      * Construct the URLImageGetter which will execute AsyncTask and refresh the container
      * @param t
@@ -36,6 +37,11 @@ public class UrlImageGetter implements ImageGetter {
     public UrlImageGetter(View t, Context c) {
         this.c = c;
         this.container = t;
+    }
+    
+    public boolean isImageLoaded()
+    {
+    	return mImageLoaded;
     }
 
     public Drawable getDrawable(String source) {
@@ -59,7 +65,7 @@ public class UrlImageGetter implements ImageGetter {
         // the drawable that you need to set, you could set the initial drawing
         // with the loading image if you need to
         protected Drawable drawable;
-
+        
         @Override
         public void draw(Canvas canvas) {
             // override the draw to facilitate refresh function later
@@ -85,15 +91,16 @@ public class UrlImageGetter implements ImageGetter {
         @Override
         protected void onPostExecute(Drawable result) {
             // set the correct bound according to the result from HTTP call
-            urlDrawable.setBounds(0, 0, 0 + result.getIntrinsicWidth(), 0 
+           urlDrawable.setBounds(0, 0, 20 + result.getIntrinsicWidth(), 20 
                     + result.getIntrinsicHeight()); 
-
+     
             // change the reference of the current drawable to the result
             // from the HTTP call
             urlDrawable.drawable = result;
 
             // redraw the image by invalidating the container
             UrlImageGetter.this.container.invalidate();
+            mImageLoaded = true;
         }
 
         /***
@@ -116,8 +123,7 @@ public class UrlImageGetter implements ImageGetter {
                 }
             }
             
-            drawable.setBounds(0, 0, 0 + drawable.getIntrinsicWidth(), 0 
-                    + drawable.getIntrinsicHeight()); 
+            drawable.setBounds(0, 0, 30, 30);//drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()); 
             return drawable;
         }
 

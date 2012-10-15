@@ -23,14 +23,6 @@
         android:layout_marginTop="10dip"
         android:orientation="horizontal" >
 
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:text="Whooch Type"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
         <Spinner
             android:id="@+id/create_spinner"
             android:layout_width="match_parent"
