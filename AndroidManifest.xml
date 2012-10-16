@@ -7,6 +7,7 @@
     <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="15" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     
     <application 
         android:icon="@drawable/ic_launcher"
@@ -22,15 +23,24 @@
             </intent-filter>
         </activity>
         
+        <activity android:name=".StreamActivity"></activity>
+        <activity android:name=".WhoochActivity"></activity>
+        <activity android:name=".WhoochProfileActivity"></activity>
+        <activity android:name=".InviteUserActivity"></activity>
+        <activity android:name=".FeedbackActivity"></activity>
+        <activity android:name=".ReactionsActivity"></activity>
+        <activity android:name=".UserProfileActivity"></activity>
+        <activity android:name=".PushSettingsActivity"></activity>
         <activity android:name=".AlertsActivity"></activity>
         <activity android:name=".CreateActivity"></activity>
         <activity android:name=".ListsActivity"></activity>
+        <activity android:name=".SearchActivity"></activity>
+        <activity android:name=".RegisterActivity"></activity>
         <activity android:name=".PostFeedbackActivity"></activity>
         <activity android:name=".PostReactionActivity"></activity>
         <activity android:name=".PostStandardActivity"></activity>
-        <activity android:name=".StreamActivity"></activity>
-        <activity android:name=".WhoochActivity"></activity>
-        
+        <activity android:name=".UploadPhotoActivity"></activity>
+        <activity android:name=".ViewPhotoActivity"></activity>
     </application>
 
 </manifest>

@@ -7,11 +7,11 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="feedback"
+        android:contentDescription="stream"
         android:paddingTop="5dip"
         android:paddingBottom="2dip"
         android:paddingLeft="8dip"
-        android:src="@drawable/feedback_tab" />
+        android:src="@drawable/ic_feedback_w" />
  
     <TextView
         android:layout_width="wrap_content"

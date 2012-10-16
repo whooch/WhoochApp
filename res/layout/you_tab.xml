@@ -7,10 +7,10 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="you"
+        android:contentDescription="stream"
         android:paddingTop="5dip"
         android:paddingBottom="2dip"
-        android:src="@drawable/you_tab" />
+        android:src="@drawable/ic_profile_w" />
  
     <TextView
         android:layout_width="wrap_content"
