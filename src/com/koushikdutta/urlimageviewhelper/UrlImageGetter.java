@@ -27,7 +27,6 @@ import android.view.View;
 public class UrlImageGetter implements ImageGetter {
     Context c;
     View container;
-    private boolean mImageLoaded = false;
     
     /***
      * Construct the URLImageGetter which will execute AsyncTask and refresh the container
@@ -38,15 +37,15 @@ public class UrlImageGetter implements ImageGetter {
         this.c = c;
         this.container = t;
     }
-    
-    public boolean isImageLoaded()
-    {
-    	return mImageLoaded;
-    }
 
     public Drawable getDrawable(String source) {
         URLDrawable urlDrawable = new URLDrawable();
-
+        
+        // NOTE: the bounds are currently hardcoded to match the size of the
+        //       image that will be displayed inline.  If the image size
+        //       changes the bounds values should be changed as well.
+        urlDrawable.setBounds(0, 0, 19, 19);
+        
         // get the actual source
         ImageGetterAsyncTask asyncTask = 
             new ImageGetterAsyncTask( urlDrawable);
@@ -91,16 +90,15 @@ public class UrlImageGetter implements ImageGetter {
         @Override
         protected void onPostExecute(Drawable result) {
             // set the correct bound according to the result from HTTP call
-           urlDrawable.setBounds(0, 0, 20 + result.getIntrinsicWidth(), 20 
+           urlDrawable.setBounds(0, 0, 0 + result.getIntrinsicWidth(), 0 
                     + result.getIntrinsicHeight()); 
-     
+           
             // change the reference of the current drawable to the result
             // from the HTTP call
             urlDrawable.drawable = result;
-
+          
             // redraw the image by invalidating the container
             UrlImageGetter.this.container.invalidate();
-            mImageLoaded = true;
         }
 
         /***
@@ -123,7 +121,7 @@ public class UrlImageGetter implements ImageGetter {
                 }
             }
             
-            drawable.setBounds(0, 0, 30, 30);//drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()); 
+            drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()); 
             return drawable;
         }
 

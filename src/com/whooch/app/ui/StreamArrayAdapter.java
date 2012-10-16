@@ -4,9 +4,6 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
-import android.text.Html;
-import android.text.Spanned;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +11,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.koushikdutta.urlimageviewhelper.UrlImageGetter;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.R;
 import com.whooch.app.helpers.WhoochHelperFunctions;
@@ -92,22 +88,12 @@ public class StreamArrayAdapter extends ArrayAdapter<StreamEntry> {
         tv2.setText(whoochEntry.userName);
         
         TextView tv3 = (TextView) view.findViewById(R.id.entry_whooch_content);
-        UrlImageGetter imageGetter = new UrlImageGetter(tv3, mContext); 
-        
-        Spanned htmlSpan = Html.fromHtml(whoochEntry.content.replaceAll(">\\s+<", "><"), imageGetter, null);
-       
-        while(imageGetter.isImageLoaded())
-        {
-        }
-        tv3.setText(htmlSpan);
+        tv3.setText(WhoochHelperFunctions.getSpannedFromHtmlContent(whoochEntry.content, tv3, mContext));
 
         if (getItemViewType(position) == TYPE_FEEDBACK) {
             
-            TextView tv5 = (TextView) view.findViewById(R.id.entry_feedback_content);
-            imageGetter = new UrlImageGetter(tv5, mContext);
-            
-            htmlSpan = Html.fromHtml(whoochEntry.feedbackInfo.content.replaceAll(">\\s+<", "><"), imageGetter, null);
-            tv5.setText(htmlSpan);
+            TextView tv5 = (TextView) view.findViewById(R.id.entry_feedback_content);            
+            tv5.setText(WhoochHelperFunctions.getSpannedFromHtmlContent(whoochEntry.feedbackInfo.content, tv5, mContext));
             
             ImageView iv2 = (ImageView) view.findViewById(R.id.entry_feedback_user_image);
             // TODO: figure out what's up with this preloading

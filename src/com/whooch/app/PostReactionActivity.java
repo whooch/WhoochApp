@@ -2,32 +2,25 @@ package com.whooch.app;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.message.BasicNameValuePair;
 
 import android.content.Intent;
 import android.graphics.Bitmap.CompressFormat;
 import android.os.Bundle;
-import android.text.Html;
-import android.text.Spanned;
 import android.view.View;
 import android.widget.Toast;
 
-import com.koushikdutta.urlimageviewhelper.UrlImageGetter;
 import com.whooch.app.helpers.ActionBarHelper;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
 import com.whooch.app.helpers.WhoochApiCallTask;
+import com.whooch.app.helpers.WhoochHelperFunctions;
 import com.whooch.app.json.ContributingEntry;
 
 public class PostReactionActivity extends PostBaseActivity {
@@ -82,9 +75,8 @@ public class PostReactionActivity extends PostBaseActivity {
                finish();
         }
         
-        UrlImageGetter imageGetter = new UrlImageGetter(mPostText, getActivityContext());
-        Spanned htmlSpan = Html.fromHtml(mContentExtra.replaceAll(">\\s+<", "><"), imageGetter, null);
-        mReactingToText.setText(htmlSpan);
+        mReactingToText.setText(WhoochHelperFunctions.getSpannedFromHtmlContent(mContentExtra, mPostText, getActivityContext()));
+
         mPostText.setText(">" + mUserNameExtra + " ");
         mPostText.setSelection(mPostText.getText().length());
     }

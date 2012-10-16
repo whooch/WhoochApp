@@ -27,8 +27,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.Html;
-import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,7 +39,6 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.koushikdutta.urlimageviewhelper.UrlImageGetter;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.helpers.ActionBarHelper;
 import com.whooch.app.helpers.Settings;
@@ -605,16 +602,11 @@ public class ReactionsActivity extends SherlockListActivity implements
 								.findViewById(R.id.entry_posted_userA);
 						tv2A.setText(entry.userName);
 
-						TextView tv3A = (TextView) view
+            	        TextView tv3A = (TextView) view
 								.findViewById(R.id.entry_whooch_contentA);
-						UrlImageGetter imageGetter = new UrlImageGetter(tv3A,
-								getActivityContext());
-
-						Spanned htmlSpan = Html.fromHtml(
-								entry.content.replaceAll(">\\s+<", "><"),
-								imageGetter, null);
-
-						tv3A.setText(htmlSpan);
+            	        tv3A.setText(WhoochHelperFunctions
+								.getSpannedFromHtmlContent(entry.content,
+										tv3A, getActivityContext()));
 
 						TextView tv4A = (TextView) view
 								.findViewById(R.id.entry_whooch_footA);
@@ -634,16 +626,11 @@ public class ReactionsActivity extends SherlockListActivity implements
 								.findViewById(R.id.entry_posted_userB);
 						tv2B.setText(mShowConvoCurrentUpdate.userName);
 
-						TextView tv3B = (TextView) view
+            	        TextView tv3B = (TextView) view
 								.findViewById(R.id.entry_whooch_contentB);
-						imageGetter = new UrlImageGetter(tv3B,
-								getActivityContext());
-
-						htmlSpan = Html.fromHtml(
-								mShowConvoCurrentUpdate.content.replaceAll(
-										">\\s+<", "><"), imageGetter, null);
-
-						tv3B.setText(htmlSpan);
+            	        tv3B.setText(WhoochHelperFunctions
+								.getSpannedFromHtmlContent(mShowConvoCurrentUpdate.content,
+										tv3B, getActivityContext()));
 
 						TextView tv4B = (TextView) view
 								.findViewById(R.id.entry_whooch_footB);

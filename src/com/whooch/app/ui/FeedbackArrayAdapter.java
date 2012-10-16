@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
-import android.text.Html;
-import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +11,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.koushikdutta.urlimageviewhelper.UrlImageGetter;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.R;
 import com.whooch.app.helpers.WhoochHelperFunctions;
@@ -56,9 +53,7 @@ public class FeedbackArrayAdapter extends ArrayAdapter<FeedbackEntry> {
         tv2.setText(feedbackEntry.userName);
         
         TextView tv3 = (TextView) view.findViewById(R.id.entry_whooch_content);
-        UrlImageGetter imageGetter = new UrlImageGetter(tv3, mContext);
-        Spanned htmlSpan = Html.fromHtml(feedbackEntry.content.replaceAll(">\\s+<", "><"), imageGetter, null);
-        tv3.setText(htmlSpan);
+        tv3.setText(WhoochHelperFunctions.getSpannedFromHtmlContent(feedbackEntry.content, tv3, mContext));
         
         TextView tv4 = (TextView) view.findViewById(R.id.entry_whooch_foot);
         tv4.setText(WhoochHelperFunctions.toRelativeTime(Long.parseLong(feedbackEntry.timestamp)));

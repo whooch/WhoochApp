@@ -1,6 +1,13 @@
 package com.whooch.app.helpers;
 
+import android.content.Context;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Base64;
+import android.widget.TextView;
+
+import com.koushikdutta.urlimageviewhelper.UrlImageGetter;
+import com.whooch.app.R;
 
 public class WhoochHelperFunctions {
 	
@@ -53,5 +60,15 @@ public class WhoochHelperFunctions {
 		}
 
 		return delta + " " + units + " ago";
+	}
+	
+	public static Spanned getSpannedFromHtmlContent(String content, TextView tv, Context ctx)
+	{
+        String strippedContent = content.replaceAll(">\\s+<", "><");
+        String styledContent = strippedContent.replaceAll(
+        		"<a class=\"highlightedUser\"(.+)</a>", 
+        		"<font color=\"#00639F\"><a class=\"highlightedUser\"$1</a></font>");
+        UrlImageGetter imageGetter = new UrlImageGetter(tv, ctx);
+        return Html.fromHtml(styledContent, imageGetter, null);
 	}
 }
