@@ -23,4 +23,6 @@
    <color name="white">#FFFFFF</color>
    <color name="black">#000000</color>
    
+   <color name="whoochblue">#00639F</color> <!-- start button gradient -->
+   
 </resources>

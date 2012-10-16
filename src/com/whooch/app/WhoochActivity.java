@@ -1,5 +1,12 @@
 package com.whooch.app;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +32,8 @@ import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -74,6 +79,8 @@ public class WhoochActivity extends SherlockListActivity implements OnScrollList
     private String mWhoochId;
     private String mWhoochName;
     private String mWhoochImage;
+    
+    private boolean mIsContributor = false;
 
     View mLoadingFooterView;
     
@@ -89,12 +96,50 @@ public class WhoochActivity extends SherlockListActivity implements OnScrollList
 		menu.add(Menu.NONE, 2, 0, "Search").setIcon(android.R.drawable.ic_menu_search)
 				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		
-		menu.add(Menu.NONE, 3, 0, "Create").setIcon(android.R.drawable.ic_input_add)
+		menu.add(Menu.NONE, 3, 0, "Options").setIcon(android.R.drawable.ic_dialog_info)
 		.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		
 		return true;
 	}
     
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		Intent i = null;
+		switch (item.getItemId()) {
+		case 1:
+			if(mIsContributor)
+			{
+				i = new Intent(getActivityContext(), PostStandardActivity.class);
+	            i.putExtra("WHOOCH_ID", mWhoochId);
+	            i.putExtra("WHOOCH_IMAGE", mWhoochImage);
+	            i.putExtra("WHOOCH_NAME", mWhoochName);
+	            i.putExtra("UPDATE_TYPE", "whooch");
+				startActivity(i);
+			}
+			else
+			{
+                i = new Intent(getApplicationContext(), PostFeedbackActivity.class);
+                i.putExtra("WHOOCH_ID", mWhoochId);
+                i.putExtra("WHOOCH_IMAGE", mWhoochImage);
+                i.putExtra("WHOOCH_NAME", mWhoochName);
+                startActivity(i);
+			}
+			return true;
+		case 2:
+			i = new Intent(getActivityContext(), SearchActivity.class);
+			startActivity(i);
+			return true;
+		case 3:
+        	i = new Intent(getActivityContext(), WhoochProfileActivity.class);
+        	i.putExtra("WHOOCH_ID", mWhoochId);
+        	startActivity(i);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+
+	}
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         
@@ -108,8 +153,8 @@ public class WhoochActivity extends SherlockListActivity implements OnScrollList
         mListView.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh() {
-              //  WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new WhoochGetNewUpdates(), false);
-              //  task.execute();
+                WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new WhoochGetNewUpdates(), false);
+                task.execute();
             }
         });
         
@@ -124,26 +169,94 @@ public class WhoochActivity extends SherlockListActivity implements OnScrollList
             finish();
         }
         
-    	Button ibtn1 = (Button) findViewById(R.id.whooch_options);
-    	if(ibtn1 != null)
-    	{
-        	//unable to find ID - let it go for now
-            ibtn1.setOnClickListener(getWhoochProfileClickListener());
-    	}
+		if (savedInstanceState == null) {
+
+			WhoochApiCallTask task = new WhoochApiCallTask(
+					getActivityContext(), new WhoochInitiate(), false);
+			task.execute();
+			
+	}
 
     }
+    
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		// Serialize state object and write it to bundle
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ObjectOutput out;
+		try {
+			out = new ObjectOutputStream(bos);
+			out.writeObject(mWhoochArray);
+			out.flush();
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		outState.putByteArray("WhoochList", bos.toByteArray());
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	protected void onRestoreInstanceState(Bundle savedState) {
+		
+		if (savedState != null) {
+
+			if (savedState.containsKey("WhoochList")) {
+
+				try {
+					
+					View loader = findViewById(R.id.main_loader);
+					if (loader != null) {
+						loader.setVisibility(View.GONE);
+					}
+					
+					ObjectInputStream objectIn = new ObjectInputStream(
+							new ByteArrayInputStream(
+									savedState.getByteArray("WhoochList")));
+					Object obj;
+					obj = objectIn.readObject();
+
+					setWhoochArray((ArrayList<StreamEntry>) obj);
+					
+	                if (mWhoochArray.size() > 0) {
+	                    mLatestWhoochNum = mWhoochArray.get(0).whoochNumber;
+	                    mOldestWhoochNum = mWhoochArray.get(mWhoochArray.size() - 1).whoochNumber;
+	                }
+					
+					mAdapter.notifyDataSetChanged();
+					mListView.onRefreshComplete();
+					mWhoochInitiated = true;
+					
+					
+				} catch (OptionalDataException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				WhoochApiCallTask task = new WhoochApiCallTask(
+						getActivityContext(), new WhoochInitiate(), false);
+				task.execute();
+			}
+		} else {
+			WhoochApiCallTask task = new WhoochApiCallTask(
+					getActivityContext(), new WhoochInitiate(), false);
+			task.execute();
+		}
+	}
+
     
     @Override
     public void onResume() {
         super.onResume();
-
-        ActionBarHelper.selectTab(getSupportActionBar(), 1);
-        
-        mWhoochInitiated = false;
-        mWhoochHasMoreUpdates = true;
-        mLoadMoreItemsInProgress = false;
-        WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new WhoochInitiate(), true);
-        task.execute();
     }
     
     private Context getActivityContext() {
@@ -325,15 +438,11 @@ public class WhoochActivity extends SherlockListActivity implements OnScrollList
                         mWhoochImage = entry.whoochImageUriLarge;
                         if(entry.isContributor.equals("0"))
                         {
-                        	Button ibtn1 = (Button) findViewById(R.id.whooch_send_feedback);
-                        	ibtn1.setVisibility(View.VISIBLE);
-                            ibtn1.setOnClickListener(getSendFeedbackClickListener());
+                        	mIsContributor = false;
                         }
                         else
                         {
-                        	Button ibtn1 = (Button) findViewById(R.id.whooch_update);
-                        	ibtn1.setVisibility(View.VISIBLE);
-                        	ibtn1.setOnClickListener(getWhoochUpdateClickListener());
+                        	mIsContributor = true;
                         }
                         
                         // the newest updates are at the front of the array, so loop over forwards
@@ -463,47 +572,6 @@ public class WhoochActivity extends SherlockListActivity implements OnScrollList
             // set flag to false so onScroll method can be called again
             mLoadMoreItemsInProgress = false;
         }
-    }
-    
-    public OnClickListener getWhoochProfileClickListener(){
-        return new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            	Intent i = new Intent(v.getContext(), WhoochProfileActivity.class);
-            	i.putExtra("WHOOCH_ID", mWhoochId);
-            	v.getContext().startActivity(i);
-            }
-        };
-    	
-    }
-    
-    public OnClickListener getSendFeedbackClickListener(){
-        return new OnClickListener() {
-            @Override
-            public void onClick(View v) {            	
-                Intent i = new Intent(getApplicationContext(), PostFeedbackActivity.class);
-                i.putExtra("WHOOCH_ID", mWhoochId);
-                i.putExtra("WHOOCH_IMAGE", mWhoochImage);
-                i.putExtra("WHOOCH_NAME", mWhoochName);
-                v.getContext().startActivity(i);
-            }
-        };
-    	
-    }
-    
-    public OnClickListener getWhoochUpdateClickListener(){
-        return new OnClickListener() {
-            @Override
-            public void onClick(View v) {            	
-                Intent i = new Intent(getApplicationContext(), PostStandardActivity.class);
-                i.putExtra("WHOOCH_ID", mWhoochId);
-                i.putExtra("WHOOCH_IMAGE", mWhoochImage);
-                i.putExtra("WHOOCH_NAME", mWhoochName);
-                i.putExtra("UPDATE_TYPE", "whooch");
-                v.getContext().startActivity(i);
-            }
-        };
-    	
     }
     
  private class ShowConversation implements WhoochApiCallInterface {
@@ -639,6 +707,15 @@ public class WhoochActivity extends SherlockListActivity implements OnScrollList
         	mDeleteWhoochNumber = null;
             
         }
+    }
+    
+    private void setWhoochArray(ArrayList<StreamEntry> temp)
+    {
+    	mWhoochArray.clear();
+    	for(int i=0; i<temp.size(); i++)
+    	{
+    		mWhoochArray.add(temp.get(i));
+    	}
     }
     
 }

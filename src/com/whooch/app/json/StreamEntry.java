@@ -1,5 +1,7 @@
 package com.whooch.app.json;
 
+import java.io.Serializable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -8,9 +10,13 @@ import android.view.WindowManager;
 
 import com.whooch.app.helpers.Settings;
 
-public class StreamEntry {
+public class StreamEntry implements Serializable {
     
-    // from JSON
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1819540536319873974L;
+	// from JSON
     public String content = null;
     public String image = null;
     public String isContributor = null;

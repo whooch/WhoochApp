@@ -50,16 +50,47 @@ public class UserProfileActivity extends SherlockListActivity implements
 			menu.add(Menu.NONE, 2, 0, "Push Settings").setShowAsAction(
 					MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-			menu.add(Menu.NONE, 3, 0, "Update Photo").setShowAsAction(
+			menu.add(Menu.NONE, 3, 0, "Sign Out").setShowAsAction(
 					MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-			menu.add(Menu.NONE, 4, 0, "Sign Out").setShowAsAction(
+			menu.add(Menu.NONE, 4, 0, "Update Photo").setShowAsAction(
 					MenuItem.SHOW_AS_ACTION_ALWAYS);
 		} else {
 			menu.add(Menu.NONE, 1, 0, "Send Friend Request").setShowAsAction(
 					MenuItem.SHOW_AS_ACTION_ALWAYS);
 		}
 		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		Intent i = null;
+		switch (item.getItemId()) {
+		case 1:
+			i = new Intent(getActivityContext(), PostStandardActivity.class);
+			i.putExtra("UPDATE_TYPE", "regular");
+			startActivity(i);
+			return true;
+		case 2:
+			i = new Intent(getActivityContext(), SearchActivity.class);
+			startActivity(i);
+			return true;
+		case 3:
+			SharedPreferences settings = getActivityContext().getSharedPreferences(
+					"whooch_preferences", 0);
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putString("username", null);
+			editor.putString("userid", null);
+			editor.putString("password", null);
+			editor.commit();
+			
+			i = new Intent(getActivityContext(), LoginActivity.class);
+			startActivity(i);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+
 	}
 
 	@Override
@@ -97,7 +128,7 @@ public class UserProfileActivity extends SherlockListActivity implements
 		ActionBarHelper.selectTab(getSupportActionBar(), 4);
 
 		WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(),
-				new ProfileInitiate(), true);
+				new ProfileInitiate(), false);
 		task.execute();
 	}
 

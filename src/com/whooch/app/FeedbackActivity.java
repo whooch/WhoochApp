@@ -1,5 +1,12 @@
 package com.whooch.app;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +57,8 @@ public class FeedbackActivity extends SherlockListActivity implements
 	boolean mFeedbackHasMoreUpdates = true;
 	boolean mLoadMoreItemsInProgress = false;
 	
+	String mFeedbackType = "received";
+	
 	String mDeleteFeedbackId = null;
 
 	private int mFeedbackNextPage = 1;
@@ -69,6 +78,37 @@ public class FeedbackActivity extends SherlockListActivity implements
 				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		
 		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case 1:
+			if(mFeedbackType == "sent")
+			{
+				mFeedbackType = "received";
+				mFeedbackArray.clear();
+				mAdapter.notifyDataSetChanged();
+				WhoochApiCallTask task = new WhoochApiCallTask(
+						getActivityContext(), new FeedbackInitiate(), false);
+				task.execute();
+			}
+			return true;
+		case 2:
+			if(mFeedbackType == "received")
+			{
+				mFeedbackType = "sent";
+				mFeedbackArray.clear();
+				mAdapter.notifyDataSetChanged();
+				WhoochApiCallTask task = new WhoochApiCallTask(
+						getActivityContext(), new FeedbackInitiate(), false);
+				task.execute();
+			}
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+
 	}
 
 	@Override
@@ -93,20 +133,100 @@ public class FeedbackActivity extends SherlockListActivity implements
 
 		mAdapter = new FeedbackArrayAdapter(this, mFeedbackArray);
 		setListAdapter(mAdapter);
+		
+		if (savedInstanceState == null) {
+
+			WhoochApiCallTask task = new WhoochApiCallTask(
+					getActivityContext(), new FeedbackInitiate(), false);
+			task.execute();
+			
+		}
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		// Serialize state object and write it to bundle
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ObjectOutput out;
+		try {
+			out = new ObjectOutputStream(bos);
+			out.writeObject(mFeedbackArray);
+			out.flush();
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		outState.putByteArray("FeedbackList", bos.toByteArray());
+		outState.putString("FeedbackType", mFeedbackType);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	protected void onRestoreInstanceState(Bundle savedState) {
+		
+		if (savedState != null) {
+
+			if (savedState.containsKey("FeedbackList") && savedState.containsKey("FeedbackType")) {
+
+				try {
+					
+					View loader = findViewById(R.id.main_loader);
+					if (loader != null) {
+						loader.setVisibility(View.GONE);
+					}
+					
+					mFeedbackType = savedState.getString("FeedbackType");
+					
+					ObjectInputStream objectIn = new ObjectInputStream(
+							new ByteArrayInputStream(
+									savedState.getByteArray("FeedbackList")));
+					Object obj;
+					obj = objectIn.readObject();
+
+					setFeedbackArray((ArrayList<FeedbackEntry>) obj);
+					
+					mFeedbackInitiated = true;
+					mFeedbackNextPage++;
+
+					if (mFeedbackArray.size() < 25) {
+						mFeedbackHasMoreUpdates = false;
+					}
+
+
+				mAdapter.notifyDataSetChanged();
+				mListView.onRefreshComplete();
+					
+					
+				} catch (OptionalDataException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				WhoochApiCallTask task = new WhoochApiCallTask(
+						getActivityContext(), new FeedbackInitiate(), false);
+				task.execute();
+			}
+		} else {
+			WhoochApiCallTask task = new WhoochApiCallTask(
+					getActivityContext(), new FeedbackInitiate(), false);
+			task.execute();
+		}
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
 
-		ActionBarHelper.selectTab(getSupportActionBar(), 2);
 
-		mFeedbackInitiated = false;
-		mFeedbackHasMoreUpdates = true;
-		mLoadMoreItemsInProgress = false;
-		WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(),
-				new FeedbackInitiate(), true);
-		task.execute();
 	}
 
 	private Context getActivityContext() {
@@ -154,6 +274,8 @@ public class FeedbackActivity extends SherlockListActivity implements
 		ArrayList<String> names = new ArrayList<String>();
 		ArrayList<Runnable> handlers = new ArrayList<Runnable>();
 
+		if(mFeedbackType == "received")
+		{
 		names.add("React");
 		handlers.add(new Runnable() {
 			public void run() {
@@ -167,6 +289,7 @@ public class FeedbackActivity extends SherlockListActivity implements
                 startActivity(i);
 			}
 		});
+		}
 
 		if (!entry.image.equals("null")) {
 			names.add("View Photo");
@@ -251,7 +374,7 @@ public class FeedbackActivity extends SherlockListActivity implements
 
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl
-					+ "/feedback/1?page=0&type=user&received=true");
+					+ "/feedback/1?page=0&type=user&" + mFeedbackType + "=true");
 		}
 
 		public void handleResponse(String responseString) {
@@ -259,6 +382,7 @@ public class FeedbackActivity extends SherlockListActivity implements
 		}
 
 		public void postExecute(int statusCode) {
+
 			if (statusCode == 200) {
 				mFeedbackArray.clear();
 
@@ -308,7 +432,7 @@ public class FeedbackActivity extends SherlockListActivity implements
 
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl + "/feedback/1?page="
-					+ mFeedbackNextPage + "&type=user&received=true");
+					+ mFeedbackNextPage + "&type=user&" + mFeedbackType + "=true");
 		}
 
 		public void handleResponse(String responseString) {
@@ -372,9 +496,18 @@ public class FeedbackActivity extends SherlockListActivity implements
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 			nameValuePairs.add(new BasicNameValuePair("feedbackId",
 					mDeleteFeedbackId));
-			nameValuePairs.add(new BasicNameValuePair("type",
+			
+			if(mFeedbackType == "received")
+			{
+				nameValuePairs.add(new BasicNameValuePair("type",
 					"whooch"));
-
+			}
+			else
+			{
+				nameValuePairs.add(new BasicNameValuePair("type",
+						"user"));
+			}
+			
 			try {
 				request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 			} catch (UnsupportedEncodingException e) {
@@ -401,5 +534,14 @@ public class FeedbackActivity extends SherlockListActivity implements
 
 		}
 	}
+	
+    private void setFeedbackArray(ArrayList<FeedbackEntry> temp)
+    {
+    	mFeedbackArray.clear();
+    	for(int i=0; i<temp.size(); i++)
+    	{
+    		mFeedbackArray.add(temp.get(i));
+    	}
+    }
 
 }

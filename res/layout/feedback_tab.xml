@@ -7,16 +7,17 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="stream"
+        android:contentDescription="feedback"
         android:paddingTop="5dip"
         android:paddingBottom="2dip"
         android:paddingLeft="8dip"
-        android:src="@drawable/ic_feedback_w" />
+        android:src="@drawable/feedback_tab" />
  
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Feedback"
-        android:textSize="9sp" />
+        android:textSize="9sp"
+        android:textColor="@drawable/tab_color" />
 
 </LinearLayout>

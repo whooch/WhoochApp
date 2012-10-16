@@ -1,5 +1,7 @@
 package com.whooch.app.json;
 
+import java.io.Serializable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -8,9 +10,13 @@ import android.view.WindowManager;
 
 import com.whooch.app.helpers.Settings;
 
-public class FeedbackEntry {
+public class FeedbackEntry implements Serializable {
     
-    // from JSON
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2676283894336767994L;
+	// from JSON
     public String content = null;
     public String feedbackId = null;
     public String timestamp = null;

@@ -12,10 +12,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TabHost;
-import android.widget.TabHost.TabContentFactory;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
@@ -29,23 +26,15 @@ import com.whooch.app.json.ListsEntry;
 import com.whooch.app.ui.ListsArrayAdapter;
 
 public class ListsActivity extends SherlockActivity {
-    
-    private TabHost mTabs;
-    private ListView mLeadingListView;
-    private ListView mContributingListView;
-    private ListView mTrailingListView;
-    
-    private ListsArrayAdapter mLeadingAdapter;
-    private ListsArrayAdapter mContributingAdapter;
-    private ListsArrayAdapter mTrailingAdapter;
+
+    private ListView mWorkingListView;
     
     private ArrayList<ListsEntry> mLeadingArray = new ArrayList<ListsEntry>();
     private ArrayList<ListsEntry> mContributingArray = new ArrayList<ListsEntry>();
     private ArrayList<ListsEntry> mTrailingArray = new ArrayList<ListsEntry>();
     
-    private Button mLeadingButton;
-    private Button mContributingButton;
-    private Button mTrailingButton;
+    private ArrayList<ListsEntry> mWorkingListArray = new ArrayList<ListsEntry>();
+    private ListsArrayAdapter mWorkingAdapter = null;
     
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -60,9 +49,61 @@ public class ListsActivity extends SherlockActivity {
 				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		
 		menu.add(Menu.NONE, 3, 0, "Trailing")
-		.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		
 		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		WhoochApiCallTask task = null;
+		switch (item.getItemId()) {
+		case 1:
+			if(mLeadingArray.isEmpty())
+			{
+				mWorkingListArray.clear();
+				mWorkingAdapter.notifyDataSetChanged();
+				task = new WhoochApiCallTask(getActivityContext(), new LoadList(1), false);
+				task.execute();
+			}
+			else
+			{
+				setWhoochList(mLeadingArray);
+				mWorkingAdapter.notifyDataSetChanged();
+			}
+            return true;
+		case 2:
+			if(mContributingArray.isEmpty())
+			{
+				mWorkingListArray.clear();
+				mWorkingAdapter.notifyDataSetChanged();
+				task = new WhoochApiCallTask(getActivityContext(), new LoadList(2), false);
+				task.execute();
+			}
+			else
+			{
+				setWhoochList(mContributingArray);
+				mWorkingAdapter.notifyDataSetChanged();
+			}
+            return true;
+		case 3:
+			if(mTrailingArray.isEmpty())
+			{
+				mWorkingListArray.clear();
+				mWorkingAdapter.notifyDataSetChanged();
+				task = new WhoochApiCallTask(getActivityContext(), new LoadList(3), false);
+				task.execute();
+			}
+			else
+			{
+				setWhoochList(mTrailingArray);
+				mWorkingAdapter.notifyDataSetChanged();
+			}
+            return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+		
 	}
     
     @Override
@@ -74,117 +115,26 @@ public class ListsActivity extends SherlockActivity {
         ActionBarHelper.setupActionBar(getSupportActionBar(), new ActionBarHelper.TabListener(getApplicationContext()), 1);
         
         // set up tabs
-        mLeadingListView = (ListView) findViewById(R.id.lists_leading);
-        mLeadingAdapter = new ListsArrayAdapter(this, mLeadingArray);
-        mLeadingListView.setAdapter(mLeadingAdapter);
-        mLeadingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mWorkingListView = (ListView) findViewById(R.id.lists_main);
+        mWorkingAdapter = new ListsArrayAdapter(this, mWorkingListArray);
+        mWorkingListView.setAdapter(mWorkingAdapter);
+        mWorkingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent i = new Intent(getApplicationContext(), WhoochActivity.class);
-                i.putExtra("WHOOCH_ID", mLeadingArray.get(position).whoochId);
+                i.putExtra("WHOOCH_ID", mWorkingListArray.get(position).whoochId);
                 startActivity(i);
             }
         });
         
-        mContributingListView = (ListView) findViewById(R.id.lists_contributing);
-        mContributingAdapter = new ListsArrayAdapter(this, mContributingArray);
-        mContributingListView.setAdapter(mContributingAdapter);
-        mContributingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent i = new Intent(getApplicationContext(), WhoochActivity.class);
-                i.putExtra("WHOOCH_ID", mContributingArray.get(position).whoochId);
-                startActivity(i);
-            }
-        });
-        
-        mTrailingListView = (ListView) findViewById(R.id.lists_trailing);
-        mTrailingAdapter = new ListsArrayAdapter(this, mTrailingArray);
-        mTrailingListView.setAdapter(mTrailingAdapter);
-        mTrailingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent i = new Intent(getApplicationContext(), WhoochActivity.class);
-                i.putExtra("WHOOCH_ID", mTrailingArray.get(position).whoochId);
-                startActivity(i);
-            }
-        });
-        
-        mTabs = (TabHost) findViewById(R.id.tabhost);
-        mTabs.setup();
-        
-        TabHost.TabSpec spec = mTabs.newTabSpec("Leading");
-        spec.setIndicator("Leading");
-        spec.setContent(new TabContentFactory() {
-            public View createTabContent(String tag) {
-                WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new LoadList(1), true);
-                task.execute();
-                return mLeadingListView;
-            }
-        });
-        mTabs.addTab(spec);
-        
-        spec = mTabs.newTabSpec("Contributing");
-        spec.setIndicator("Contributing");
-        spec.setContent(new TabContentFactory() {
-            public View createTabContent(String tag) {
-                WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new LoadList(2), true);
-                task.execute();
-                return mContributingListView;
-            }
-        });
-        mTabs.addTab(spec);
-        
-        spec = mTabs.newTabSpec("Trailing");
-        spec.setIndicator("Trailing");
-        spec.setContent(new TabContentFactory() {
-            public View createTabContent(String tag) {
-                WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new LoadList(3), true);
-                task.execute();
-                return mTrailingListView;
-            }
-        });
-        mTabs.addTab(spec);
-        
-        mLeadingButton = (Button) findViewById(R.id.lists_leading_button);
-        mContributingButton = (Button) findViewById(R.id.lists_contributing_button);
-        mTrailingButton = (Button) findViewById(R.id.lists_trailing_button);
-        
-        mLeadingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mLeadingButton.setSelected(true);
-                mContributingButton.setSelected(false);
-                mTrailingButton.setSelected(false);
-                mTabs.setCurrentTab(0);
-            }
-        });
-        
-        mContributingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mLeadingButton.setSelected(false);
-                mContributingButton.setSelected(true);
-                mTrailingButton.setSelected(false);
-                mTabs.setCurrentTab(1);
-            }
-        });
-        
-        mTrailingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mLeadingButton.setSelected(false);
-                mContributingButton.setSelected(false);
-                mTrailingButton.setSelected(true);
-                mTabs.setCurrentTab(2);
-            }
-        });
+		WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new LoadList(1), false);
+		task.execute();
+       
     }
     
     @Override
     public void onResume() {
         super.onResume();
         ActionBarHelper.selectTab(getSupportActionBar(), 1);
-        mLeadingButton.setSelected(true);
-        mContributingButton.setSelected(false);
-        mTrailingButton.setSelected(false);
     }
     
     private Context getActivityContext() {
@@ -195,24 +145,20 @@ public class ListsActivity extends SherlockActivity {
         
         private String mResponseString = null;
         private int mListId;
-        private ArrayList<ListsEntry> mWorkingListArray = null;
-        private ListsArrayAdapter mWorkingAdapter = null;
+        private ArrayList<ListsEntry> mLocalArray = null;
 
         LoadList(int listId) {
             mListId = listId;
             
             switch (mListId) {
             case 1:
-                mWorkingListArray = mLeadingArray;
-                mWorkingAdapter = mLeadingAdapter;
+                mLocalArray = mLeadingArray;
                 break;
             case 2:
-                mWorkingListArray = mContributingArray;
-                mWorkingAdapter = mContributingAdapter;
+                mLocalArray = mContributingArray;
                 break;
             case 3:
-                mWorkingListArray = mTrailingArray;
-                mWorkingAdapter = mTrailingAdapter;
+                mLocalArray = mTrailingArray;
                 break;
             }
         }
@@ -233,12 +179,12 @@ public class ListsActivity extends SherlockActivity {
                 try {
                     JSONArray jsonArray = new JSONArray(mResponseString);
                     
-                    mWorkingListArray.clear();
+                    mLocalArray.clear();
                     for (int i=0; i<jsonArray.length(); i++) {
                         
                         // create the class that will be used to populate the List View
                         ListsEntry entry = new ListsEntry(jsonArray.getJSONObject(i), getWindowManager());
-                        mWorkingListArray.add(entry);
+                        mLocalArray.add(entry);
                         
                         // pre-load the image that will be displayed
                         UrlImageViewHelper.loadUrlDrawable(getApplicationContext(), entry.whoochImageUriDefault);
@@ -254,12 +200,22 @@ public class ListsActivity extends SherlockActivity {
             
             // if the list is empty, add an empty entry.  The adapter will see this and display that there
             // are no items in the list
-            if (mWorkingListArray.size() == 0) {
-                mWorkingListArray.add(new ListsEntry());
+            if (mLocalArray.size() == 0) {
+                mLocalArray.add(new ListsEntry());
             }
             
+            setWhoochList(mLocalArray);
             mWorkingAdapter.notifyDataSetChanged();
         }
+    }
+    
+    private void setWhoochList(ArrayList<ListsEntry> temp)
+    {
+    	mWorkingListArray.clear();
+    	for(int i=0; i<temp.size(); i++)
+    	{
+    		mWorkingListArray.add(temp.get(i));
+    	}
     }
 
 }

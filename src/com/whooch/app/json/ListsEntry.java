@@ -60,9 +60,15 @@ public class ListsEntry {
         
         // determine the URLs for the whooch image
         if (whoochImage != null && whoochId != null) {
-            whoochImageUriSmall = Settings.cdnUrl + "w" + whoochId + "_s" + whoochImage;
-            whoochImageUriMedium = Settings.cdnUrl + "w" + whoochId + "_m" + whoochImage;
-            whoochImageUriLarge = Settings.cdnUrl + "w" + whoochId + "_l" + whoochImage;
+            if (whoochImage.equals("defaultWhooch.png")) {
+                whoochImageUriSmall = Settings.cdnUrl + "s_" + whoochImage;
+                whoochImageUriMedium = Settings.cdnUrl + "m_" + whoochImage;
+                whoochImageUriLarge = Settings.cdnUrl + "l_" + whoochImage;
+            } else {
+                whoochImageUriSmall = Settings.cdnUrl + "w" + whoochId + "_s" + whoochImage;
+                whoochImageUriMedium = Settings.cdnUrl + "w" + whoochId + "_m" + whoochImage;
+                whoochImageUriLarge = Settings.cdnUrl + "w" + whoochId + "_l" + whoochImage;
+            }
         }
         
         // determine proper image to use based on the current screen resolution

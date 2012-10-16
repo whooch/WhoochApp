@@ -66,10 +66,14 @@ public class ListsArrayAdapter extends ArrayAdapter<ListsEntry> {
             ListsEntry listEntry = mData.get(position);
         
             ImageView iv1 = (ImageView) view.findViewById(R.id.lists_entry_whooch_image);
-            UrlImageViewHelper.setUrlDrawable(iv1, listEntry.whoochImageUriDefault);
+            UrlImageViewHelper.setUrlDrawable(iv1, listEntry.whoochImageUriLarge);
+           
             
             TextView tv1 = (TextView) view.findViewById(R.id.lists_entry_whooch_title);
             tv1.setText(listEntry.whoochName);
+            
+            TextView tv2 = (TextView) view.findViewById(R.id.lists_entry_whooch_leader);
+            tv2.setText(listEntry.leaderName);
             
             ImageView iv2 = (ImageView) view.findViewById(R.id.lists_entry_open_closed_image);
             if (listEntry.type.equals("open")) {

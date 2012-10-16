@@ -12,121 +12,147 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import com.whooch.app.R;
+
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
-
 public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
-    
-    private ProgressDialog mProgressDialog;
-    private Context mActivityContext;
-    private WhoochApiCallInterface mWhoochApiCall;
-    private boolean mShowProgressDialog;
 
-    public WhoochApiCallTask(Context ctx, WhoochApiCallInterface whoochApiCall, boolean showProgressDialog) {
-        super();
-        mActivityContext = ctx;
-        mWhoochApiCall = whoochApiCall;
-        mShowProgressDialog = showProgressDialog;
-    }
-    
-    @Override
-    protected void onPreExecute() {
-        if (mShowProgressDialog) {
-            this.mProgressDialog = ProgressDialog.show(mActivityContext, null, "loading", true);
-        }
-    }
+	private ProgressDialog mProgressDialog;
+	private Context mActivityContext;
+	private WhoochApiCallInterface mWhoochApiCall;
+	private boolean mShowProgressDialog;
 
-    @Override
-    protected Integer doInBackground(Void... params) {
-        
-        // get the http request and add authentication headers
-        HttpRequestBase httpRequest = mWhoochApiCall.getHttpRequest();
-        
-        // TESTING
-        Log.d("WhoochApiCallTask", httpRequest.getURI().toString());
-        
-        SharedPreferences settings = mActivityContext.getSharedPreferences("whooch_preferences", 0);
-        String username = settings.getString("username", null);
-        String password = settings.getString("password", null);
-        httpRequest.setHeader("Authorization", WhoochHelperFunctions.getB64Auth(username, password));
-        
-        // make the request
-        HttpClient client = new DefaultHttpClient();
-        HttpResponse response = null;
-        try {
-            response = client.execute(httpRequest);
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-        // get the response
-        int statusCode = -1;
-        String responseString = "";
-        if (response != null) {
-            statusCode = response.getStatusLine().getStatusCode();
-            
-            if (statusCode >= 200 && statusCode < 300 || statusCode == 304) {
-                InputStream content = null;
-                StringBuilder builder = new StringBuilder();
-                try {
-                    HttpEntity entity = response.getEntity();
-                    if (entity != null) {
-                        content = response.getEntity().getContent();
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(content));
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            builder.append(line);
-                        }
-                    }
-                } catch (IllegalStateException e) {
-                    e.printStackTrace();
-                    statusCode = -2;
-                    return statusCode;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    statusCode = -3;
-                    return statusCode;
-                }
-                
-                responseString = builder.toString();
-                
-                // handle the response
-                mWhoochApiCall.handleResponse(responseString);
-            }
-        }
-        
-        return statusCode;
-    }
+	public WhoochApiCallTask(Context ctx, WhoochApiCallInterface whoochApiCall,
+			boolean showProgressDialog) {
+		super();
+		mActivityContext = ctx;
+		mWhoochApiCall = whoochApiCall;
+		mShowProgressDialog = showProgressDialog;
+	}
 
-    @Override
-    protected void onPostExecute(Integer statusCode) {
+	@Override
+	protected void onPreExecute() {
+		if (mShowProgressDialog) {
+			this.mProgressDialog = ProgressDialog.show(mActivityContext, null,
+					"loading", true);
+		}
+		
+		Activity a = (Activity) mActivityContext;
+		View loader = a.findViewById(R.id.main_loader);
+		if (loader != null) {
+			loader.setVisibility(View.VISIBLE);
+		}
+	}
 
-        // execute the post execute method for this task
-        mWhoochApiCall.postExecute(statusCode);
-        
-        if (mShowProgressDialog) {
-            this.mProgressDialog.cancel();
-        }
-        
-        // do error handling
-        if (statusCode == 407 || statusCode == 400) {
-            Toast.makeText(mActivityContext, "bad user credentials, please log in again", Toast.LENGTH_LONG).show();
-            // TODO: force user back to log in screen
-        } else if (statusCode == -1) {
-            Toast.makeText(mActivityContext, "Error 37-1", Toast.LENGTH_LONG).show();
-        } else if (statusCode == -2) {
-            Toast.makeText(mActivityContext, "Error 37-2", Toast.LENGTH_LONG).show();
-        } else if (statusCode == -3) {
-            Toast.makeText(mActivityContext, "Error 37-3", Toast.LENGTH_LONG).show();
-        } else if (statusCode == -4) {
-            Toast.makeText(mActivityContext, "Error 37-4", Toast.LENGTH_LONG).show();
-        }
-    }
+	@Override
+	protected Integer doInBackground(Void... params) {
+
+		// get the http request and add authentication headers
+		HttpRequestBase httpRequest = mWhoochApiCall.getHttpRequest();
+
+		// TESTING
+		Log.d("WhoochApiCallTask", httpRequest.getURI().toString());
+
+		SharedPreferences settings = mActivityContext.getSharedPreferences(
+				"whooch_preferences", 0);
+		String username = settings.getString("username", null);
+		String password = settings.getString("password", null);
+		httpRequest.setHeader("Authorization",
+				WhoochHelperFunctions.getB64Auth(username, password));
+
+		// make the request
+		HttpClient client = new DefaultHttpClient();
+		HttpResponse response = null;
+		try {
+			response = client.execute(httpRequest);
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// get the response
+		int statusCode = -1;
+		String responseString = "";
+		if (response != null) {
+			statusCode = response.getStatusLine().getStatusCode();
+
+			if (statusCode >= 200 && statusCode < 300 || statusCode == 304) {
+				InputStream content = null;
+				StringBuilder builder = new StringBuilder();
+				try {
+					HttpEntity entity = response.getEntity();
+					if (entity != null) {
+						content = response.getEntity().getContent();
+						BufferedReader reader = new BufferedReader(
+								new InputStreamReader(content));
+						String line;
+						while ((line = reader.readLine()) != null) {
+							builder.append(line);
+						}
+					}
+				} catch (IllegalStateException e) {
+					e.printStackTrace();
+					statusCode = -2;
+					return statusCode;
+				} catch (IOException e) {
+					e.printStackTrace();
+					statusCode = -3;
+					return statusCode;
+				}
+
+				responseString = builder.toString();
+
+				// handle the response
+				mWhoochApiCall.handleResponse(responseString);
+			}
+		}
+
+		return statusCode;
+	}
+
+	@Override
+	protected void onPostExecute(Integer statusCode) {
+
+		Activity a = (Activity) mActivityContext;
+		View loader = a.findViewById(R.id.main_loader);
+		if (loader != null) {
+			loader.setVisibility(View.GONE);
+		}
+		
+		// execute the post execute method for this task
+		mWhoochApiCall.postExecute(statusCode);
+
+		if (mShowProgressDialog) {
+			this.mProgressDialog.cancel();
+		}
+
+		// do error handling
+		if (statusCode == 407 || statusCode == 400) {
+			Toast.makeText(mActivityContext,
+					"bad user credentials, please log in again",
+					Toast.LENGTH_LONG).show();
+			// TODO: force user back to log in screen
+		} else if (statusCode == -1) {
+			Toast.makeText(mActivityContext, "Error 37-1", Toast.LENGTH_LONG)
+					.show();
+		} else if (statusCode == -2) {
+			Toast.makeText(mActivityContext, "Error 37-2", Toast.LENGTH_LONG)
+					.show();
+		} else if (statusCode == -3) {
+			Toast.makeText(mActivityContext, "Error 37-3", Toast.LENGTH_LONG)
+					.show();
+		} else if (statusCode == -4) {
+			Toast.makeText(mActivityContext, "Error 37-4", Toast.LENGTH_LONG)
+					.show();
+		}
+	}
 }

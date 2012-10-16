@@ -3,29 +3,45 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical" >
-    
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dip"
-        android:layout_marginBottom="3dip" >    
+        android:layout_marginBottom="3dip"
+        android:layout_marginTop="3dip" >
+
         <ImageView
             android:id="@+id/lists_entry_whooch_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+    		android:layout_height="50dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="3dip"
             android:src="@drawable/ic_launcher" />
-    
-        <TextView
-            android:id="@+id/lists_entry_whooch_title"
+        
+        <LinearLayout
+            android:id="@+id/lists_entry_info_block"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dip"
-            android:layout_toRightOf="@id/lists_entry_whooch_image"
-            android:text="Whooch Name"
-            android:textStyle="bold" />    
+            android:layout_toRightOf="@+id/lists_entry_whooch_image"
+            android:layout_toLeftOf="@+id/lists_entry_open_closed_image"
+            android:orientation="vertical"
+            android:paddingLeft="10dip" >
+            <TextView
+                android:id="@+id/lists_entry_whooch_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Whooch Name"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/lists_entry_whooch_leader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/gray1"
+                android:text="Whooch Leader" />
+            
+        </LinearLayout>
+
         <ImageView
             android:id="@+id/lists_entry_open_closed_image"
             android:layout_width="wrap_content"
@@ -34,7 +50,6 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="10dip"
             android:src="@drawable/ic_closed_gr" />
-    
     </RelativeLayout>
 
 </LinearLayout>

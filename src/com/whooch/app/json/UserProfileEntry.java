@@ -162,23 +162,6 @@ public class UserProfileEntry {
             }
         };
     }
-    public OnClickListener getSignOutClickListener(){
-        return new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            	SharedPreferences settings = v.getContext().getSharedPreferences(
-						"whooch_preferences", 0);
-				SharedPreferences.Editor editor = settings.edit();
-				editor.putString("username", null);
-				editor.putString("userid", null);
-				editor.putString("password", null);
-				editor.commit();
-				
-            	Intent i = new Intent(v.getContext(), LoginActivity.class);
-            	v.getContext().startActivity(i);
-            }
-        };
-    }
     
     public OnClickListener getAlertsClickListener(){
         return new OnClickListener() {

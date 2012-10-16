@@ -1,5 +1,12 @@
 package com.whooch.app;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +26,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
@@ -34,7 +42,6 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.SubMenu;
 import com.koushikdutta.urlimageviewhelper.UrlImageGetter;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.helpers.ActionBarHelper;
@@ -44,10 +51,6 @@ import com.whooch.app.helpers.WhoochApiCallTask;
 import com.whooch.app.helpers.WhoochHelperFunctions;
 import com.whooch.app.json.StreamEntry;
 import com.whooch.app.ui.StreamArrayAdapter;
-
-import com.whooch.app.CreateActivity;
-import com.whooch.app.PostStandardActivity;
-import com.whooch.app.SearchActivity;
 
 import eu.erikw.PullToRefreshListView;
 import eu.erikw.PullToRefreshListView.OnRefreshListener;
@@ -82,18 +85,21 @@ public class StreamActivity extends SherlockListActivity implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
-	//	SubMenu sub = menu.addSubMenu("Settings");
-	//	sub.setIcon(R.drawable.abs__ic_menu_moreoverflow_holo_dark);
+		// SubMenu sub = menu.addSubMenu("Settings");
+		// sub.setIcon(R.drawable.abs__ic_menu_moreoverflow_holo_dark);
 
-		menu.add(Menu.NONE, 1, 0, "Update").setIcon(android.R.drawable.ic_menu_edit)
+		menu.add(Menu.NONE, 1, 0, "Update")
+				.setIcon(android.R.drawable.ic_menu_edit)
 				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-		menu.add(Menu.NONE, 2, 0, "Search").setIcon(android.R.drawable.ic_menu_search)
+		menu.add(Menu.NONE, 2, 0, "Search")
+				.setIcon(android.R.drawable.ic_menu_search)
 				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		
-		menu.add(Menu.NONE, 3, 0, "Create").setIcon(android.R.drawable.ic_input_add)
-		.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		
+
+		menu.add(Menu.NONE, 3, 0, "Create")
+				.setIcon(android.R.drawable.ic_input_add)
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 		return true;
 	}
 
@@ -102,28 +108,29 @@ public class StreamActivity extends SherlockListActivity implements
 		Intent i = null;
 		switch (item.getItemId()) {
 		case 1:
-            i = new Intent(getActivityContext(), PostStandardActivity.class);
-            i.putExtra("UPDATE_TYPE", "regular");
-            startActivity(i);
-            return true;
+			i = new Intent(getActivityContext(), PostStandardActivity.class);
+			i.putExtra("UPDATE_TYPE", "regular");
+			startActivity(i);
+			return true;
 		case 2:
-            i = new Intent(getActivityContext(), SearchActivity.class);
-            startActivity(i);
-            return true;
+			i = new Intent(getActivityContext(), SearchActivity.class);
+			startActivity(i);
+			return true;
 		case 3:
-            i = new Intent(getActivityContext(), CreateActivity.class);
-            startActivity(i);
-            return true;
+			i = new Intent(getActivityContext(), CreateActivity.class);
+			startActivity(i);
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
-		
+
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.stream);
 
 		ActionBarHelper.setupActionBar(getSupportActionBar(),
@@ -137,26 +144,108 @@ public class StreamActivity extends SherlockListActivity implements
 				WhoochApiCallTask task = new WhoochApiCallTask(
 						getActivityContext(), new StreamGetNewUpdates(), false);
 				task.execute();
-			}
+			} 
 		});
 
 		mAdapter = new StreamArrayAdapter(this, mStreamArray, false);
 		setListAdapter(mAdapter);
+		
+		ActionBarHelper.selectTab(getSupportActionBar(), 0);
 
+		if (savedInstanceState == null) {
+
+				WhoochApiCallTask task = new WhoochApiCallTask(
+						getActivityContext(), new StreamInitiate(), false);
+				task.execute();
+				
+		}
+	}
+	
+	 @Override
+	 public void onConfigurationChanged(Configuration newConfig) {
+	  // TODO Auto-generated method stub
+	  super.onConfigurationChanged(newConfig);
+	 }
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		// Serialize state object and write it to bundle
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ObjectOutput out;
+		try {
+			out = new ObjectOutputStream(bos);
+			out.writeObject(mStreamArray);
+			out.flush();
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		outState.putByteArray("StreamList", bos.toByteArray());
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	protected void onRestoreInstanceState(Bundle savedState) {
+		
+		if (savedState != null) {
+
+			if (savedState.containsKey("StreamList")) {
+
+				try {
+					
+					View loader = findViewById(R.id.main_loader);
+					if (loader != null) {
+						loader.setVisibility(View.GONE);
+					}
+					
+					ObjectInputStream objectIn = new ObjectInputStream(
+							new ByteArrayInputStream(
+									savedState.getByteArray("StreamList")));
+					Object obj;
+					obj = objectIn.readObject();
+
+					setStreamArray((ArrayList<StreamEntry>) obj);
+					
+					if (mStreamArray.size() > 0) {
+						mLatestTimestamp = mStreamArray.get(0).timestamp;
+						mOldestTimestamp = mStreamArray
+								.get(mStreamArray.size() - 1).timestamp;
+					}
+					
+					mAdapter.notifyDataSetChanged();
+					mListView.onRefreshComplete();
+					mStreamInitiated = true;
+					
+					
+				} catch (OptionalDataException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				WhoochApiCallTask task = new WhoochApiCallTask(
+						getActivityContext(), new StreamInitiate(), false);
+				task.execute();
+			}
+		} else {
+			WhoochApiCallTask task = new WhoochApiCallTask(
+					getActivityContext(), new StreamInitiate(), false);
+			task.execute();
+		}
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
 
-		ActionBarHelper.selectTab(getSupportActionBar(), 0);
-
-		mStreamInitiated = false;
-		mStreamHasMoreUpdates = true;
-		mLoadMoreItemsInProgress = false;
-		WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(),
-				new StreamInitiate(), true);
-		task.execute();
 	}
 
 	private Context getActivityContext() {
@@ -370,6 +459,7 @@ public class StreamActivity extends SherlockListActivity implements
 		public void postExecute(int statusCode) {
 
 			if (statusCode == 200) {
+
 				mStreamArray.clear();
 
 				// parse the response as JSON and update the Content Array
@@ -411,7 +501,7 @@ public class StreamActivity extends SherlockListActivity implements
 							.get(mStreamArray.size() - 1).timestamp;
 				}
 			}
-
+			
 			mAdapter.notifyDataSetChanged();
 			mListView.onRefreshComplete();
 
@@ -700,5 +790,14 @@ public class StreamActivity extends SherlockListActivity implements
 
 		}
 	}
+	
+    private void setStreamArray(ArrayList<StreamEntry> temp)
+    {
+    	mStreamArray.clear();
+    	for(int i=0; i<temp.size(); i++)
+    	{
+    		mStreamArray.add(temp.get(i));
+    	}
+    }
 
 }

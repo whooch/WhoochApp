@@ -78,9 +78,6 @@ public class UserProfileArrayAdapter extends ArrayAdapter<UserProfileEntry> {
 			Button ibtn2 = (Button) view.findViewById(R.id.profile_updatephoto);
 			ibtn2.setOnClickListener(userProfileEntry
 					.getUpdatePhotoClickListener());
-
-			Button ibtn3 = (Button) view.findViewById(R.id.profile_signout);
-			ibtn3.setOnClickListener(userProfileEntry.getSignOutClickListener());
 			
 			Button ibtn4 = (Button) view.findViewById(R.id.profile_alerts);
 			ibtn4.setOnClickListener(userProfileEntry.getAlertsClickListener());

@@ -3,7 +3,7 @@ package com.whooch.app.helpers;
 import android.util.Base64;
 
 public class WhoochHelperFunctions {
-
+	
 	public static String getB64Auth(String login, String pass) {
 		String source = login + ":" + pass;
 		//TODO:Need base64 encode for API level 7
@@ -52,6 +52,6 @@ public class WhoochHelperFunctions {
 			units += "s";
 		}
 
-		return "about " + delta + " " + units + " ago";
+		return delta + " " + units + " ago";
 	}
 }

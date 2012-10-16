@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,7 +56,7 @@ public class StreamArrayAdapter extends ArrayAdapter<StreamEntry> {
     
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        
+    	
         View view = convertView;
         if (view == null)
         {

@@ -7,16 +7,17 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="stream"
+        android:contentDescription="reactions"
         android:paddingTop="5dip"
         android:paddingBottom="2dip"
         android:paddingLeft="8dip"
-        android:src="@drawable/ic_reactions_w" />
+        android:src="@drawable/reactions_tab" />
  
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Reactions"
-        android:textSize="9sp" />
+        android:textSize="9sp"
+        android:textColor="@drawable/tab_color" />
 
 </LinearLayout>

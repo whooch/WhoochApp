@@ -4,36 +4,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     
-    <LinearLayout
+    <ProgressBar
+        android:id="@+id/main_loader"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">    
-        
-        <Button
-        android:id="@+id/whooch_options"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Whooch Options" />
-        
-        <Button
-        android:id="@+id/whooch_send_feedback"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Send Feedback"
-        android:visibility="gone" />
-        
-        <Button
-        android:id="@+id/whooch_update"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Update"
-        android:visibility="gone" />
+        android:layout_height="wrap_content" />
     
-    
-    </LinearLayout>
-    
-
-
     <eu.erikw.PullToRefreshListView
         android:id="@android:id/list"
         android:layout_width="match_parent"

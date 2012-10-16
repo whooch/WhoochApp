@@ -3,6 +3,7 @@ package com.whooch.app.helpers;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
@@ -25,9 +26,9 @@ public class ActionBarHelper {
    //     actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setTitle("Stream");
 
-        actionBar.setDisplayShowCustomEnabled(false);
-        actionBar.setDisplayShowTitleEnabled(false);
 
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayShowHomeEnabled(true);
 
         
         for (int i=0; i<TAB_NAMES.length; ++i) {
@@ -69,6 +70,7 @@ public class ActionBarHelper {
         if (actionBar.getSelectedTab().getPosition() != index) {
             Tab tab = actionBar.getTabAt(index);
             actionBar.selectTab(tab);
+            
         }
     }
     
