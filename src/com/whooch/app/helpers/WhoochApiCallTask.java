@@ -12,10 +12,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.whooch.app.R;
-
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -23,9 +20,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.whooch.app.R;
+
 public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 
-	private ProgressDialog mProgressDialog;
 	private Context mActivityContext;
 	private WhoochApiCallInterface mWhoochApiCall;
 	private boolean mShowProgressDialog;
@@ -41,15 +39,15 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 	@Override
 	protected void onPreExecute() {
 		if (mShowProgressDialog) {
-			this.mProgressDialog = ProgressDialog.show(mActivityContext, null,
-					"loading", true);
+			Activity a = (Activity) mActivityContext;
+			View loader = a.findViewById(R.id.main_loader);
+			if (loader != null) {
+				loader.setVisibility(View.VISIBLE);
+			}
 		}
 		
-		Activity a = (Activity) mActivityContext;
-		View loader = a.findViewById(R.id.main_loader);
-		if (loader != null) {
-			loader.setVisibility(View.VISIBLE);
-		}
+		mWhoochApiCall.preExecute();
+		
 	}
 
 	@Override
@@ -122,18 +120,16 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 	@Override
 	protected void onPostExecute(Integer statusCode) {
 
-		Activity a = (Activity) mActivityContext;
-		View loader = a.findViewById(R.id.main_loader);
-		if (loader != null) {
-			loader.setVisibility(View.GONE);
+		if (mShowProgressDialog) {
+			Activity a = (Activity) mActivityContext;
+			View loader = a.findViewById(R.id.main_loader);
+			if (loader != null) {
+				loader.setVisibility(View.GONE);
+			}
 		}
 		
 		// execute the post execute method for this task
 		mWhoochApiCall.postExecute(statusCode);
-
-		if (mShowProgressDialog) {
-			this.mProgressDialog.cancel();
-		}
 
 		// do error handling
 		if (statusCode == 407 || statusCode == 400) {

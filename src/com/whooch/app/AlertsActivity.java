@@ -36,7 +36,7 @@ public class AlertsActivity extends SherlockListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.alerts);
         
-        ActionBarHelper.setupActionBar(getSupportActionBar(), new ActionBarHelper.TabListener(getApplicationContext()), 4);
+        ActionBarHelper.setupActionBar(getSupportActionBar(), new ActionBarHelper.TabListener(getApplicationContext()), 3);
         
         mAdapter = new AlertsArrayAdapter(this, mAlertsArray);
         setListAdapter(mAdapter);
@@ -46,7 +46,7 @@ public class AlertsActivity extends SherlockListActivity {
     public void onResume() {
         super.onResume();
         
-        ActionBarHelper.selectTab(getSupportActionBar(), 4);
+        ActionBarHelper.selectTab(getSupportActionBar(), 3);
         
         WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new AlertsInitiate(), true);
         task.execute();
@@ -64,6 +64,10 @@ public class AlertsActivity extends SherlockListActivity {
     private class AlertsInitiate implements WhoochApiCallInterface {
         
         private String mResponseString = null;
+        
+		public void preExecute() {
+			
+		}
         
         public HttpRequestBase getHttpRequest() {
             return new HttpGet(Settings.apiUrl + "/alerts/1");
@@ -115,7 +119,7 @@ public class AlertsActivity extends SherlockListActivity {
                 // if it is null we don't mind, there just wasn't anything there
             }
             
-            // if the list is empty, add an empty entry.  The adapter will see this and display that there
+            // if the list is empty, add an empty entry. The adapter will see this and display that there
             // are no items in the list
             if (mAlertsArray.size() == 0) {
                 mAlertsArray.add(new AlertsTrailRequestEntry());
@@ -123,6 +127,7 @@ public class AlertsActivity extends SherlockListActivity {
             
             mAdapter.notifyDataSetChanged();
         }
+
     }
 
 }

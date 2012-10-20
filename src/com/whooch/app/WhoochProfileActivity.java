@@ -21,8 +21,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.whooch.app.helpers.ActionBarHelper;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
@@ -41,20 +39,11 @@ public class WhoochProfileActivity extends SherlockListActivity implements OnScr
     // Unique id counter to prevent Android from reusing the same dialog.
     int mNextDialogId = 0;
     
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-
-			menu.add(Menu.NONE, 1, 0, "Trail Whooch").setShowAsAction(
-					MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-		return true;
-	}
-    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.user_profile);
+        setContentView(R.layout.whooch_profile);
          
        ActionBarHelper.setupActionBar(getSupportActionBar(), new ActionBarHelper.TabListener(getApplicationContext()), 1);
         
@@ -117,6 +106,8 @@ public class WhoochProfileActivity extends SherlockListActivity implements OnScr
     private class ProfileInitiate implements WhoochApiCallInterface {
         
         private String mResponseString = null;
+        
+        public void preExecute() {}
         
         public HttpRequestBase getHttpRequest() {
             Intent i = getIntent();

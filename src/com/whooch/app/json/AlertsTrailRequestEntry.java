@@ -142,8 +142,13 @@ public class AlertsTrailRequestEntry extends AlertsEntry {
     }
 
     @Override
-    public String getImageUrl() {
+    public String getWhoochImageUrl() {
         return whoochImageUriDefault;
+    }
+
+    @Override
+    public String getUserImageUrl() {
+        return userImageUriDefault;
     }
 
     @Override
@@ -175,6 +180,8 @@ public class AlertsTrailRequestEntry extends AlertsEntry {
     
     private class ConfirmOpenTrailRequest implements WhoochApiCallInterface {
                 
+        public void preExecute() {}
+        
         public HttpRequestBase getHttpRequest() {
             HttpPost request = new HttpPost(Settings.apiUrl + "/whooch/starttrailingopen");
             
@@ -199,6 +206,8 @@ public class AlertsTrailRequestEntry extends AlertsEntry {
     }
     
     private class DeclineOpenTrailRequest implements WhoochApiCallInterface {
+        
+        public void preExecute() {}
         
         public HttpRequestBase getHttpRequest() {
             HttpPost request = new HttpPost(Settings.apiUrl + "/alerts/removerequest");

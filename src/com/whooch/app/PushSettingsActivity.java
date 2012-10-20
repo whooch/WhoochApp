@@ -84,6 +84,8 @@ public class PushSettingsActivity extends SherlockListActivity {
         
         private String mResponseString = null;
         
+        public void preExecute() {}
+        
         public HttpRequestBase getHttpRequest() {
         	SharedPreferences settings = getActivityContext().getSharedPreferences("whooch_preferences", 0);
         	mUserId = settings.getString("userid", null);

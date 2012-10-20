@@ -114,6 +114,8 @@ public class InviteUserActivity extends SherlockListActivity {
         
         private String mResponseString = null;
         
+        public void preExecute() {}
+        
         public HttpRequestBase getHttpRequest() {
             return new HttpGet(Settings.apiUrl + "/friends/1");
         }
@@ -156,6 +158,8 @@ public class InviteUserActivity extends SherlockListActivity {
     
     private class Invite implements WhoochApiCallInterface {
 
+        public void preExecute() {}
+        
         public HttpRequestBase getHttpRequest() {
             
             HttpPost request = new HttpPost(Settings.apiUrl + "/whooch/add/fake");

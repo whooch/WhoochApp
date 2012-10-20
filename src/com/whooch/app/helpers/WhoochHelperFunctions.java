@@ -1,19 +1,18 @@
 package com.whooch.app.helpers;
 
+import com.koushikdutta.urlimageviewhelper.UrlImageGetter;
+
 import android.content.Context;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Base64;
 import android.widget.TextView;
 
-import com.koushikdutta.urlimageviewhelper.UrlImageGetter;
-import com.whooch.app.R;
-
 public class WhoochHelperFunctions {
-	
+
 	public static String getB64Auth(String login, String pass) {
 		String source = login + ":" + pass;
-		//TODO:Need base64 encode for API level 7
+		// TODO:Need base64 encode for API level 7
 		String ret = "Basic "
 				+ Base64.encodeToString(source.getBytes(), Base64.URL_SAFE
 						| Base64.NO_WRAP);
@@ -61,14 +60,14 @@ public class WhoochHelperFunctions {
 
 		return delta + " " + units + " ago";
 	}
-	
-	public static Spanned getSpannedFromHtmlContent(String content, TextView tv, Context ctx)
-	{
-        String strippedContent = content.replaceAll(">\\s+<", "><");
-        String styledContent = strippedContent.replaceAll(
-        		"<a class=\"highlightedUser\"(.+)</a>", 
-        		"<font color=\"#00639F\"><a class=\"highlightedUser\"$1</a></font>");
-        UrlImageGetter imageGetter = new UrlImageGetter(tv, ctx);
-        return Html.fromHtml(styledContent, imageGetter, null);
+
+	public static Spanned getSpannedFromHtmlContent(String content,
+			TextView tv, Context ctx) {
+		String strippedContent = content.replaceAll(">\\s+<", "><");
+		String styledContent = strippedContent
+				.replaceAll("<a class=\"highlightedUser\"(.+?)</a>",
+						"<font color=\"#00639F\"><a class=\"highlightedUser\"$1</a></font>");
+		UrlImageGetter imageGetter = new UrlImageGetter(tv, ctx);
+		return Html.fromHtml(styledContent, imageGetter, null);
 	}
 }

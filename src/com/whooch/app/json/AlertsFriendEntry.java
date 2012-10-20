@@ -86,7 +86,12 @@ public class AlertsFriendEntry extends AlertsEntry {
     }
 
     @Override
-    public String getImageUrl() {
+    public String getWhoochImageUrl() {
+        return null;
+    }
+
+    @Override
+    public String getUserImageUrl() {
         return userImageUriDefault;
     }
 
@@ -119,6 +124,8 @@ public class AlertsFriendEntry extends AlertsEntry {
     
     private class ConfirmFriendRequest implements WhoochApiCallInterface {
                 
+        public void preExecute() {}
+        
         public HttpRequestBase getHttpRequest() {
             HttpPost request = new HttpPost(Settings.apiUrl + "/alerts/acceptfriend");
             
@@ -143,6 +150,8 @@ public class AlertsFriendEntry extends AlertsEntry {
     }
     
     private class DeclineFriendRequest implements WhoochApiCallInterface {
+        
+        public void preExecute() {}
         
         public HttpRequestBase getHttpRequest() {
             HttpPost request = new HttpPost(Settings.apiUrl + "/alerts/declinefriend");

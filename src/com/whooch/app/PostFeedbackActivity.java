@@ -2,23 +2,17 @@ package com.whooch.app;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.message.BasicNameValuePair;
 
 import android.content.Intent;
 import android.graphics.Bitmap.CompressFormat;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -27,7 +21,6 @@ import com.whooch.app.helpers.ActionBarHelper;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
 import com.whooch.app.helpers.WhoochApiCallTask;
-import com.whooch.app.json.ContributingEntry;
 
 public class PostFeedbackActivity extends PostBaseActivity {
     
@@ -41,16 +34,25 @@ public class PostFeedbackActivity extends PostBaseActivity {
         
         ActionBarHelper.setupActionBar(getSupportActionBar(), new ActionBarHelper.TabListener(getApplicationContext()), 1);
         
-        mUserSearchLayout.setVisibility(View.GONE);
-        mWhoochSelectorLayout.setVisibility(View.GONE);
-        mReactingToText.setVisibility(View.GONE);
+        mLayoutType = "feedback";
+        
+        mWhoochFeedbackLayout.setVisibility(View.VISIBLE);
 
-        mSubmitButton.setText("Send");
+        mSubmitButton.setText("Send Feedback");
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new Submit(), true);
-                task.execute();
+				if (mPostText.getText().toString().trim().length() <= 0)
+				{
+					Toast.makeText(getActivityContext(),
+							"You need to say something", Toast.LENGTH_SHORT)
+							.show();
+				}
+				else
+				{
+					WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new Submit(), true);
+					task.execute();
+				}
             }
         });
     }
@@ -86,6 +88,8 @@ public class PostFeedbackActivity extends PostBaseActivity {
     
     private class Submit implements WhoochApiCallInterface {
                         
+        public void preExecute() {}
+        
         public HttpRequestBase getHttpRequest() {
             
             HttpPost request = new HttpPost(Settings.apiUrl + "/feedback/add");
@@ -127,5 +131,4 @@ public class PostFeedbackActivity extends PostBaseActivity {
             }
         }
     }
-
 }

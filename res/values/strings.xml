@@ -8,8 +8,8 @@
 	<string name="ptr_refreshing">Loading</string>
 
 	<string-array name="whooch_types">
-		<item>Closed</item>
-		<item>Open</item>
+		<item>closed</item>
+		<item>open</item>
 	</string-array>
 	
 	<string-array name="image_retrieval_type">
@@ -19,5 +19,10 @@
 
 	<!-- MAX_POST_LENGTH is also defined in Settings.java -->
 	<string name="MAX_POST_LENGTH">151</string>
+	
+	<string-array name="search_spinner">
+        <item>open whooches</item>
+        <item>users</item>
+    </string-array>
 
 </resources>

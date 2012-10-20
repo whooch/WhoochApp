@@ -4,53 +4,58 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-<RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
-    <RadioButton android:id="@+id/search_whooch_rb"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Whooch"
-        android:onClick="onRadioButtonClicked"/>
-    <RadioButton android:id="@+id/search_user_rb"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="User"
-        android:onClick="onRadioButtonClicked"/>
-</RadioGroup>
+        android:layout_margin="10dip"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/profile_name_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Searching for"
+            android:textColor="@color/gray1" />
+
+        <Spinner
+            android:id="@+id/search_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:entries="@array/search_spinner" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/search_query_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Search"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
             android:id="@+id/search_query"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:ems="10" />
+            android:ems="10"
+            android:hint="Search Whooch"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:textSize="18sp" />
     </LinearLayout>
+    
+    <ProgressBar
+        android:id="@+id/search_loader"
+		android:layout_gravity="center"
+        android:layout_width="35dip"
+        android:layout_height="35dip"
+        android:visibility="gone"
+        />
 
-    <Button
-        android:id="@+id/search_submit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Search" />
-
-    <eu.erikw.PullToRefreshListView
+    <ListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1" >
-    </eu.erikw.PullToRefreshListView>
+    </ListView>
 
     <TextView
         android:id="@android:id/empty"

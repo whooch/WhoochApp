@@ -67,7 +67,7 @@ public class AlertsArrayAdapter extends ArrayAdapter<AlertsEntry> {
             AlertsEntry alertsEntry = mData.get(position);
 
             ImageView iv1 = (ImageView) view.findViewById(R.id.alerts_entry_image);
-            UrlImageViewHelper.setUrlDrawable(iv1, alertsEntry.getImageUrl());
+            UrlImageViewHelper.setUrlDrawable(iv1, alertsEntry.getUserImageUrl());
 
             TextView tv1 = (TextView) view.findViewById(R.id.alerts_entry_message_text);
             tv1.setText(alertsEntry.getMessage());

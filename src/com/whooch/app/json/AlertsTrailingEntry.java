@@ -135,10 +135,15 @@ public class AlertsTrailingEntry extends AlertsEntry {
     }
 
     @Override
-    public String getImageUrl() {
+    public String getWhoochImageUrl() {
         return whoochImageUriDefault;
     }
 
+    @Override
+    public String getUserImageUrl() {
+        return leaderUserImageUriDefault;
+    }
+    
     @Override
     public String getMessage() {
         return leaderUserName + " has invited you to trail " + whoochName;
@@ -168,6 +173,8 @@ public class AlertsTrailingEntry extends AlertsEntry {
     
     private class ConfirmTrailingRequest implements WhoochApiCallInterface {
                 
+        public void preExecute() {}
+        
         public HttpRequestBase getHttpRequest() {
             HttpPost request = new HttpPost(Settings.apiUrl + "/alerts/accepttrail");
             
@@ -192,6 +199,8 @@ public class AlertsTrailingEntry extends AlertsEntry {
     }
     
     private class DeclineTrailingRequest implements WhoochApiCallInterface {
+        
+        public void preExecute() {}
         
         public HttpRequestBase getHttpRequest() {
             HttpPost request = new HttpPost(Settings.apiUrl + "/alerts/declinetrail");

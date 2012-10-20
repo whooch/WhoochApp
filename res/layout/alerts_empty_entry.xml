@@ -8,7 +8,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dip"
-        android:layout_marginBottom="3dip" >    
+        android:layout_marginBottom="5dip" >    
         <ImageView
             android:id="@+id/alerts_empty_entry_image"
             android:layout_width="wrap_content"
@@ -23,7 +23,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dip"
             android:layout_toRightOf="@id/alerts_empty_entry_image"
-            android:text="No Alerts"
+            android:text="You do not have any alerts"
             android:textStyle="bold" />
     
     </RelativeLayout>

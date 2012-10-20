@@ -113,9 +113,19 @@ public class AlertsContributingEntry extends AlertsEntry {
         
         // determine the URLs for the user image
         if (leaderUserImage != null && leaderUserId != null) {
-            leaderUserImageUriSmall = Settings.cdnUrl + "u" + leaderUserId + "_s" + leaderUserImage;
-            leaderUserImageUriMedium = Settings.cdnUrl + "u" + leaderUserId + "_m" + leaderUserImage;
-            leaderUserImageUriLarge = Settings.cdnUrl + "u" + leaderUserId + "_l" + leaderUserImage;
+            
+        	 if (leaderUserImage.equals("defaultUser.png")) 
+        	 {
+        		 leaderUserImageUriSmall = Settings.cdnUrl + "s_" + leaderUserImage;
+        		 leaderUserImageUriMedium = Settings.cdnUrl + "m_" + leaderUserImage;
+        		 leaderUserImageUriLarge = Settings.cdnUrl + "l_" + leaderUserImage;
+             } 
+        	 else
+        	 {
+        		 leaderUserImageUriSmall = Settings.cdnUrl + "u" + leaderUserId + "_s" + leaderUserImage;
+        		 leaderUserImageUriMedium = Settings.cdnUrl + "u" + leaderUserId + "_m" + leaderUserImage;
+        		 leaderUserImageUriLarge = Settings.cdnUrl + "u" + leaderUserId + "_l" + leaderUserImage;
+        	 }
         }
         
         // determine proper image to use based on the current screen resolution
@@ -135,8 +145,13 @@ public class AlertsContributingEntry extends AlertsEntry {
     }
 
     @Override
-    public String getImageUrl() {
+    public String getWhoochImageUrl() {
         return whoochImageUriDefault;
+    }
+
+    @Override
+    public String getUserImageUrl() {
+        return leaderUserImageUriDefault;
     }
 
     @Override
@@ -168,6 +183,8 @@ public class AlertsContributingEntry extends AlertsEntry {
     
     private class ConfirmContributingRequest implements WhoochApiCallInterface {
                 
+        public void preExecute() {}
+        
         public HttpRequestBase getHttpRequest() {
             HttpPost request = new HttpPost(Settings.apiUrl + "/alerts/acceptcontribute");
             
@@ -192,6 +209,8 @@ public class AlertsContributingEntry extends AlertsEntry {
     }
     
     private class DeclineContributingRequest implements WhoochApiCallInterface {
+        
+        public void preExecute() {}
         
         public HttpRequestBase getHttpRequest() {
             HttpPost request = new HttpPost(Settings.apiUrl + "/alerts/declinecontribute");

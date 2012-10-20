@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +13,7 @@ import android.widget.TextView;
 
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.R;
+import com.whooch.app.json.ListsEntry;
 import com.whooch.app.json.SearchEntry;
 
 public class SearchArrayAdapter extends ArrayAdapter<SearchEntry> {
@@ -67,10 +67,14 @@ public class SearchArrayAdapter extends ArrayAdapter<SearchEntry> {
             SearchEntry searchEntry = mData.get(position);
             
             ImageView iv1 = (ImageView) view.findViewById(R.id.search_whooch_image);
-            UrlImageViewHelper.setUrlDrawable(iv1, searchEntry.whoochImageUriMedium);
-
-            TextView tv1 = (TextView) view.findViewById(R.id.search_whooch_name);
+            UrlImageViewHelper.setUrlDrawable(iv1, searchEntry.whoochImageUriLarge);
+                 
+            TextView tv1 = (TextView) view.findViewById(R.id.search_whooch_title);
             tv1.setText(searchEntry.whoochName);
+            
+            TextView tv2 = (TextView) view.findViewById(R.id.search_whooch_leader);
+            tv2.setText(searchEntry.leaderName);
+           
 
         }
         else if (getItemViewType(position) == TYPE_USER)
@@ -78,10 +82,11 @@ public class SearchArrayAdapter extends ArrayAdapter<SearchEntry> {
             SearchEntry searchEntry = mData.get(position);
             
             ImageView iv1 = (ImageView) view.findViewById(R.id.search_user_image);
-            UrlImageViewHelper.setUrlDrawable(iv1, searchEntry.userImageUriMedium);
-
+            UrlImageViewHelper.setUrlDrawable(iv1, searchEntry.userImageUriLarge);
+                 
             TextView tv1 = (TextView) view.findViewById(R.id.search_user_name);
             tv1.setText(searchEntry.userName);
+
         }
         else
         {

@@ -52,16 +52,16 @@ public class FeedbackActivity extends SherlockListActivity implements
 
 	private ArrayList<FeedbackEntry> mFeedbackArray = new ArrayList<FeedbackEntry>();
 	private FeedbackArrayAdapter mAdapter;
-
+	
 	boolean mFeedbackInitiated = false;
 	boolean mFeedbackHasMoreUpdates = true;
 	boolean mLoadMoreItemsInProgress = false;
+	private int mFeedbackNextPage = 1;
 	
 	String mFeedbackType = "received";
 	
 	String mDeleteFeedbackId = null;
-
-	private int mFeedbackNextPage = 1;
+	private int mLastSelectedPosition = -1;
 
 	View mLoadingFooterView;
 
@@ -90,7 +90,7 @@ public class FeedbackActivity extends SherlockListActivity implements
 				mFeedbackArray.clear();
 				mAdapter.notifyDataSetChanged();
 				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new FeedbackInitiate(), false);
+						getActivityContext(), new FeedbackInitiate(), true);
 				task.execute();
 			}
 			return true;
@@ -101,7 +101,7 @@ public class FeedbackActivity extends SherlockListActivity implements
 				mFeedbackArray.clear();
 				mAdapter.notifyDataSetChanged();
 				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new FeedbackInitiate(), false);
+						getActivityContext(), new FeedbackInitiate(), true);
 				task.execute();
 			}
 			return true;
@@ -125,6 +125,8 @@ public class FeedbackActivity extends SherlockListActivity implements
 		mListView.setOnRefreshListener(new OnRefreshListener() {
 			@Override
 			public void onRefresh() {
+				//mFeedbackArray.clear();
+				//mAdapter.notifyDataSetChanged();
 				WhoochApiCallTask task = new WhoochApiCallTask(
 						getActivityContext(), new FeedbackInitiate(), false);
 				task.execute();
@@ -137,7 +139,7 @@ public class FeedbackActivity extends SherlockListActivity implements
 		if (savedInstanceState == null) {
 
 			WhoochApiCallTask task = new WhoochApiCallTask(
-					getActivityContext(), new FeedbackInitiate(), false);
+					getActivityContext(), new FeedbackInitiate(), true);
 			task.execute();
 			
 		}
@@ -212,12 +214,12 @@ public class FeedbackActivity extends SherlockListActivity implements
 				}
 			} else {
 				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new FeedbackInitiate(), false);
+						getActivityContext(), new FeedbackInitiate(), true);
 				task.execute();
 			}
 		} else {
 			WhoochApiCallTask task = new WhoochApiCallTask(
-					getActivityContext(), new FeedbackInitiate(), false);
+					getActivityContext(), new FeedbackInitiate(), true);
 			task.execute();
 		}
 	}
@@ -226,7 +228,7 @@ public class FeedbackActivity extends SherlockListActivity implements
 	public void onResume() {
 		super.onResume();
 
-
+		ActionBarHelper.selectTab(getSupportActionBar(), 2);
 	}
 
 	private Context getActivityContext() {
@@ -269,6 +271,8 @@ public class FeedbackActivity extends SherlockListActivity implements
 
 		final FeedbackEntry entry = mFeedbackArray
 				.get(b.getInt("POSITION") - 1);
+		
+		mLastSelectedPosition = b.getInt("POSITION") - 1;
 
 		// create the menu
 		ArrayList<String> names = new ArrayList<String>();
@@ -286,6 +290,8 @@ public class FeedbackActivity extends SherlockListActivity implements
                 i.putExtra("REACTION_TYPE", "feedback");
                 i.putExtra("CONTENT", entry.content);
                 i.putExtra("USER_NAME", entry.userName);
+                i.putExtra("WHOOCH_NAME", entry.whoochName);
+                i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriLarge);
                 startActivity(i);
 			}
 		});
@@ -339,7 +345,7 @@ public class FeedbackActivity extends SherlockListActivity implements
     						public void onClick(DialogInterface dialog, int id) {
     							mDeleteFeedbackId = entry.feedbackId;
     							WhoochApiCallTask task = new WhoochApiCallTask(
-    									getActivityContext(), new RemoveFeedback(), false);
+    									getActivityContext(), new RemoveFeedback(), true);
     							task.execute();
     						}
     					});
@@ -372,6 +378,15 @@ public class FeedbackActivity extends SherlockListActivity implements
 
 		private String mResponseString = null;
 
+        public void preExecute() {
+        	
+        	mFeedbackInitiated = false;
+        	mFeedbackHasMoreUpdates = true;
+        	mLoadMoreItemsInProgress = false;
+        	mFeedbackNextPage = 1;
+        	
+        }
+        
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl
 					+ "/feedback/1?page=0&type=user&" + mFeedbackType + "=true");
@@ -391,6 +406,10 @@ public class FeedbackActivity extends SherlockListActivity implements
 					try {
 						JSONArray jsonArray = new JSONArray(mResponseString);
 
+						if (jsonArray.length() < 25) {
+							mFeedbackHasMoreUpdates = false;
+						}
+						
 						// the newest updates are at the front of the array, so
 						// loop over forwards
 						for (int i = 0; i < jsonArray.length(); i++) {
@@ -407,13 +426,6 @@ public class FeedbackActivity extends SherlockListActivity implements
 						// TODO: error handling
 					}
 				} else {
-					// if it is null we don't mind, there just wasn't anything
-					// there
-				}
-
-				mFeedbackNextPage++;
-
-				if (mFeedbackArray.size() < 25) {
 					mFeedbackHasMoreUpdates = false;
 				}
 
@@ -430,6 +442,8 @@ public class FeedbackActivity extends SherlockListActivity implements
 
 		private String mResponseString = null;
 
+        public void preExecute() {}
+        
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl + "/feedback/1?page="
 					+ mFeedbackNextPage + "&type=user&" + mFeedbackType + "=true");
@@ -445,6 +459,10 @@ public class FeedbackActivity extends SherlockListActivity implements
 			if (!mResponseString.equals("null")) {
 				try {
 					JSONArray jsonArray = new JSONArray(mResponseString);
+					
+					if (jsonArray.length() < 10) {
+						mFeedbackHasMoreUpdates = false;
+					}
 
 					// the newest updates are at the front of the array, so loop
 					// over forwards
@@ -467,15 +485,10 @@ public class FeedbackActivity extends SherlockListActivity implements
 					// TODO: error handling
 				}
 			} else {
-
+					mFeedbackHasMoreUpdates = false;
 			}
 
 			mFeedbackNextPage++;
-
-			// if size is 10 we need to keep checking for more updates
-			if (mFeedbackArray.size() < 10) {
-				mFeedbackHasMoreUpdates = false;
-			}
 
 			mAdapter.notifyDataSetChanged();
 			mListView.onRefreshComplete();
@@ -490,6 +503,8 @@ public class FeedbackActivity extends SherlockListActivity implements
 
 	private class RemoveFeedback implements WhoochApiCallInterface {
 
+        public void preExecute() {}
+        
 		public HttpRequestBase getHttpRequest() {
 			HttpPost request = new HttpPost(Settings.apiUrl + "/feedback/delete");
 
@@ -525,9 +540,8 @@ public class FeedbackActivity extends SherlockListActivity implements
 		public void postExecute(int statusCode) {
 
 			if (statusCode == 200) {
-				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new FeedbackInitiate(), false);
-				task.execute();
+				mFeedbackArray.remove(mLastSelectedPosition);
+				mAdapter.notifyDataSetChanged();
 			}
 
 			mDeleteFeedbackId = null;

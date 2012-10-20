@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,14 +66,20 @@ public class ContributingArrayAdapter extends ArrayAdapter<ContributingEntry> {
         ImageView iv1 = (ImageView) view.findViewById(R.id.lists_entry_whooch_image);
         TextView tv1 = (TextView) view.findViewById(R.id.lists_entry_whooch_title);
         ImageView iv2 = (ImageView) view.findViewById(R.id.lists_entry_open_closed_image);
+        
+        TextView tv2 = (TextView) view.findViewById(R.id.lists_entry_whooch_leader);
 
         if (getItemViewType(position) == TYPE_FIRST) {
-            UrlImageViewHelper.setUrlDrawable(iv1, Settings.defaultWhoochImageUriMedium);
-            tv1.setText("No Whooch Selected");
-            iv2.setVisibility(View.INVISIBLE);
+            UrlImageViewHelper.setUrlDrawable(iv1, Settings.defaultWhoochImageUriLarge);
+            tv1.setText("");
+            tv1.setPadding(0, 25, 0, 0);
+            tv1.setHint("Select a whooch to update");
+            iv2.setVisibility(View.GONE);
+            tv2.setVisibility(View.GONE);
         } else {
-            UrlImageViewHelper.setUrlDrawable(iv1, contributingEntry.whoochImageUriMedium);
+            UrlImageViewHelper.setUrlDrawable(iv1, contributingEntry.whoochImageUriLarge);
             tv1.setText(contributingEntry.whoochName);
+            tv2.setText(contributingEntry.leaderName);
             iv2.setVisibility(View.VISIBLE);
             if (contributingEntry.type.equals("open")) {
                 iv2.setImageResource(R.drawable.ic_open_gr);

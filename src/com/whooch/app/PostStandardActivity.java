@@ -18,6 +18,8 @@ import android.content.Intent;
 import android.graphics.Bitmap.CompressFormat;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
@@ -35,7 +37,9 @@ public class PostStandardActivity extends PostBaseActivity {
 	private String mWhoochIdExtra = null;
 	private String mWhoochImageExtra = null;
 	private String mWhoochNameExtra = null;
-	private String mUpdateType = null;
+
+	private Spinner mSelectorSpinner = null;
+	private ProgressBar mSelectorProgress = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -44,27 +48,36 @@ public class PostStandardActivity extends PostBaseActivity {
 		Intent i = getIntent();
 		Bundle b = i.getExtras();
 
+		mSelectorSpinner = (Spinner) findViewById(R.id.post_whooch_spinner);
+		mSelectorProgress = (ProgressBar) findViewById(R.id.spinner_loader);
+
+		mLayoutType = "regular";
+
 		if (b.getString("UPDATE_TYPE").equals("whooch")) {
 			mWhoochIdExtra = b.getString("WHOOCH_ID");
 			mWhoochImageExtra = b.getString("WHOOCH_IMAGE");
 			mWhoochNameExtra = b.getString("WHOOCH_NAME");
 			mUpdateType = "whooch";
 
-			mWhoochSelectorLayout.setVisibility(View.GONE);
+			mWhoochFeedbackLayout.setVisibility(View.VISIBLE);
 
-	        if ( (mWhoochIdExtra == null) || 
-	                (mWhoochImageExtra == null)  || (mWhoochNameExtra == null) ) {
-	               Toast.makeText(getApplicationContext(), "Error: bad intent", Toast.LENGTH_SHORT).show();
-	               finish();
-	               return;
-	        }
-	        
-	        UrlImageViewHelper.setUrlDrawable(mWhoochImage, mWhoochImageExtra);
-	        mWhoochName.setText(mWhoochNameExtra);
+			if ((mWhoochIdExtra == null) || (mWhoochImageExtra == null)
+					|| (mWhoochNameExtra == null)) {
+				Toast.makeText(getApplicationContext(), "Error: bad intent",
+						Toast.LENGTH_SHORT).show();
+				finish();
+				return;
+			}
+
+			UrlImageViewHelper.setUrlDrawable(mWhoochImage, mWhoochImageExtra);
+			mWhoochName.setText(mWhoochNameExtra);
 		} else {
 			// add the invalid "No Whooch Selected" entry. This will be rendered
 			// by
 			// the adapter.
+
+			mWhoochSelectorLayout.setVisibility(View.VISIBLE);
+
 			mUpdateType = "regular";
 			mContributingArray.add(new ContributingEntry());
 
@@ -72,12 +85,14 @@ public class PostStandardActivity extends PostBaseActivity {
 					android.R.layout.simple_spinner_item, mContributingArray);
 			mWhoochSelector.setAdapter(mWhoochSelectorAdapter);
 			mWhoochFeedbackLayout.setVisibility(View.GONE);
+
+			WhoochApiCallTask task = new WhoochApiCallTask(
+					getActivityContext(), new GetContributingList(), false);
+			task.execute();
 		}
 
 		ActionBarHelper.setupActionBar(getSupportActionBar(),
 				new ActionBarHelper.TabListener(getApplicationContext()), 1);
-
-		mReactingToText.setVisibility(View.GONE);
 
 		mSubmitButton.setText("Update");
 		mSubmitButton.setOnClickListener(new View.OnClickListener() {
@@ -87,7 +102,11 @@ public class PostStandardActivity extends PostBaseActivity {
 						&& (mWhoochSelector.getSelectedItemPosition() == 0)) {
 					// User selected the placeholder item
 					Toast.makeText(getActivityContext(),
-							"Please select a Whooch", Toast.LENGTH_SHORT)
+							"Please select a whooch", Toast.LENGTH_SHORT)
+							.show();
+				} else if (mPostText.getText().toString().trim().length() <= 0) {
+					Toast.makeText(getActivityContext(),
+							"You need to say something", Toast.LENGTH_SHORT)
 							.show();
 				} else {
 					WhoochApiCallTask task = new WhoochApiCallTask(
@@ -103,16 +122,15 @@ public class PostStandardActivity extends PostBaseActivity {
 		super.onResume();
 		ActionBarHelper.selectTab(getSupportActionBar(), 1);
 
-		if (mUpdateType == "regular") {
-			WhoochApiCallTask task = new WhoochApiCallTask(
-					getActivityContext(), new GetContributingList(), false);
-			task.execute();
-		}
 	}
 
 	private class GetContributingList implements WhoochApiCallInterface {
 
 		private String mResponseString = null;
+
+		public void preExecute() {
+			mSelectorProgress.setVisibility(View.VISIBLE);
+		}
 
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl + "/user/contributinglist");
@@ -149,10 +167,30 @@ public class PostStandardActivity extends PostBaseActivity {
 			}
 
 			mWhoochSelectorAdapter.notifyDataSetChanged();
+
+			if (mSpinnerId != null) {
+
+				for (int i = 0; i < mWhoochSelectorAdapter.getCount(); i++) {
+					ContributingEntry entry = (ContributingEntry) mWhoochSelectorAdapter.getItem(i);
+					if (entry.whoochId != null) {
+						if (entry.whoochId.equals(mSpinnerId)) {
+							mWhoochSelector.setSelection(i);
+							break;
+						}
+					}
+				}
+
+			}
+
+			mSelectorProgress.setVisibility(View.GONE);
+			mSelectorSpinner.setVisibility(View.VISIBLE);
 		}
 	}
 
 	private class Submit implements WhoochApiCallInterface {
+
+		public void preExecute() {
+		}
 
 		public HttpRequestBase getHttpRequest() {
 
@@ -202,12 +240,14 @@ public class PostStandardActivity extends PostBaseActivity {
 
 		public void postExecute(int statusCode) {
 			if (statusCode == 202) {
-				// TODO: take user to the whooch they just posted in? Would need
-				// to go
-				// to the correct activity but also remove the PostStandard
-				// activity from
-				// the backstack.
-				finish();
+				if (mUpdateType == "whooch") {
+					finish();
+				} else {
+					Intent i = new Intent(getApplicationContext(),
+							StreamActivity.class);
+					startActivity(i);
+					finish();
+				}
 			}
 
 		}

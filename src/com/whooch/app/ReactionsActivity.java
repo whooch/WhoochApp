@@ -27,6 +27,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +41,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.koushikdutta.urlimageviewhelper.UrlImageGetter;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.helpers.ActionBarHelper;
 import com.whooch.app.helpers.Settings;
@@ -62,6 +65,7 @@ public class ReactionsActivity extends SherlockListActivity implements
 	boolean mReactionsInitiated = false;
 	boolean mReactionsHasMoreUpdates = true;
 	boolean mLoadMoreItemsInProgress = false;
+	private int mReactionsNextPage = 1;
 
 	private String mShowConvoId = null;
 	private String mShowConvoNumber = null;
@@ -69,10 +73,9 @@ public class ReactionsActivity extends SherlockListActivity implements
 
 	private String mDeleteWhoochId = null;
 	private String mDeleteWhoochNumber = null;
+	private int mLastSelectedPosition = -1;
 
 	private String mReactionsType = "received";
-
-	private int mReactionsNextPage = 1;
 
 	View mLoadingFooterView;
 
@@ -100,7 +103,7 @@ public class ReactionsActivity extends SherlockListActivity implements
 				mWhoochArray.clear();
 				mAdapter.notifyDataSetChanged();
 				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new ReactionsInitiate(), false);
+						getActivityContext(), new ReactionsInitiate(), true);
 				task.execute();
 			}
 			return true;
@@ -110,7 +113,7 @@ public class ReactionsActivity extends SherlockListActivity implements
 				mWhoochArray.clear();
 				mAdapter.notifyDataSetChanged();
 				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new ReactionsInitiate(), false);
+						getActivityContext(), new ReactionsInitiate(), true);
 				task.execute();
 			}
 			return true;
@@ -147,7 +150,7 @@ public class ReactionsActivity extends SherlockListActivity implements
 
 		if (savedInstanceState == null) {
 			WhoochApiCallTask task = new WhoochApiCallTask(
-					getActivityContext(), new ReactionsInitiate(), false);
+					getActivityContext(), new ReactionsInitiate(), true);
 			task.execute();
 		}
 	}
@@ -220,12 +223,12 @@ public class ReactionsActivity extends SherlockListActivity implements
 				}
 			} else {
 				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new ReactionsInitiate(), false);
+						getActivityContext(), new ReactionsInitiate(), true);
 				task.execute();
 			}
 		} else {
 			WhoochApiCallTask task = new WhoochApiCallTask(
-					getActivityContext(), new ReactionsInitiate(), false);
+					getActivityContext(), new ReactionsInitiate(), true);
 			task.execute();
 		}
 	}
@@ -234,6 +237,7 @@ public class ReactionsActivity extends SherlockListActivity implements
 	public void onResume() {
 		super.onResume();
 
+		ActionBarHelper.selectTab(getSupportActionBar(), 3);
 	}
 
 	private Context getActivityContext() {
@@ -275,6 +279,7 @@ public class ReactionsActivity extends SherlockListActivity implements
 	protected Dialog onCreateDialog(int id, Bundle b) {
 
 		final StreamEntry entry = mWhoochArray.get(b.getInt("POSITION") - 1);
+		mLastSelectedPosition = b.getInt("POSITION") - 1;
 
 		// create the menu
 		ArrayList<String> names = new ArrayList<String>();
@@ -297,6 +302,8 @@ public class ReactionsActivity extends SherlockListActivity implements
 					i.putExtra("REACTION_TYPE", "whooch");
 					i.putExtra("CONTENT", entry.content);
 					i.putExtra("USER_NAME", entry.userName);
+	                i.putExtra("WHOOCH_NAME", entry.whoochName);
+	                i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriLarge);
 					startActivity(i);
 				}
 			});
@@ -422,6 +429,15 @@ public class ReactionsActivity extends SherlockListActivity implements
 
 		private String mResponseString = null;
 
+        public void preExecute() {
+        	
+        	mReactionsInitiated = false;
+        	mReactionsHasMoreUpdates = true;
+        	mLoadMoreItemsInProgress = false;
+        	mReactionsNextPage = 1;
+        	
+        }
+        
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl
 					+ "/reactions/1?page=0&type=user&" + mReactionsType
@@ -441,6 +457,10 @@ public class ReactionsActivity extends SherlockListActivity implements
 				if (!mResponseString.equals("null")) {
 					try {
 						JSONArray jsonArray = new JSONArray(mResponseString);
+						
+						if (jsonArray.length() < 25) {
+							mReactionsHasMoreUpdates = false;
+						}
 
 						// the newest updates are at the front of the array, so
 						// loop over forwards
@@ -458,17 +478,9 @@ public class ReactionsActivity extends SherlockListActivity implements
 						// TODO: error handling
 					}
 				} else {
-					// if it is null we don't mind, there just wasn't anything
-					// there
+						mReactionsHasMoreUpdates = false;
 				}
 
-				mReactionsNextPage++;
-
-				// if it is less than 25 then we should stop trying to get more
-				// updates
-				if (mWhoochArray.size() < 25) {
-					mReactionsHasMoreUpdates = false;
-				}
 			}
 
 			mAdapter.notifyDataSetChanged();
@@ -482,8 +494,10 @@ public class ReactionsActivity extends SherlockListActivity implements
 
 		private String mResponseString = null;
 
+        public void preExecute() {}
+        
 		public HttpRequestBase getHttpRequest() {
-			return new HttpGet(Settings.apiUrl + "/feedback/1?page="
+			return new HttpGet(Settings.apiUrl + "/reactions/1?page="
 					+ mReactionsNextPage + "&type=user&" + mReactionsType
 					+ "=true");
 		}
@@ -499,6 +513,9 @@ public class ReactionsActivity extends SherlockListActivity implements
 				try {
 					JSONArray jsonArray = new JSONArray(mResponseString);
 
+					if (jsonArray.length() < 10) {
+						mReactionsHasMoreUpdates = false;
+					}
 					// the newest updates are at the front of the array, so loop
 					// over forwards
 					for (int i = 0; i < jsonArray.length(); i++) {
@@ -520,16 +537,10 @@ public class ReactionsActivity extends SherlockListActivity implements
 					// TODO: error handling
 				}
 			} else {
-
+				mReactionsHasMoreUpdates = false;
 			}
 
 			mReactionsNextPage++;
-
-			// if it is less than 10 then we should stop trying to get more
-			// updates
-			if (mWhoochArray.size() < 10) {
-				mReactionsHasMoreUpdates = false;
-			}
 
 			mAdapter.notifyDataSetChanged();
 			mListView.onRefreshComplete();
@@ -546,6 +557,10 @@ public class ReactionsActivity extends SherlockListActivity implements
 
 		private String mResponseString = null;
 
+        public void preExecute() {
+        	
+        }
+        
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl + "/whooch/" + mShowConvoId
 					+ "?single=1&whoochNumber=" + mShowConvoNumber);
@@ -556,7 +571,7 @@ public class ReactionsActivity extends SherlockListActivity implements
 		}
 
 		public void postExecute(int statusCode) {
-
+			
 			if (statusCode == 200) {
 
 				// parse the response as JSON and update the Content Array
@@ -602,11 +617,9 @@ public class ReactionsActivity extends SherlockListActivity implements
 								.findViewById(R.id.entry_posted_userA);
 						tv2A.setText(entry.userName);
 
-            	        TextView tv3A = (TextView) view
+						TextView tv3A = (TextView) view
 								.findViewById(R.id.entry_whooch_contentA);
-            	        tv3A.setText(WhoochHelperFunctions
-								.getSpannedFromHtmlContent(entry.content,
-										tv3A, getActivityContext()));
+						tv3A.setText(WhoochHelperFunctions.getSpannedFromHtmlContent(entry.content, tv3A, getActivityContext()));
 
 						TextView tv4A = (TextView) view
 								.findViewById(R.id.entry_whooch_footA);
@@ -626,11 +639,9 @@ public class ReactionsActivity extends SherlockListActivity implements
 								.findViewById(R.id.entry_posted_userB);
 						tv2B.setText(mShowConvoCurrentUpdate.userName);
 
-            	        TextView tv3B = (TextView) view
+						TextView tv3B = (TextView) view
 								.findViewById(R.id.entry_whooch_contentB);
-            	        tv3B.setText(WhoochHelperFunctions
-								.getSpannedFromHtmlContent(mShowConvoCurrentUpdate.content,
-										tv3B, getActivityContext()));
+						tv3B.setText(WhoochHelperFunctions.getSpannedFromHtmlContent(mShowConvoCurrentUpdate.content, tv3B, getActivityContext()));
 
 						TextView tv4B = (TextView) view
 								.findViewById(R.id.entry_whooch_footB);
@@ -659,6 +670,8 @@ public class ReactionsActivity extends SherlockListActivity implements
 
 	private class DeleteUpdate implements WhoochApiCallInterface {
 
+        public void preExecute() {}
+        
 		public HttpRequestBase getHttpRequest() {
 			HttpPost request = new HttpPost(Settings.apiUrl + "/whooch/delete");
 
@@ -683,13 +696,12 @@ public class ReactionsActivity extends SherlockListActivity implements
 		}
 
 		public void postExecute(int statusCode) {
-
+			
 			if (statusCode == 200) {
-				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new ReactionsInitiate(), false);
-				task.execute();
+				mWhoochArray.remove(mLastSelectedPosition);
+				mAdapter.notifyDataSetChanged();
 			}
-
+			
 			mDeleteWhoochId = null;
 			mDeleteWhoochNumber = null;
 

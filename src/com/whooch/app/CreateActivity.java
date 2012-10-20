@@ -48,8 +48,14 @@ public class CreateActivity extends SherlockActivity {
 		mSubmitButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				if(mWhoochNameText.getText().toString().length() != 0)
-				{	
+				if (mWhoochNameText.getText().toString().trim().length() <= 0)
+				{
+					Toast.makeText(getActivityContext(),
+							"Please provide a name for your whooch", Toast.LENGTH_SHORT)
+							.show();
+				}
+				else
+				{
 					WhoochApiCallTask task = new WhoochApiCallTask(
 					getActivityContext(), new CreateWhooch(), true);
 					task.execute();
@@ -73,6 +79,8 @@ public class CreateActivity extends SherlockActivity {
 
 		private String mResponseString = null;
 
+        public void preExecute() {}
+        
 		public HttpRequestBase getHttpRequest() {
 
 				HttpPost request = new HttpPost(Settings.apiUrl + "/whooch");

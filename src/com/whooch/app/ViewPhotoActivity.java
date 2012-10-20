@@ -1,15 +1,15 @@
 package com.whooch.app;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.actionbarsherlock.app.SherlockListActivity;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.helpers.Settings;
 
-public class ViewPhotoActivity extends Activity { 
+public class ViewPhotoActivity extends SherlockListActivity { 
     
     @Override
     public void onCreate(Bundle savedInstanceState) {

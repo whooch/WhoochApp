@@ -4,35 +4,39 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dip"
-        android:layout_marginLeft="3dip"
-        android:orientation="horizontal" >
+        android:layout_marginBottom="3dip"
+        android:layout_marginTop="3dip" >
+
         <ImageView
             android:id="@+id/search_user_image"
+            android:layout_width="50dp"
+    		android:layout_height="50dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="3dip"
+            android:src="@drawable/ic_launcher" />
+        
+        <LinearLayout
+            android:id="@+id/search_info_block"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_launcher" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="10dip"
-            android:orientation="vertical" >
+            android:layout_toRightOf="@+id/search_user_image"
+            android:layout_centerVertical="true"
+            android:orientation="vertical"
+            android:paddingLeft="10dip" >
 
             <TextView
                 android:id="@+id/search_user_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Whooch Name"
-                android:textColor="@color/darkblue"
                 android:textStyle="bold" />
-
+            
         </LinearLayout>
 
-    </LinearLayout>
 
-    
+    </RelativeLayout>
+
 </LinearLayout>

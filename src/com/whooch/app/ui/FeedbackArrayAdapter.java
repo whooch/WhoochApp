@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
+import android.text.Html;
+import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.koushikdutta.urlimageviewhelper.UrlImageGetter;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.R;
 import com.whooch.app.helpers.WhoochHelperFunctions;
@@ -62,6 +66,11 @@ public class FeedbackArrayAdapter extends ArrayAdapter<FeedbackEntry> {
         {
         	ImageView iv2 = (ImageView) view.findViewById(R.id.imagePicture);
         	iv2.setVisibility(View.GONE);
+        }
+        else
+        {
+        	ImageView iv2 = (ImageView) view.findViewById(R.id.imagePicture);
+        	iv2.setVisibility(View.VISIBLE);
         }
         
     	ImageView iv3 = (ImageView) view.findViewById(R.id.imagePlus);

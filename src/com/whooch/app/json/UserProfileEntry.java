@@ -9,12 +9,15 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,8 +25,6 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.whooch.app.AlertsActivity;
-import com.whooch.app.LoginActivity;
-import com.whooch.app.PushSettingsActivity;
 import com.whooch.app.UploadPhotoActivity;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
@@ -86,6 +87,12 @@ public class UserProfileEntry {
         }
         
         try {
+            location = json.getString("location");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        
+        try {
             isFriend = json.getString("isFriend");
         } catch (JSONException e) {
             e.printStackTrace();
@@ -129,29 +136,6 @@ public class UserProfileEntry {
         }
     }
     
-    public OnClickListener getPushSettingsClickListener(){
-        return new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            	Intent i = new Intent(v.getContext(), PushSettingsActivity.class);
-            	v.getContext().startActivity(i);
-            }
-        };
-    	
-    }
-    
-    public OnClickListener getFriendRequestClickListener(){
-        return new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            	//send friend request
-                WhoochApiCallTask task = new WhoochApiCallTask(v.getContext(), new SendFriendRequest(userId, v.getContext()), true);
-                task.execute();
-            }
-        };
-    	
-    }
-    
     public OnClickListener getUpdatePhotoClickListener(){
         return new OnClickListener() {
             @Override
@@ -167,28 +151,77 @@ public class UserProfileEntry {
         return new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(v.getContext(), AlertsActivity.class);
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                v.getContext().startActivity(i);
+            	Intent i = new Intent(v.getContext(), AlertsActivity.class);
+            	v.getContext().startActivity(i);
             }
         };
     }
     
-	private class SendFriendRequest implements WhoochApiCallInterface {
+    public OnClickListener getFriendRequestClickListener(){
+        return new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                        WhoochApiCallTask task = new WhoochApiCallTask(v.getContext(), new FriendRequest(userId, "request", v.getContext()), true);
+                        task.execute();
+                    }
+        };
+    }
+    
+    public OnClickListener getFriendRemoveClickListener(){
+        return new OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+            	
+    			AlertDialog.Builder builder = new AlertDialog.Builder(
+    					v.getContext());
+
+    			builder.setTitle("Whooch");
+    			builder.setMessage("Are you sure you want to remove this friend?");
+
+    			builder.setNegativeButton("CANCEL",
+    					new DialogInterface.OnClickListener() {
+    						public void onClick(DialogInterface dialog,
+    								int id) {
+
+    						}
+    					});
+
+    			builder.setPositiveButton("OK",
+    					new DialogInterface.OnClickListener() {
+    						public void onClick(DialogInterface dialog,
+    								int id) {
+    			                WhoochApiCallTask task = new WhoochApiCallTask(v.getContext(), new FriendRequest(userId, "remove", v.getContext()), true);
+    			                task.execute();
+    						}
+    					});
+
+    			AlertDialog dialog = builder.create();
+
+    			dialog.show();
+            }
+        };
+    }
+    
+ 
+  
+	private class FriendRequest implements WhoochApiCallInterface {
 
 		private String mUserId = null;
 		private Context mContext = null;
+		private String mType = null;
 
+        public void preExecute() {}
 
-		public SendFriendRequest(String userId, Context context) {
+		public FriendRequest(String userId, String type, Context context) {
 			mUserId = userId;
 			mContext = context;
+			mType = type;
 		}
 
 		public HttpRequestBase getHttpRequest() {
 
 			HttpPost request = new HttpPost(Settings.apiUrl
-					+ "/friends/request");
+					+ "/friends/" + mType);
 
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 			nameValuePairs.add(new BasicNameValuePair("userId", mUserId));
@@ -211,8 +244,20 @@ public class UserProfileEntry {
 
 			// parse the response as JSON and update the Content Array
 			if (statusCode == 200) {
-				Toast.makeText(mContext, "Friend request sent",
+				if(mType == "request")
+				{
+					Toast.makeText(mContext, "Friend request sent",
 						Toast.LENGTH_SHORT).show();
+				}
+				else
+				{
+					Toast.makeText(mContext, "Friend removed",
+							Toast.LENGTH_SHORT).show();
+					Activity a = (Activity)mContext;
+					Intent intent = a.getIntent();
+					a.finish();
+					a.startActivity(intent);
+				}
 			} else {
 				Toast.makeText(mContext,
 						"Something went wrong, try again", Toast.LENGTH_SHORT)
@@ -221,5 +266,5 @@ public class UserProfileEntry {
 
 		}
 	}
-    
+       
 }

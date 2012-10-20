@@ -9,7 +9,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Bitmap.Config;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -18,21 +25,21 @@ import android.util.Log;
 import android.view.View;
 
 /*
- * NOTE: this file was not originally part of the urlimageviewhelper library. The code 
- *       was taken from a stackoverflow answer:
- *       
- *       http://stackoverflow.com/questions/7424512/android-html-imagegetter-as-asynctask
- */
+* NOTE: this file was not originally part of the urlimageviewhelper library. The code
+* was taken from a stackoverflow answer:
+*
+* http://stackoverflow.com/questions/7424512/android-html-imagegetter-as-asynctask
+*/
 
 public class UrlImageGetter implements ImageGetter {
     Context c;
     View container;
     
     /***
-     * Construct the URLImageGetter which will execute AsyncTask and refresh the container
-     * @param t
-     * @param c
-     */
+* Construct the URLImageGetter which will execute AsyncTask and refresh the container
+* @param t
+* @param c
+*/
     public UrlImageGetter(View t, Context c) {
         this.c = c;
         this.container = t;
@@ -42,12 +49,12 @@ public class UrlImageGetter implements ImageGetter {
         URLDrawable urlDrawable = new URLDrawable();
         
         // NOTE: the bounds are currently hardcoded to match the size of the
-        //       image that will be displayed inline.  If the image size
-        //       changes the bounds values should be changed as well.
-        urlDrawable.setBounds(0, 0, 19, 19);
+        // image that will be displayed inline. If the image size
+        // changes the bounds values should be changed as well.
+        urlDrawable.setBounds(0, 0, 35, 35);
         
         // get the actual source
-        ImageGetterAsyncTask asyncTask = 
+        ImageGetterAsyncTask asyncTask =
             new ImageGetterAsyncTask( urlDrawable);
 
         asyncTask.execute(source);
@@ -74,7 +81,7 @@ public class UrlImageGetter implements ImageGetter {
         }
     }
     
-    public class ImageGetterAsyncTask extends AsyncTask<String, Void, Drawable>  {
+    public class ImageGetterAsyncTask extends AsyncTask<String, Void, Drawable> {
         URLDrawable urlDrawable;
 
         public ImageGetterAsyncTask(URLDrawable d) {
@@ -90,8 +97,8 @@ public class UrlImageGetter implements ImageGetter {
         @Override
         protected void onPostExecute(Drawable result) {
             // set the correct bound according to the result from HTTP call
-           urlDrawable.setBounds(0, 0, 0 + result.getIntrinsicWidth(), 0 
-                    + result.getIntrinsicHeight()); 
+           urlDrawable.setBounds(0, 0, 20 + result.getIntrinsicWidth(), 20
+                    + result.getIntrinsicHeight());
            
             // change the reference of the current drawable to the result
             // from the HTTP call
@@ -102,10 +109,10 @@ public class UrlImageGetter implements ImageGetter {
         }
 
         /***
-         * Get the Drawable from URL
-         * @param urlString
-         * @return
-         */
+* Get the Drawable from URL
+* @param urlString
+* @return
+*/
         public Drawable fetchDrawable(String urlString) {
             
             final UrlImageCache cache = UrlImageCache.getInstance();
@@ -121,7 +128,7 @@ public class UrlImageGetter implements ImageGetter {
                 }
             }
             
-            drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()); 
+            drawable.setBounds(0, 0, 30, 30); //drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
             return drawable;
         }
 

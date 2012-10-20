@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.koushikdutta.urlimageviewhelper.UrlImageGetter;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.R;
 import com.whooch.app.helpers.WhoochHelperFunctions;
@@ -92,8 +95,8 @@ public class StreamArrayAdapter extends ArrayAdapter<StreamEntry> {
 
         if (getItemViewType(position) == TYPE_FEEDBACK) {
             
-            TextView tv5 = (TextView) view.findViewById(R.id.entry_feedback_content);            
-            tv5.setText(WhoochHelperFunctions.getSpannedFromHtmlContent(whoochEntry.feedbackInfo.content, tv5, mContext));
+        	TextView tv5 = (TextView) view.findViewById(R.id.entry_feedback_content);            
+        	tv5.setText(WhoochHelperFunctions.getSpannedFromHtmlContent(whoochEntry.feedbackInfo.content, tv5, mContext));
             
             ImageView iv2 = (ImageView) view.findViewById(R.id.entry_feedback_user_image);
             // TODO: figure out what's up with this preloading
@@ -109,11 +112,21 @@ public class StreamArrayAdapter extends ArrayAdapter<StreamEntry> {
         	ImageView iv3 = (ImageView) view.findViewById(R.id.imagePicture);
         	iv3.setVisibility(View.GONE);
         }
+        else
+        {
+        	ImageView iv3 = (ImageView) view.findViewById(R.id.imagePicture);
+        	iv3.setVisibility(View.VISIBLE);
+        }
         
         if(!whoochEntry.reactionType.equals("whooch"))
         {
         	ImageView iv4 = (ImageView) view.findViewById(R.id.imagePlus);
         	iv4.setVisibility(View.GONE);
+        }
+        else
+        {
+        	ImageView iv4 = (ImageView) view.findViewById(R.id.imagePlus);
+        	iv4.setVisibility(View.VISIBLE);
         }
         
         return view;

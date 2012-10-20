@@ -7,61 +7,59 @@
     android:orientation="vertical" >
 
     <!-- Post, React -->
+
     <LinearLayout
         android:id="@+id/post_user_search_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:visibility="gone" >
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Search for Users"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-    
         <AutoCompleteTextView
             android:id="@+id/post_search_users"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="10dip"
             android:ems="10"
+            android:hint="Search for a user to react to"
+            android:singleLine="true"
             android:text="" />
     </LinearLayout>
-    
+
     <!-- Post -->
+
     <LinearLayout
         android:id="@+id/post_select_whooch_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
-        
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Select a Whooch"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-        
+        android:orientation="vertical"
+        android:visibility="gone"
+         >
+
         <Spinner
             android:id="@+id/post_whooch_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/lists_entry_whooch_title" />
-    </LinearLayout>
+            android:visibility="gone"/>
         
-    <!-- React -->
-    <TextView
-        android:id="@+id/post_reacting_to"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="post content" />
-    
+        <ProgressBar
+        android:id="@+id/spinner_loader"
+        android:layout_width="35dip"
+        android:layout_height="35dip"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        />
+    </LinearLayout>
+
     <!-- Feedback -->
+
     <RelativeLayout
         android:id="@+id/post_whooch_feedback_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="3dip"
-        android:layout_marginTop="3dip" >
+        android:layout_marginTop="3dip"
+        android:visibility="gone" >
 
         <ImageView
             android:id="@+id/post_whooch_image"
@@ -78,43 +76,115 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dip"
             android:layout_toRightOf="@id/post_whooch_image"
+            android:hint="Update here"
             android:text="Whooch Name"
             android:textStyle="bold" />
     </RelativeLayout>
-    
+
+    <!-- React -->
+
+    <RelativeLayout
+        android:id="@+id/post_react_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="3dip"
+        android:layout_marginTop="3dip"
+        android:visibility="gone" >
+
+        <ImageView
+            android:id="@+id/post_react_whooch_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="3dip"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/ic_launcher" />
+
+        <LinearLayout
+            android:id="@+id/post_react_info_block"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/post_react_whooch_image"
+            android:orientation="vertical"
+            android:paddingLeft="10dip" >
+
+            <TextView
+                android:id="@+id/post_react_whooch_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Whooch Name"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/post_react_whooch_contributor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Whooch Contributor"
+                android:textColor="@color/gray1" />
+
+            <TextView
+                android:id="@+id/post_reacting_to"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="post content" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
     <EditText
         android:id="@+id/post_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dip"
         android:ems="10"
+        android:inputType="textShortMessage|textMultiLine"
         android:maxLength="151" >
 
-        <requestFocus />
+        <requestFocus android:layout_width="wrap_content" />
     </EditText>
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/post_action_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
 
         <!-- Post, Feedback -->
 
         <ImageButton
+            android:id="@+id/react_button"
+            android:layout_width="50dip"
+            android:layout_height="40dip"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/update_button"
+            android:src="@drawable/ic_reactions_bl"
+            android:textColor="@color/white" />
+
+        <ImageButton
             android:id="@+id/imageButton1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_menu_camera" />
+            android:layout_width="50dip"
+            android:layout_height="40dip"
+            android:layout_marginLeft="3dip"
+            android:layout_toRightOf="@+id/react_button"
+            android:background="@drawable/update_button"
+            android:src="@drawable/ic_camera_bl" />
 
         <TextView
             android:id="@+id/post_char_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/MAX_POST_LENGTH" />
+            android:layout_width="40dip"
+            android:layout_height="40dip"
+            android:layout_toLeftOf="@+id/post_submit_button"
+            android:gravity="center"
+            android:text="@string/MAX_POST_LENGTH"
+            android:textSize="15sp" />
 
         <Button
             android:id="@+id/post_submit_button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Submit" />
-    </LinearLayout>
+            android:layout_height="40dip"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/lists_button_selector"
+            android:textColor="@color/white"
+            android:textSize="15sp" />
+    </RelativeLayout>
 
 </LinearLayout>

@@ -16,7 +16,8 @@
         android:theme="@style/Theme.Sherlock.Light"
         android:uiOptions="splitActionBarWhenNarrow" >
         
-        <activity android:name=".LoginActivity" >
+        <activity android:name=".LoginActivity"
+        android:noHistory="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -32,13 +33,20 @@
         <activity android:name=".UserProfileActivity"></activity>
         <activity android:name=".PushSettingsActivity"></activity>
         <activity android:name=".AlertsActivity"></activity>
-        <activity android:name=".CreateActivity"></activity>
+        <activity android:name=".CreateActivity"
+        android:noHistory="true"
+        android:windowSoftInputMode="stateVisible"></activity>
         <activity android:name=".ListsActivity"></activity>
-        <activity android:name=".SearchActivity"></activity>
-        <activity android:name=".RegisterActivity"></activity>
-        <activity android:name=".PostFeedbackActivity"></activity>
-        <activity android:name=".PostReactionActivity"></activity>
-        <activity android:name=".PostStandardActivity"></activity>
+        <activity android:name=".SearchActivity"
+        android:windowSoftInputMode="stateVisible"></activity>
+        <activity android:name=".RegisterActivity"
+        android:noHistory="true"></activity>
+        <activity android:name=".PostFeedbackActivity"
+        android:windowSoftInputMode="stateVisible"></activity>
+        <activity android:name=".PostReactionActivity"
+        android:windowSoftInputMode="stateVisible"></activity>
+        <activity android:name=".PostStandardActivity"
+        android:windowSoftInputMode="stateVisible"></activity>
         <activity android:name=".UploadPhotoActivity"></activity>
         <activity android:name=".ViewPhotoActivity"></activity>
     </application>

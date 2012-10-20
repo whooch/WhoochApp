@@ -2,20 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="3dip"
-    android:layout_marginRight="3dip"
+    android:layout_margin="10dip"
     android:orientation="vertical" >
-
-    <EditText
-        android:id="@+id/create_whooch_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
-        android:ems="10"
-        android:hint="Enter Whooch Name" >
-    
-        <requestFocus />
-    </EditText>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,13 +11,45 @@
         android:layout_marginTop="10dip"
         android:orientation="horizontal" >
 
+        <TextView
+            android:id="@+id/profile_name_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Whooch name"
+            android:textColor="@color/gray1" />
+
+        <EditText
+            android:id="@+id/create_whooch_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLength="25"
+            android:layout_marginTop="10dip"
+            android:singleLine="true"
+            android:ems="10" >
+
+            <requestFocus />
+        </EditText>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dip"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/profile_name_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Whooch type"
+            android:textColor="@color/gray1" />
+
         <Spinner
             android:id="@+id/create_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dip"
             android:entries="@array/whooch_types" />
-
     </LinearLayout>
 
     <Button

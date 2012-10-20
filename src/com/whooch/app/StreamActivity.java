@@ -38,8 +38,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockListActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.helpers.ActionBarHelper;
 import com.whooch.app.helpers.Settings;
@@ -73,55 +71,12 @@ public class StreamActivity extends SherlockListActivity implements
 
 	private String mDeleteWhoochId = null;
 	private String mDeleteWhoochNumber = null;
+	private int mLastSelectedPosition = -1;
 
 	View mLoadingFooterView;
 
 	// Unique id counter to prevent Android from reusing the same dialog.
 	int mNextDialogId = 0;
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-
-		// SubMenu sub = menu.addSubMenu("Settings");
-		// sub.setIcon(R.drawable.abs__ic_menu_moreoverflow_holo_dark);
-
-		menu.add(Menu.NONE, 1, 0, "Update")
-				.setIcon(android.R.drawable.ic_menu_edit)
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-		menu.add(Menu.NONE, 2, 0, "Search")
-				.setIcon(android.R.drawable.ic_menu_search)
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-		menu.add(Menu.NONE, 3, 0, "Create")
-				.setIcon(android.R.drawable.ic_input_add)
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		Intent i = null;
-		switch (item.getItemId()) {
-		case 1:
-			i = new Intent(getActivityContext(), PostStandardActivity.class);
-			i.putExtra("UPDATE_TYPE", "regular");
-			startActivity(i);
-			return true;
-		case 2:
-			i = new Intent(getActivityContext(), SearchActivity.class);
-			startActivity(i);
-			return true;
-		case 3:
-			i = new Intent(getActivityContext(), CreateActivity.class);
-			startActivity(i);
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-
-	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -152,7 +107,7 @@ public class StreamActivity extends SherlockListActivity implements
 		if (savedInstanceState == null) {
 
 				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new StreamInitiate(), false);
+						getActivityContext(), new StreamInitiate(), true);
 				task.execute();
 				
 		}
@@ -206,6 +161,11 @@ public class StreamActivity extends SherlockListActivity implements
 
 					setStreamArray((ArrayList<StreamEntry>) obj);
 					
+	                if(mStreamArray.size() < 25)
+	                {
+	                	mStreamHasMoreUpdates = false;
+	                }
+					
 					if (mStreamArray.size() > 0) {
 						mLatestTimestamp = mStreamArray.get(0).timestamp;
 						mOldestTimestamp = mStreamArray
@@ -229,12 +189,12 @@ public class StreamActivity extends SherlockListActivity implements
 				}
 			} else {
 				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new StreamInitiate(), false);
+						getActivityContext(), new StreamInitiate(), true);
 				task.execute();
 			}
 		} else {
 			WhoochApiCallTask task = new WhoochApiCallTask(
-					getActivityContext(), new StreamInitiate(), false);
+					getActivityContext(), new StreamInitiate(), true);
 			task.execute();
 		}
 	}
@@ -242,6 +202,8 @@ public class StreamActivity extends SherlockListActivity implements
 	@Override
 	public void onResume() {
 		super.onResume();
+		
+		ActionBarHelper.selectTab(getSupportActionBar(), 0);
 
 	}
 
@@ -261,6 +223,7 @@ public class StreamActivity extends SherlockListActivity implements
 	protected Dialog onCreateDialog(int id, Bundle b) {
 
 		final StreamEntry entry = mStreamArray.get(b.getInt("POSITION") - 1);
+		mLastSelectedPosition = b.getInt("POSITION") - 1;
 
 		// create the menu
 		ArrayList<String> names = new ArrayList<String>();
@@ -283,6 +246,8 @@ public class StreamActivity extends SherlockListActivity implements
 					i.putExtra("REACTION_TYPE", "whooch");
 					i.putExtra("CONTENT", entry.content);
 					i.putExtra("USER_NAME", entry.userName);
+	                i.putExtra("WHOOCH_NAME", entry.whoochName);
+	                i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriLarge);
 					startActivity(i);
 				}
 			});
@@ -372,7 +337,7 @@ public class StreamActivity extends SherlockListActivity implements
 										int id) {
 									mDeleteWhoochId = entry.whoochId;
 									mDeleteWhoochNumber = entry.whoochNumber;
-
+									
 									WhoochApiCallTask task = new WhoochApiCallTask(
 											getActivityContext(),
 											new DeleteUpdate(), true);
@@ -445,6 +410,17 @@ public class StreamActivity extends SherlockListActivity implements
 
 		private String mResponseString = null;
 
+        public void preExecute() {
+        	
+        	mLatestTimestamp = "0";
+        	mOldestTimestamp = "0";
+
+        	mStreamInitiated = false;
+        	mStreamHasMoreUpdates = true;
+        	mLoadMoreItemsInProgress = false;
+     	
+        }
+        
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl + "/stream/1?count=25");
 		}
@@ -463,6 +439,10 @@ public class StreamActivity extends SherlockListActivity implements
 				if (!mResponseString.equals("null")) {
 					try {
 						JSONArray jsonArray = new JSONArray(mResponseString);
+						
+						if (jsonArray.length() < 25) {
+							mStreamHasMoreUpdates = false;
+						}
 
 						// the newest updates are at the front of the array, so
 						// loop over forwards
@@ -488,10 +468,9 @@ public class StreamActivity extends SherlockListActivity implements
 						// TODO: error handling
 					}
 				} else {
-					// if it is null we don't mind, there just wasn't anything
-					// there
+					mStreamHasMoreUpdates = false;
 				}
-
+			
 				if (mStreamArray.size() > 0) {
 					mLatestTimestamp = mStreamArray.get(0).timestamp;
 					mOldestTimestamp = mStreamArray
@@ -511,6 +490,8 @@ public class StreamActivity extends SherlockListActivity implements
 
 		private String mResponseString = null;
 
+        public void preExecute() {}
+        
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl + "/stream/1?boundary="
 					+ mLatestTimestamp + "&after=true");
@@ -567,6 +548,8 @@ public class StreamActivity extends SherlockListActivity implements
 
 		private String mResponseString = null;
 
+        public void preExecute() {}
+        
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl + "/stream/1?boundary="
 					+ mOldestTimestamp + "&before=true");
@@ -582,6 +565,10 @@ public class StreamActivity extends SherlockListActivity implements
 			if (!mResponseString.equals("null")) {
 				try {
 					JSONArray jsonArray = new JSONArray(mResponseString);
+					
+					if (jsonArray.length() < 10) {
+						mStreamHasMoreUpdates = false;
+					}
 
 					// the newest updates are at the front of the array, so loop
 					// over forwards
@@ -628,6 +615,10 @@ public class StreamActivity extends SherlockListActivity implements
 
 		private String mResponseString = null;
 
+        public void preExecute() {
+        	
+        }
+        
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl + "/whooch/" + mShowConvoId
 					+ "?single=1&whoochNumber=" + mShowConvoNumber);
@@ -638,7 +629,7 @@ public class StreamActivity extends SherlockListActivity implements
 		}
 
 		public void postExecute(int statusCode) {
-
+			
 			if (statusCode == 200) {
 
 				// parse the response as JSON and update the Content Array
@@ -686,9 +677,8 @@ public class StreamActivity extends SherlockListActivity implements
 
 						TextView tv3A = (TextView) view
 								.findViewById(R.id.entry_whooch_contentA);
-				        tv3A.setText(WhoochHelperFunctions
-								.getSpannedFromHtmlContent(entry.content, 
-				        				tv3A, getActivityContext()));
+						tv3A.setText(WhoochHelperFunctions.getSpannedFromHtmlContent(entry.content, tv3A, getActivityContext()));
+
 
 						TextView tv4A = (TextView) view
 								.findViewById(R.id.entry_whooch_footA);
@@ -710,9 +700,8 @@ public class StreamActivity extends SherlockListActivity implements
 
 						TextView tv3B = (TextView) view
 								.findViewById(R.id.entry_whooch_contentB);
-				        tv3B.setText(WhoochHelperFunctions
-								.getSpannedFromHtmlContent(mShowConvoCurrentUpdate.content, 
-				        				tv3B, getActivityContext()));
+						tv3B.setText(WhoochHelperFunctions.getSpannedFromHtmlContent(mShowConvoCurrentUpdate.content, tv3B, getActivityContext()));
+
 
 						TextView tv4B = (TextView) view
 								.findViewById(R.id.entry_whooch_footB);
@@ -741,6 +730,8 @@ public class StreamActivity extends SherlockListActivity implements
 
 	private class DeleteUpdate implements WhoochApiCallInterface {
 
+        public void preExecute() {}
+        
 		public HttpRequestBase getHttpRequest() {
 			HttpPost request = new HttpPost(Settings.apiUrl + "/whooch/delete");
 
@@ -767,9 +758,8 @@ public class StreamActivity extends SherlockListActivity implements
 		public void postExecute(int statusCode) {
 
 			if (statusCode == 200) {
-				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new StreamInitiate(), false);
-				task.execute();
+				mStreamArray.remove(mLastSelectedPosition);
+				mAdapter.notifyDataSetChanged();
 			}
 
 			mDeleteWhoochId = null;

@@ -293,6 +293,8 @@ public class UploadPhotoActivity extends Activity {
 
 	private class UploadPhoto implements WhoochApiCallInterface {
 
+        public void preExecute() {}
+        
 		public HttpRequestBase getHttpRequest() {
 			
 			String apiString = null;

@@ -3,33 +3,56 @@ package com.whooch.app.helpers;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
+import com.whooch.app.CreateActivity;
 import com.whooch.app.FeedbackActivity;
 import com.whooch.app.ListsActivity;
+import com.whooch.app.PostStandardActivity;
 import com.whooch.app.R;
 import com.whooch.app.ReactionsActivity;
+import com.whooch.app.SearchActivity;
 import com.whooch.app.StreamActivity;
 import com.whooch.app.UserProfileActivity;
 
 public class ActionBarHelper {
 
     private static final String[] TAB_NAMES = {"Stream", "Whooch", "Feedback", "Reactions", "You"};
+    protected static Context mApplicationContext = null;
     
     public static void setupActionBar(ActionBar actionBar, ActionBar.TabListener tabListener, int selected) {
     	
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-   //     actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setTitle("Stream");
-
-
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setDisplayShowHomeEnabled(true);
+    	
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        actionBar.setDisplayShowCustomEnabled(true);
 
+		LayoutInflater inflater = (LayoutInflater) mApplicationContext.getSystemService(
+						Context.LAYOUT_INFLATER_SERVICE);
+
+		View view = inflater.inflate(
+				R.layout.title_bar, null);
+        
+        
+        actionBar.setCustomView(view);
+        
+		Button btn1 = (Button) view.findViewById(R.id.main_create);
+		btn1.setOnClickListener(getCreateWhoochClickListener());
+
+		ImageButton ibtn2 = (ImageButton) view.findViewById(R.id.main_search);
+		ibtn2.setOnClickListener(getSearchClickListener());
+		
+		ImageButton ibtn3 = (ImageButton) view.findViewById(R.id.main_update);
+		ibtn3.setOnClickListener(getUpdateClickListener());
         
         for (int i=0; i<TAB_NAMES.length; ++i) {
             Tab tab = actionBar.newTab();
@@ -70,13 +93,11 @@ public class ActionBarHelper {
         if (actionBar.getSelectedTab().getPosition() != index) {
             Tab tab = actionBar.getTabAt(index);
             actionBar.selectTab(tab);
-            
         }
     }
     
     public static class TabListener implements ActionBar.TabListener {
 
-        private Context mApplicationContext = null;
         private boolean mTabDebounce = false;
         private String lastUnselectedTab = "";
         
@@ -144,6 +165,41 @@ public class ActionBarHelper {
                mTabDebounce = true;
                lastUnselectedTab = tab.getTag().toString();
         }
+    }
+    
+    public static OnClickListener getCreateWhoochClickListener(){
+        return new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	Intent i = new Intent(v.getContext(), CreateActivity.class);
+            	i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            	v.getContext().startActivity(i);
+            }
+        };
+    	
+    }
+    
+    public static OnClickListener getSearchClickListener(){
+        return new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	Intent i = new Intent(v.getContext(), SearchActivity.class);
+            	i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            	v.getContext().startActivity(i);
+            }
+        };
+    }
+        
+    public static OnClickListener getUpdateClickListener(){
+        return new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              	Intent i = new Intent(v.getContext(), PostStandardActivity.class);
+                i.putExtra("UPDATE_TYPE", "regular");
+              	i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+              	v.getContext().startActivity(i);
+            }
+        };
     }
     
 }

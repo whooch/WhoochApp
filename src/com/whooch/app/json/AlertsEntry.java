@@ -9,7 +9,8 @@ abstract public class AlertsEntry {
     
     public String alertType = null;
 
-    abstract public String getImageUrl();
+    abstract public String getUserImageUrl();
+    abstract public String getWhoochImageUrl();
     abstract public String getMessage();
     abstract public OnClickListener getAcceptClickListener();
     abstract public OnClickListener getDeclineClickListener();

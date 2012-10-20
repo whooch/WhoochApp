@@ -20,7 +20,7 @@
             android:src="@drawable/ic_launcher" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dip"
             android:layout_marginRight="15dip"
@@ -43,7 +43,7 @@
 
             <TextView
                 android:id="@+id/entry_whooch_contentA"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="content goes here..." />
         </LinearLayout>
@@ -65,7 +65,7 @@
 
         <TextView
             android:id="@+id/entry_whooch_footA"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="time is an illusion"
             android:textColor="@color/gray1"
@@ -88,7 +88,7 @@
             android:src="@drawable/ic_launcher" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dip"
             android:layout_marginRight="15dip"
@@ -113,7 +113,7 @@
 
             <TextView
                 android:id="@+id/entry_whooch_contentB"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="content goes here..." />
         </LinearLayout>
@@ -135,7 +135,7 @@
 
         <TextView
             android:id="@+id/entry_whooch_footB"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="time is an illusion"
             android:textColor="@color/gray1"

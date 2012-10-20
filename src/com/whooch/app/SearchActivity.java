@@ -22,14 +22,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.Button;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RadioButton;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListActivity;
@@ -40,13 +44,10 @@ import com.whooch.app.helpers.WhoochApiCallTask;
 import com.whooch.app.json.SearchEntry;
 import com.whooch.app.ui.SearchArrayAdapter;
 
-import eu.erikw.PullToRefreshListView;
-import eu.erikw.PullToRefreshListView.OnRefreshListener;
-
 public class SearchActivity extends SherlockListActivity implements
 		OnScrollListener {
 
-	private PullToRefreshListView mListView;
+	private ListView mListView;
 
 	private ArrayList<SearchEntry> mSearchArray = new ArrayList<SearchEntry>();
 	private SearchArrayAdapter mAdapter;
@@ -58,6 +59,8 @@ public class SearchActivity extends SherlockListActivity implements
 	private int mSearchNextPage = 1;
 	private EditText mSearchQuery = null;
 	private String mSearchType = "open";
+	
+	private Spinner mSearchSpinner = null;
 
 	View mLoadingFooterView;
 
@@ -73,29 +76,46 @@ public class SearchActivity extends SherlockListActivity implements
 		ActionBarHelper.setupActionBar(getSupportActionBar(),
 				new ActionBarHelper.TabListener(getApplicationContext()), 1);
 
-		mListView = (PullToRefreshListView) getListView();
-		mListView.setOnScrollListener(this);
-		mListView.setOnRefreshListener(new OnRefreshListener() {
-			@Override
-			public void onRefresh() {
-				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new SearchInitiate(), false);
-				task.execute();
-			}
-		});
-
 		mSearchQuery = (EditText) findViewById(R.id.search_query);
-
-		RadioButton searchWhoochRB = (RadioButton) findViewById(R.id.search_whooch_rb);
-		searchWhoochRB.setChecked(true);
 
 		mAdapter = new SearchArrayAdapter(this, mSearchArray);
 		setListAdapter(mAdapter);
+		
+		EditText et1 = (EditText)findViewById(R.id.search_query);
+		et1.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+		    @Override
+		    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+		        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+					WhoochApiCallTask task = new WhoochApiCallTask(
+							getActivityContext(), new SearchInitiate(), false);
+					task.execute();
+		            return true;
+		        }
+		        return false;
+		    }
+		});
+		
+		mSearchSpinner = (Spinner) findViewById(R.id.search_spinner);
+		mSearchSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+		    @Override
+		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+		        if(position == 0)
+		        {
+		        	mSearchType = "open";
+		        }
+		        else
+		        {
+		        	mSearchType = "user";
+		        }
+		    }
 
-		Button ibtn1 = (Button) findViewById(R.id.search_submit);
+		    @Override
+		    public void onNothingSelected(AdapterView<?> parentView) {
+		       
+		    }
 
-		// unable to find ID - let it go for now
-		ibtn1.setOnClickListener(getSearchSubmitClickListener());
+		});
+
 	}
 
 	@Override
@@ -146,7 +166,7 @@ public class SearchActivity extends SherlockListActivity implements
 	@Override
 	protected Dialog onCreateDialog(int id, Bundle b) {
 
-		final SearchEntry entry = mSearchArray.get(b.getInt("POSITION") - 1);
+		final SearchEntry entry = mSearchArray.get(b.getInt("POSITION"));
 
 		// create the menu
 		ArrayList<String> names = new ArrayList<String>();
@@ -227,7 +247,17 @@ public class SearchActivity extends SherlockListActivity implements
 	private class SearchInitiate implements WhoochApiCallInterface {
 
 		private String mResponseString = null;
+		private ProgressBar mSearchLoader = null;
 
+        public void preExecute() {
+        	
+        	mSearchLoader = (ProgressBar)findViewById(R.id.search_loader);
+        	mSearchLoader.setVisibility(View.VISIBLE);
+        	mSearchArray.clear();
+			mAdapter.notifyDataSetChanged();
+        	
+        }
+        
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl + "/search/1?page=0&type="
 					+ mSearchType + "&query="
@@ -281,8 +311,9 @@ public class SearchActivity extends SherlockListActivity implements
 				}
 			}
 
+        	mSearchLoader = (ProgressBar)findViewById(R.id.search_loader);
+        	mSearchLoader.setVisibility(View.GONE);
 			mAdapter.notifyDataSetChanged();
-			mListView.onRefreshComplete();
 
 			mSearchInitiated = true;
 		}
@@ -292,6 +323,8 @@ public class SearchActivity extends SherlockListActivity implements
 
 		private String mResponseString = null;
 
+        public void preExecute() {}
+        
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl + "/search/1?page="
 					+ mSearchNextPage + "&type=" + mSearchType + "&query="
@@ -343,7 +376,6 @@ public class SearchActivity extends SherlockListActivity implements
 			}
 
 			mAdapter.notifyDataSetChanged();
-			mListView.onRefreshComplete();
 
 			// dismiss the 'loading more items' footer
 			mListView.removeFooterView(mLoadingFooterView);
@@ -353,40 +385,13 @@ public class SearchActivity extends SherlockListActivity implements
 		}
 	}
 
-	public OnClickListener getSearchSubmitClickListener() {
-		return new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new SearchInitiate(), true);
-				task.execute();
-			}
-		};
-
-	}
-
-	public void onRadioButtonClicked(View view) {
-		// Is the button now checked?
-		boolean checked = ((RadioButton) view).isChecked();
-
-		// Check which radio button was clicked
-		switch (view.getId()) {
-		case R.id.search_whooch_rb:
-			if (checked)
-				mSearchType = "open";
-			break;
-		case R.id.search_user_rb:
-			if (checked)
-				mSearchType = "user";
-			break;
-		}
-	}
-
 	private class TrailWhooch implements WhoochApiCallInterface {
 
 		private String mWhoochId = null;
 		private String mResponseString = null;
 
+        public void preExecute() {}
+        
 		public TrailWhooch(String whoochId) {
 			mWhoochId = whoochId;
 		}
@@ -456,6 +461,7 @@ public class SearchActivity extends SherlockListActivity implements
 
 		private String mUserId = null;
 
+        public void preExecute() {}
 
 		public SendFriendRequest(String userId) {
 			mUserId = userId;

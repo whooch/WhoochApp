@@ -7,90 +7,197 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="3dip"
-        android:layout_marginTop="3dip"
+        android:layout_margin="10dip"
         android:orientation="horizontal" >
 
         <ImageView
             android:id="@+id/wprofile_whoochimage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dip"
+            android:layout_height="50dip"
             android:src="@drawable/ic_launcher" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/wprofile_whoochname"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dip"
-            android:orientation="vertical" >
-
-            <TextView
-                android:id="@+id/wprofile_whoochname"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Whooch Name"
-                android:textColor="@color/darkblue"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/wprofile_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Description" />
-        </LinearLayout>
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="5dip"
+            android:text="WhoochName"
+            android:textColor="@color/whoochblue"
+            android:textSize="20sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dip"
-        android:layout_marginLeft="3dip"
-        android:orientation="horizontal" >
+        android:layout_marginTop="0dip"
+        android:layout_marginBottom="20dip"
+        android:layout_marginRight="10dip"
+        android:layout_marginLeft="10dip"
+        android:orientation="vertical" >
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/wprofile_leader_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dip"
-            android:orientation="vertical" >
-            
-            <TextView
-                android:id="@+id/wprofile_leader_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Leader"
-                android:textColor="@color/gray1" />
+            android:layout_marginTop="5dip"
+            android:layout_marginBottom="2dip"
+            android:text="Leader"
+            android:textColor="@color/gray1"
+            android:textSize="15sp" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/wprofile_leaderimage"
+                android:layout_width="20dip"
+                android:layout_height="20dip"
+                android:src="@drawable/ic_launcher" />
 
             <TextView
-                android:id="@+id/wprofile_leader"
+                android:id="@+id/wprofile_leadername"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="5dip"
+                android:layout_toRightOf="@+id/wprofile_leaderimage"
                 android:text="Leader"
-                android:textColor="@color/darkblue"
-                android:textStyle="bold" />
+                android:textSize="15sp" />
+        </RelativeLayout>
 
+        <TextView
+            android:id="@+id/wprofile_type_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dip"
+            android:layout_marginBottom="2dip"
+            android:text="Type"
+            android:textColor="@color/gray1"
+            android:textSize="15sp" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/wprofile_typeimage"
+                android:layout_width="20dip"
+                android:layout_height="20dip"
+                android:src="@drawable/ic_closed_gr" />
+
+            <TextView
+                android:id="@+id/wprofile_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dip"
+                android:layout_toRightOf="@+id/wprofile_typeimage"
+                android:text="Type"
+                android:textSize="15sp" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/wprofile_open_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone" >
+
+            <TextView
+                android:id="@+id/wprofile_users_trailing_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dip"
+                android:layout_marginBottom="2dip"
+                android:text="Users Trailing"
+                android:textColor="@color/gray1"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/wprofile_users_trailing"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Users Trailing"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/wprofile_rating_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dip"
+                android:layout_marginBottom="2dip"
+                android:text="Rating"
+                android:textColor="@color/gray1"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/wprofile_rating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rating"
+                android:textSize="15sp" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/wprofile_description_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dip"
+            android:layout_marginBottom="2dip"
+            android:text="Description"
+            android:textColor="@color/gray1"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/wprofile_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Description"
+            android:textSize="15sp" />
     </LinearLayout>
 
     <Button
         android:id="@+id/wprofile_inviteuser"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Invite" 
-        android:visibility="gone"/>
+        android:layout_marginBottom="10dip"
+        android:layout_marginLeft="20dip"
+        android:layout_marginRight="20dip"
+        android:layout_marginTop="10dip"
+        android:background="@drawable/lists_button_selector"
+        android:text="Invite"
+        android:textColor="@color/white"
+        android:textSize="15dip"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/wprofile_updatephoto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Update Photo" 
-        android:visibility="gone"/>
-    
+        android:layout_marginBottom="10dip"
+        android:layout_marginLeft="20dip"
+        android:layout_marginRight="20dip"
+        android:layout_marginTop="10dip"
+        android:background="@drawable/lists_button_selector"
+        android:text="Update whooch image"
+        android:textColor="@color/white"
+        android:textSize="15dip"
+        android:visibility="gone" />
+
     <Button
         android:id="@+id/wprofile_trailwhooch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Trail Whooch" 
-        android:visibility="gone"/>
+        android:layout_marginBottom="10dip"
+        android:layout_marginLeft="20dip"
+        android:layout_marginRight="20dip"
+        android:layout_marginTop="10dip"
+        android:background="@drawable/lists_button_selector"
+        android:textColor="@color/white"
+        android:textSize="15dip"
+        android:visibility="gone" />
 
-    
 </LinearLayout>

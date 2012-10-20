@@ -12,9 +12,11 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
@@ -57,6 +59,8 @@ public class WhoochProfileEntry {
     public String whoochImageUriLarge = null;
     
     public String whoochImageUriDefault = null;
+    
+    public String leaderImageUriDefault = null;
     
     public WhoochProfileEntry() {
     }
@@ -158,6 +162,16 @@ public class WhoochProfileEntry {
         case DisplayMetrics.DENSITY_HIGH:
             whoochImageUriDefault = whoochImageUriLarge;
         }
+        
+        if (leaderImage.equals("defaultUser.png")) {
+        	leaderImageUriDefault = Settings.cdnUrl + "s_" + leaderImage;
+        }
+        else
+        {
+        	leaderImageUriDefault = Settings.cdnUrl + "u" + leaderId + "_s" + leaderImage;
+        }
+        
+        Log.e("test", leaderImageUriDefault);
     }
     
     public OnClickListener getInviteUserClickListener(){
@@ -188,7 +202,17 @@ public class WhoochProfileEntry {
         return new OnClickListener() {
             @Override
             public void onClick(View v) {
-                WhoochApiCallTask task = new WhoochApiCallTask(v.getContext(), new TrailWhooch(whoochId, v.getContext()), true);
+                WhoochApiCallTask task = new WhoochApiCallTask(v.getContext(), new TrailWhooch(whoochId, "start", v.getContext()), true);
+                task.execute();
+            }
+        };
+    }
+    
+    public OnClickListener getStopTrailWhoochClickListener(){
+        return new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                WhoochApiCallTask task = new WhoochApiCallTask(v.getContext(), new TrailWhooch(whoochId, "stop", v.getContext()), true);
                 task.execute();
             }
         };
@@ -199,16 +223,20 @@ public class WhoochProfileEntry {
 		private String mWhoochId = null;
 		private String mResponseString = null;
 		private Context mContext = null;
+		private String mAction = null;
 
-		public TrailWhooch(String whoochId, Context context) {
+        public void preExecute() {}
+        
+		public TrailWhooch(String whoochId, String action, Context context) {
 			mWhoochId = whoochId;
 			mContext = context;
+			mAction = action;
 		}
 
 		public HttpRequestBase getHttpRequest() {
 
 			HttpPost request = new HttpPost(Settings.apiUrl
-					+ "/whooch/starttrailingopen");
+					+ "/whooch/" + mAction + "trailingopen");
 
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 			nameValuePairs.add(new BasicNameValuePair("whoochId", mWhoochId));
@@ -238,11 +266,11 @@ public class WhoochProfileEntry {
 						String trailStatus = jsonObject
 								.getString("trailingStatus");
 
-						if ((trailStatus != null)
-								&& (trailStatus.equals("true"))) {
-							Toast.makeText(mContext,
-									"You are now trailing this whooch",
-									Toast.LENGTH_SHORT).show();
+						if (trailStatus != null) {
+							Activity a = (Activity)mContext;
+							Intent intent = a.getIntent();
+							a.finish();
+							a.startActivity(intent);
 						} else {
 							Toast.makeText(mContext,
 									"Something went wrong, try again",

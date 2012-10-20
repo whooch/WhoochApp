@@ -16,6 +16,8 @@ public class ContributingEntry {
     public String whoochImage = null;
     public String whoochName = null;
     
+    public String leaderName = null;
+    
     // derived attributes
     public String whoochImageUriSmall = null;
     public String whoochImageUriMedium = null;
@@ -47,6 +49,12 @@ public class ContributingEntry {
         
         try {
             whoochName = json.getString("whoochName");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        
+        try {
+            leaderName = json.getString("leaderName");
         } catch (JSONException e) {
             e.printStackTrace();
         }

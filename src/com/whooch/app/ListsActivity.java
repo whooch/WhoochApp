@@ -63,7 +63,7 @@ public class ListsActivity extends SherlockActivity {
 			{
 				mWorkingListArray.clear();
 				mWorkingAdapter.notifyDataSetChanged();
-				task = new WhoochApiCallTask(getActivityContext(), new LoadList(1), false);
+				task = new WhoochApiCallTask(getActivityContext(), new LoadList(1), true);
 				task.execute();
 			}
 			else
@@ -77,7 +77,7 @@ public class ListsActivity extends SherlockActivity {
 			{
 				mWorkingListArray.clear();
 				mWorkingAdapter.notifyDataSetChanged();
-				task = new WhoochApiCallTask(getActivityContext(), new LoadList(2), false);
+				task = new WhoochApiCallTask(getActivityContext(), new LoadList(2), true);
 				task.execute();
 			}
 			else
@@ -91,7 +91,7 @@ public class ListsActivity extends SherlockActivity {
 			{
 				mWorkingListArray.clear();
 				mWorkingAdapter.notifyDataSetChanged();
-				task = new WhoochApiCallTask(getActivityContext(), new LoadList(3), false);
+				task = new WhoochApiCallTask(getActivityContext(), new LoadList(3), true);
 				task.execute();
 			}
 			else
@@ -126,7 +126,7 @@ public class ListsActivity extends SherlockActivity {
             }
         });
         
-		WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new LoadList(1), false);
+		WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new LoadList(1), true);
 		task.execute();
        
     }
@@ -147,6 +147,8 @@ public class ListsActivity extends SherlockActivity {
         private int mListId;
         private ArrayList<ListsEntry> mLocalArray = null;
 
+        public void preExecute() {}
+        
         LoadList(int listId) {
             mListId = listId;
             

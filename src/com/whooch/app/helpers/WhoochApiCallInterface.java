@@ -6,4 +6,5 @@ public interface WhoochApiCallInterface {
     public HttpRequestBase getHttpRequest();
     public void handleResponse(String responseString);
     public void postExecute(int statusCode);
+    public void preExecute();
 }
