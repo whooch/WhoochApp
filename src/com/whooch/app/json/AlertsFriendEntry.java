@@ -67,9 +67,15 @@ public class AlertsFriendEntry extends AlertsEntry {
         
         // determine the URLs for the user image
         if (userImage != null && userId != null) {
-            userImageUriSmall = Settings.cdnUrl + "u" + userId + "_s" + userImage;
-            userImageUriMedium = Settings.cdnUrl + "u" + userId + "_m" + userImage;
-            userImageUriLarge = Settings.cdnUrl + "u" + userId + "_l" + userImage;
+            if(userImage.equals("defaultUser.png")) {
+            	userImageUriSmall = Settings.cdnUrl + "s_" + userImage;
+            	userImageUriMedium = Settings.cdnUrl + "m_" + userImage;
+            	userImageUriLarge = Settings.cdnUrl + "l_" + userImage;
+            } else {
+                userImageUriSmall = Settings.cdnUrl + "u" + userId + "_s" + userImage;
+                userImageUriMedium = Settings.cdnUrl + "u" + userId + "_m" + userImage;
+                userImageUriLarge = Settings.cdnUrl + "u" + userId + "_l" + userImage;
+            }
         }
         
         // determine proper image to use based on the current screen resolution
@@ -92,12 +98,22 @@ public class AlertsFriendEntry extends AlertsEntry {
 
     @Override
     public String getUserImageUrl() {
-        return userImageUriDefault;
+        return userImageUriSmall;
     }
 
     @Override
-    public String getMessage() {
-        return userName + " has sent you a friend request";
+    public String getAlertType() {
+        return " has sent you a friend request";
+    }
+    
+    @Override
+    public String getUserName() {
+        return userName;
+    }
+    
+    @Override
+    public String getWhoochName() {
+        return "";
     }
 
     public OnClickListener getAcceptClickListener() {

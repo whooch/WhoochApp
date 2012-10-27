@@ -11,12 +11,14 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.Button;
+import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.Button;
 
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
@@ -25,6 +27,7 @@ import com.whooch.app.helpers.ActionBarHelper;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
 import com.whooch.app.helpers.WhoochApiCallTask;
+import com.whooch.app.helpers.WhoochHelperFunctions;
 import com.whooch.app.json.UserProfileEntry;
 import com.whooch.app.ui.UserProfileArrayAdapter;
 
@@ -45,7 +48,9 @@ public class UserProfileActivity extends SherlockListActivity implements
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 
-		if (mProfileType == "local") {
+		WhoochHelperFunctions whoochHelper = new WhoochHelperFunctions();
+		if (mProfileType == "local"
+				&& (whoochHelper.getScreenOrientation(this) == Configuration.ORIENTATION_PORTRAIT)) {
 
 			menu.add(Menu.NONE, 1, 0, "Settings").setShowAsAction(
 					MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -62,7 +67,7 @@ public class UserProfileActivity extends SherlockListActivity implements
 		Intent i = null;
 		switch (item.getItemId()) {
 		case 1:
-			i = new Intent(getActivityContext(), PushSettingsActivity.class);
+			i = new Intent(getActivityContext(), SettingsActivity.class);
 			startActivity(i);
 			return true;
 		case 2:
@@ -77,6 +82,9 @@ public class UserProfileActivity extends SherlockListActivity implements
 			i = new Intent(getActivityContext(), LoginActivity.class);
 			startActivity(i);
 			return true;
+	    case android.R.id.home:
+	        finish();
+	        return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -98,17 +106,41 @@ public class UserProfileActivity extends SherlockListActivity implements
 		mUserId = b.getString("USER_ID");
 
 		if (mUserId.equals(userId)) {
-			mProfileType = "local";
+			if(b.containsKey("FORCE_FOREIGN"))
+			{
+				mProfileType = "localForeign";
+			}
+			else
+			{
+				mProfileType = "local";
+			}	
 		} else {
 			mProfileType = "foreign";
 		}
 
+		if (mProfileType.equals("local")) {
+			ActionBarHelper
+					.setupActionBar(getSupportActionBar(),
+							new ActionBarHelper.TabListener(
+									getApplicationContext()), 4);
+		}
+		else
+		{
+			getSupportActionBar().setDisplayShowHomeEnabled(true);
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+			
+			LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			View title_view = inflater.inflate(R.layout.title_bar_generic, null);
+			getSupportActionBar().setCustomView(title_view);
+			getSupportActionBar().setDisplayShowCustomEnabled(true);
+			TextView tvhead = (TextView)title_view.findViewById(R.id.header_generic_title);
+			tvhead.setText("Profile");
+		}
+		
+		
 		mAdapter = new UserProfileArrayAdapter(this, mProfileType,
 				mUserProfileArray);
 		setListAdapter(mAdapter);
-
-		ActionBarHelper.setupActionBar(getSupportActionBar(),
-				new ActionBarHelper.TabListener(getApplicationContext()), 4);
 
 	}
 
@@ -116,7 +148,10 @@ public class UserProfileActivity extends SherlockListActivity implements
 	public void onResume() {
 		super.onResume();
 
-		ActionBarHelper.selectTab(getSupportActionBar(), 4);
+		if (mProfileType.equals("local")) 
+		{
+			ActionBarHelper.selectTab(getSupportActionBar(), 4);
+		}
 
 		WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(),
 				new ProfileInitiate(), true);
@@ -192,7 +227,7 @@ public class UserProfileActivity extends SherlockListActivity implements
 		}
 
 		public HttpRequestBase getHttpRequest() {
-			return new HttpGet(Settings.apiUrl + "/user/alertmessagecount");
+			return new HttpGet(Settings.apiUrl + "/alerts/1");
 		}
 
 		public void handleResponse(String responseString) {
@@ -208,12 +243,25 @@ public class UserProfileActivity extends SherlockListActivity implements
 				// parse the response as JSON and update the Content Array
 				if (!mResponseString.equals("null")) {
 					try {
+						JSONArray jsonArray = new JSONArray(mResponseString);
 
-						JSONObject jsonObject = new JSONObject(mResponseString);
-						// create an object that will be used to populate the
-						// List View and add it to the array
+						int alertCount = 0;
 
-						String alertCount = jsonObject.getString("alerts");
+						for (int i = 0; i < jsonArray.length(); i++) {
+
+							JSONObject jsonAlert = jsonArray.getJSONObject(i);
+							String alertType = jsonAlert.getString("alertType");
+
+							if (alertType.equals("friend")
+									|| alertType.equals("trailing")
+									|| alertType.equals("contributing")
+									|| alertType.equals("trailrequest")) {
+
+								alertCount++;
+
+							}
+
+						}
 
 						ibtn1.setText("Alerts (" + alertCount + ")");
 
@@ -223,11 +271,8 @@ public class UserProfileActivity extends SherlockListActivity implements
 						ibtn1.setText("Alerts");
 					}
 				} else {
-					// if it is null we don't mind, there just wasn't anything
-					// there
 					ibtn1.setText("Alerts");
 				}
-
 			} else {
 				ibtn1.setText("Alerts");
 			}
@@ -248,4 +293,5 @@ public class UserProfileActivity extends SherlockListActivity implements
 		// TODO Auto-generated method stub
 
 	}
+	
 }

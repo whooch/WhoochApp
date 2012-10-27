@@ -24,6 +24,14 @@
             android:hint="Search for a user to react to"
             android:singleLine="true"
             android:text="" />
+
+        <ProgressBar
+            android:id="@+id/post_searchuser_loader"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
     </LinearLayout>
 
     <!-- Post -->
@@ -33,53 +41,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="gone"
-         >
+        android:visibility="gone" >
 
         <Spinner
             android:id="@+id/post_whooch_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"/>
-        
+            android:visibility="gone" />
+
         <ProgressBar
-        android:id="@+id/spinner_loader"
-        android:layout_width="35dip"
-        android:layout_height="35dip"
-        android:layout_gravity="center"
-        android:visibility="gone"
-        />
+            android:id="@+id/spinner_loader"
+            android:layout_width="35dip"
+            android:layout_height="35dip"
+            android:layout_gravity="center"
+            android:visibility="gone" />
     </LinearLayout>
 
-    <!-- Feedback -->
 
-    <RelativeLayout
-        android:id="@+id/post_whooch_feedback_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="3dip"
-        android:layout_marginTop="3dip"
-        android:visibility="gone" >
-
-        <ImageView
-            android:id="@+id/post_whooch_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="3dip"
-            android:src="@drawable/ic_launcher" />
-
-        <TextView
-            android:id="@+id/post_whooch_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dip"
-            android:layout_toRightOf="@id/post_whooch_image"
-            android:hint="Update here"
-            android:text="Whooch Name"
-            android:textStyle="bold" />
-    </RelativeLayout>
 
     <!-- React -->
 
@@ -87,47 +65,14 @@
         android:id="@+id/post_react_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="3dip"
-        android:layout_marginTop="3dip"
+        android:layout_margin="5dip"
         android:visibility="gone" >
 
-        <ImageView
-            android:id="@+id/post_react_whooch_image"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginLeft="3dip"
-            android:layout_alignParentTop="true"
-            android:src="@drawable/ic_launcher" />
-
-        <LinearLayout
-            android:id="@+id/post_react_info_block"
+        <TextView
+            android:id="@+id/post_reacting_to"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/post_react_whooch_image"
-            android:orientation="vertical"
-            android:paddingLeft="10dip" >
-
-            <TextView
-                android:id="@+id/post_react_whooch_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Whooch Name"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/post_react_whooch_contributor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Whooch Contributor"
-                android:textColor="@color/gray1" />
-
-            <TextView
-                android:id="@+id/post_reacting_to"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="post content" />
-        </LinearLayout>
-
+            android:text="post content" />
     </RelativeLayout>
 
     <EditText
@@ -183,6 +128,8 @@
             android:layout_height="40dip"
             android:layout_alignParentRight="true"
             android:background="@drawable/lists_button_selector"
+            android:paddingLeft="4dip"
+            android:paddingRight="4dip"
             android:textColor="@color/white"
             android:textSize="15sp" />
     </RelativeLayout>

@@ -21,130 +21,142 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockListActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
+import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.helpers.ActionBarHelper;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
 import com.whooch.app.helpers.WhoochApiCallTask;
+import com.whooch.app.helpers.WhoochHelperFunctions;
 import com.whooch.app.json.FeedbackEntry;
 import com.whooch.app.ui.FeedbackArrayAdapter;
-
-import eu.erikw.PullToRefreshListView;
-import eu.erikw.PullToRefreshListView.OnRefreshListener;
 
 public class FeedbackActivity extends SherlockListActivity implements
 		OnScrollListener {
 
-	private PullToRefreshListView mListView;
+	private ListView mListView;
 
 	private ArrayList<FeedbackEntry> mFeedbackArray = new ArrayList<FeedbackEntry>();
 	private FeedbackArrayAdapter mAdapter;
-	
+
 	boolean mFeedbackInitiated = false;
 	boolean mFeedbackHasMoreUpdates = true;
 	boolean mLoadMoreItemsInProgress = false;
 	private int mFeedbackNextPage = 1;
 	
+    private Button mReceivedButton = null;
+    private Button mSentButton = null;
+
 	String mFeedbackType = "received";
-	
+
 	String mDeleteFeedbackId = null;
 	private int mLastSelectedPosition = -1;
+	
+	private FeedbackEntry mDialogCurrentUpdate = null;
 
 	View mLoadingFooterView;
 
 	// Unique id counter to prevent Android from reusing the same dialog.
 	int mNextDialogId = 0;
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-
-		menu.add(Menu.NONE, 1, 0, "Received")
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-		menu.add(Menu.NONE, 2, 0, "Sent")
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		
-		return true;
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case 1:
-			if(mFeedbackType == "sent")
-			{
-				mFeedbackType = "received";
-				mFeedbackArray.clear();
-				mAdapter.notifyDataSetChanged();
-				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new FeedbackInitiate(), true);
-				task.execute();
-			}
-			return true;
-		case 2:
-			if(mFeedbackType == "received")
-			{
-				mFeedbackType = "sent";
-				mFeedbackArray.clear();
-				mAdapter.notifyDataSetChanged();
-				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new FeedbackInitiate(), true);
-				task.execute();
-			}
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-
-	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.stream);
+		setContentView(R.layout.feedback_reactions);
 
 		ActionBarHelper.setupActionBar(getSupportActionBar(),
 				new ActionBarHelper.TabListener(getApplicationContext()), 2);
 
-		mListView = (PullToRefreshListView) getListView();
+		mListView = getListView();
 		mListView.setOnScrollListener(this);
-		mListView.setOnRefreshListener(new OnRefreshListener() {
-			@Override
-			public void onRefresh() {
-				//mFeedbackArray.clear();
-				//mAdapter.notifyDataSetChanged();
-				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new FeedbackInitiate(), false);
-				task.execute();
-			}
-		});
+		
+		//Add and remove loading footer before setting adapter
+		//Footer won't show up unless one is present when adapter is set
+		mLoadingFooterView = this.getLayoutInflater().inflate(
+				R.layout.stream_loading_footer, null);
+		mListView.addFooterView(mLoadingFooterView);
 
-		mAdapter = new FeedbackArrayAdapter(this, mFeedbackArray);
+		mAdapter = new FeedbackArrayAdapter(this, mFeedbackArray, false);
 		setListAdapter(mAdapter);
 		
+		mListView.removeFooterView(mLoadingFooterView);
+
 		if (savedInstanceState == null) {
 
 			WhoochApiCallTask task = new WhoochApiCallTask(
 					getActivityContext(), new FeedbackInitiate(), true);
 			task.execute();
-			
+
 		}
-	}
+		
+		mReceivedButton = (Button) findViewById(R.id.received_action);
+		mSentButton = (Button) findViewById(R.id.sent_action);
+		
+		mReceivedButton.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				
+				if (mFeedbackType == "sent") {
+		            mReceivedButton.setSelected(true);
+		            mSentButton.setSelected(false);
+
+					mFeedbackType = "received";
+					mFeedbackArray.clear();
+					mAdapter.notifyDataSetChanged();
+					WhoochApiCallTask task = new WhoochApiCallTask(
+							getActivityContext(), new FeedbackInitiate(), true);
+					task.execute();
+				}
 	
+			}
+			
+		});
+		
+		mSentButton.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				
+				if (mFeedbackType == "received") {
+		            mSentButton.setSelected(true);
+		            mReceivedButton.setSelected(false);
+					
+					mFeedbackType = "sent";
+					mFeedbackArray.clear();
+					mAdapter.notifyDataSetChanged();
+					WhoochApiCallTask task = new WhoochApiCallTask(
+							getActivityContext(), new FeedbackInitiate(), true);
+					task.execute();
+				}
+				
+			}
+			
+		});
+
+		mReceivedButton.setSelected(true);
+	}
+
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
@@ -168,20 +180,21 @@ public class FeedbackActivity extends SherlockListActivity implements
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onRestoreInstanceState(Bundle savedState) {
-		
+
 		if (savedState != null) {
 
-			if (savedState.containsKey("FeedbackList") && savedState.containsKey("FeedbackType")) {
+			if (savedState.containsKey("FeedbackList")
+					&& savedState.containsKey("FeedbackType")) {
 
 				try {
-					
+
 					View loader = findViewById(R.id.main_loader);
 					if (loader != null) {
 						loader.setVisibility(View.GONE);
 					}
-					
+
 					mFeedbackType = savedState.getString("FeedbackType");
-					
+
 					ObjectInputStream objectIn = new ObjectInputStream(
 							new ByteArrayInputStream(
 									savedState.getByteArray("FeedbackList")));
@@ -189,7 +202,7 @@ public class FeedbackActivity extends SherlockListActivity implements
 					obj = objectIn.readObject();
 
 					setFeedbackArray((ArrayList<FeedbackEntry>) obj);
-					
+
 					mFeedbackInitiated = true;
 					mFeedbackNextPage++;
 
@@ -197,11 +210,8 @@ public class FeedbackActivity extends SherlockListActivity implements
 						mFeedbackHasMoreUpdates = false;
 					}
 
+					mAdapter.notifyDataSetChanged();
 
-				mAdapter.notifyDataSetChanged();
-				mListView.onRefreshComplete();
-					
-					
 				} catch (OptionalDataException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -229,6 +239,12 @@ public class FeedbackActivity extends SherlockListActivity implements
 		super.onResume();
 
 		ActionBarHelper.selectTab(getSupportActionBar(), 2);
+
+		if (mFeedbackInitiated) {
+			WhoochApiCallTask task = new WhoochApiCallTask(
+					getActivityContext(), new FeedbackInitiate(), false);
+			task.execute();
+		}
 	}
 
 	private Context getActivityContext() {
@@ -269,32 +285,31 @@ public class FeedbackActivity extends SherlockListActivity implements
 	@Override
 	protected Dialog onCreateDialog(int id, Bundle b) {
 
-		final FeedbackEntry entry = mFeedbackArray
-				.get(b.getInt("POSITION") - 1);
-		
-		mLastSelectedPosition = b.getInt("POSITION") - 1;
+		final FeedbackEntry entry = mFeedbackArray.get(b.getInt("POSITION"));
+		mLastSelectedPosition = b.getInt("POSITION");
+		mDialogCurrentUpdate = entry;
 
 		// create the menu
 		ArrayList<String> names = new ArrayList<String>();
 		ArrayList<Runnable> handlers = new ArrayList<Runnable>();
 
-		if(mFeedbackType == "received")
-		{
-		names.add("React");
-		handlers.add(new Runnable() {
-			public void run() {
+		if (mFeedbackType == "received") {
+			names.add("React");
+			handlers.add(new Runnable() {
+				public void run() {
 
-                Intent i = new Intent(getApplicationContext(), PostReactionActivity.class);
-                i.putExtra("WHOOCH_ID", entry.whoochId);
-                i.putExtra("REACTION_TO", entry.feedbackId);
-                i.putExtra("REACTION_TYPE", "feedback");
-                i.putExtra("CONTENT", entry.content);
-                i.putExtra("USER_NAME", entry.userName);
-                i.putExtra("WHOOCH_NAME", entry.whoochName);
-                i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriLarge);
-                startActivity(i);
-			}
-		});
+					Intent i = new Intent(getApplicationContext(),
+							PostReactionActivity.class);
+					i.putExtra("WHOOCH_ID", entry.whoochId);
+					i.putExtra("REACTION_TO", entry.feedbackId);
+					i.putExtra("REACTION_TYPE", "feedback");
+					i.putExtra("CONTENT", entry.content);
+					i.putExtra("USER_NAME", entry.userName);
+					i.putExtra("WHOOCH_NAME", entry.whoochName);
+					i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriLarge);
+					startActivity(i);
+				}
+			});
 		}
 
 		if (!entry.image.equals("null")) {
@@ -307,6 +322,9 @@ public class FeedbackActivity extends SherlockListActivity implements
 					i.putExtra("FEEDBACK_ID", entry.feedbackId);
 					i.putExtra("IMAGE_TYPE", "feedback");
 					i.putExtra("IMAGE_NAME", entry.image);
+					i.putExtra("WHOOCH_NAME", entry.whoochName);
+					i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriMedium);
+					i.putExtra("USER_NAME", entry.userName);
 					startActivity(i);
 				}
 			});
@@ -326,34 +344,34 @@ public class FeedbackActivity extends SherlockListActivity implements
 		handlers.add(new Runnable() {
 			public void run() {
 				Log.d("FeedbackActivity", "Remove Feedback");
-				
-                AlertDialog.Builder builder = new AlertDialog.Builder(
-    					getActivityContext());
-                
-                builder.setTitle("Whooch");
-                builder.setMessage("Are you sure you want to remove this feedback?");
-                
-                builder.setNegativeButton("CANCEL",
-    					new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
 
-					}
-				});
-                
-    			builder.setPositiveButton("OK",
-    					new DialogInterface.OnClickListener() {
-    						public void onClick(DialogInterface dialog, int id) {
-    							mDeleteFeedbackId = entry.feedbackId;
-    							WhoochApiCallTask task = new WhoochApiCallTask(
-    									getActivityContext(), new RemoveFeedback(), true);
-    							task.execute();
-    						}
-    					});
-    	        
-    		    
-    			AlertDialog dialog = builder.create();
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						getActivityContext());
 
-    			dialog.show();
+				builder.setTitle("Whooch");
+				builder.setMessage("Are you sure you want to remove this feedback?");
+
+				builder.setNegativeButton("CANCEL",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+
+							}
+						});
+
+				builder.setPositiveButton("OK",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								mDeleteFeedbackId = entry.feedbackId;
+								WhoochApiCallTask task = new WhoochApiCallTask(
+										getActivityContext(),
+										new RemoveFeedback(), true);
+								task.execute();
+							}
+						});
+
+				AlertDialog dialog = builder.create();
+
+				dialog.show();
 			}
 		});
 
@@ -361,13 +379,59 @@ public class FeedbackActivity extends SherlockListActivity implements
 		final Runnable[] handlersArray = handlers.toArray(new Runnable[handlers
 				.size()]);
 
-		return new AlertDialog.Builder(getActivityContext()).setItems(
+		return assembleUpdateDialog(namesArray, handlersArray);
+	}
+	
+	private Dialog assembleUpdateDialog(final String[] namesArray, final Runnable[] handlersArray)
+	{
+		Builder dialog = new AlertDialog.Builder(getActivityContext());
+		
+		LayoutInflater inflater = (LayoutInflater) getActivityContext()
+				.getSystemService(
+						Context.LAYOUT_INFLATER_SERVICE);
+
+		View view = inflater.inflate(
+				R.layout.stream_entry, null);
+		
+		dialog.setCustomTitle(view);
+		
+		dialog.setItems(
 				namesArray, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
-						Log.d("FeedbackActivity", "Something Was Clicked");
 						handlersArray[which].run();
 					}
-				}).create();
+				});
+		
+		ImageView iv1 = (ImageView) view
+				.findViewById(R.id.entry_whooch_image);
+		UrlImageViewHelper.setUrlDrawable(iv1,
+				mDialogCurrentUpdate.whoochImageUriLarge);
+
+		TextView tv1 = (TextView) view
+				.findViewById(R.id.entry_whooch_title);
+		tv1.setText(mDialogCurrentUpdate.whoochName);
+
+		TextView tv2 = (TextView) view
+				.findViewById(R.id.entry_posted_user);
+		tv2.setText(mDialogCurrentUpdate.userName);
+
+		TextView tv3 = (TextView) view
+				.findViewById(R.id.entry_whooch_content);
+		tv3.setText(WhoochHelperFunctions
+				.getSpannedFromHtmlContent(
+						mDialogCurrentUpdate.content, tv3,
+						getActivityContext()));
+		tv3.setMovementMethod(LinkMovementMethod.getInstance());
+
+		TextView tv4 = (TextView) view
+				.findViewById(R.id.entry_whooch_foot);
+		tv4.setText(WhoochHelperFunctions.toRelativeTime(Long
+				.parseLong(mDialogCurrentUpdate.timestamp)));
+		
+		LinearLayout ll1 = (LinearLayout) view.findViewById(R.id.entry_update_extras);
+		ll1.setVisibility(View.GONE);
+		
+		return dialog.create();
 	}
 
 	@Override
@@ -378,15 +442,15 @@ public class FeedbackActivity extends SherlockListActivity implements
 
 		private String mResponseString = null;
 
-        public void preExecute() {
-        	
-        	mFeedbackInitiated = false;
-        	mFeedbackHasMoreUpdates = true;
-        	mLoadMoreItemsInProgress = false;
-        	mFeedbackNextPage = 1;
-        	
-        }
-        
+		public void preExecute() {
+
+			mFeedbackInitiated = false;
+			mFeedbackHasMoreUpdates = true;
+			mLoadMoreItemsInProgress = false;
+			mFeedbackNextPage = 1;
+
+		}
+
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl
 					+ "/feedback/1?page=0&type=user&" + mFeedbackType + "=true");
@@ -409,7 +473,7 @@ public class FeedbackActivity extends SherlockListActivity implements
 						if (jsonArray.length() < 25) {
 							mFeedbackHasMoreUpdates = false;
 						}
-						
+
 						// the newest updates are at the front of the array, so
 						// loop over forwards
 						for (int i = 0; i < jsonArray.length(); i++) {
@@ -432,7 +496,6 @@ public class FeedbackActivity extends SherlockListActivity implements
 			}
 
 			mAdapter.notifyDataSetChanged();
-			mListView.onRefreshComplete();
 
 			mFeedbackInitiated = true;
 		}
@@ -442,11 +505,13 @@ public class FeedbackActivity extends SherlockListActivity implements
 
 		private String mResponseString = null;
 
-        public void preExecute() {}
-        
+		public void preExecute() {
+		}
+
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl + "/feedback/1?page="
-					+ mFeedbackNextPage + "&type=user&" + mFeedbackType + "=true");
+					+ mFeedbackNextPage + "&type=user&" + mFeedbackType
+					+ "=true");
 		}
 
 		public void handleResponse(String responseString) {
@@ -459,7 +524,7 @@ public class FeedbackActivity extends SherlockListActivity implements
 			if (!mResponseString.equals("null")) {
 				try {
 					JSONArray jsonArray = new JSONArray(mResponseString);
-					
+
 					if (jsonArray.length() < 10) {
 						mFeedbackHasMoreUpdates = false;
 					}
@@ -485,13 +550,12 @@ public class FeedbackActivity extends SherlockListActivity implements
 					// TODO: error handling
 				}
 			} else {
-					mFeedbackHasMoreUpdates = false;
+				mFeedbackHasMoreUpdates = false;
 			}
 
 			mFeedbackNextPage++;
 
 			mAdapter.notifyDataSetChanged();
-			mListView.onRefreshComplete();
 
 			// dismiss the 'loading more items' footer
 			mListView.removeFooterView(mLoadingFooterView);
@@ -503,26 +567,23 @@ public class FeedbackActivity extends SherlockListActivity implements
 
 	private class RemoveFeedback implements WhoochApiCallInterface {
 
-        public void preExecute() {}
-        
+		public void preExecute() {
+		}
+
 		public HttpRequestBase getHttpRequest() {
-			HttpPost request = new HttpPost(Settings.apiUrl + "/feedback/delete");
+			HttpPost request = new HttpPost(Settings.apiUrl
+					+ "/feedback/delete");
 
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 			nameValuePairs.add(new BasicNameValuePair("feedbackId",
 					mDeleteFeedbackId));
-			
-			if(mFeedbackType == "received")
-			{
-				nameValuePairs.add(new BasicNameValuePair("type",
-					"whooch"));
+
+			if (mFeedbackType == "received") {
+				nameValuePairs.add(new BasicNameValuePair("type", "whooch"));
+			} else {
+				nameValuePairs.add(new BasicNameValuePair("type", "user"));
 			}
-			else
-			{
-				nameValuePairs.add(new BasicNameValuePair("type",
-						"user"));
-			}
-			
+
 			try {
 				request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 			} catch (UnsupportedEncodingException e) {
@@ -548,14 +609,12 @@ public class FeedbackActivity extends SherlockListActivity implements
 
 		}
 	}
-	
-    private void setFeedbackArray(ArrayList<FeedbackEntry> temp)
-    {
-    	mFeedbackArray.clear();
-    	for(int i=0; i<temp.size(); i++)
-    	{
-    		mFeedbackArray.add(temp.get(i));
-    	}
-    }
+
+	private void setFeedbackArray(ArrayList<FeedbackEntry> temp) {
+		mFeedbackArray.clear();
+		for (int i = 0; i < temp.size(); i++) {
+			mFeedbackArray.add(temp.get(i));
+		}
+	}
 
 }

@@ -120,9 +120,15 @@ public class AlertsTrailRequestEntry extends AlertsEntry {
         
         // determine the URLs for the user image
         if (userImage != null && userId != null) {
-            userImageUriSmall = Settings.cdnUrl + "u" + userId + "_s" + userImage;
-            userImageUriMedium = Settings.cdnUrl + "u" + userId + "_m" + userImage;
-            userImageUriLarge = Settings.cdnUrl + "u" + userId + "_l" + userImage;
+            if (userImage.equals("defaultUser.png")) {
+            	userImageUriSmall = Settings.cdnUrl + "s_" + userImage;
+            	userImageUriMedium = Settings.cdnUrl + "m_" + userImage;
+            	userImageUriLarge = Settings.cdnUrl + "l_" + userImage;
+            } else {
+            	userImageUriSmall = Settings.cdnUrl + "w" + userId + "_s" + userImage;
+            	userImageUriMedium = Settings.cdnUrl + "w" + userId + "_m" + userImage;
+            	userImageUriLarge = Settings.cdnUrl + "w" + userId + "_l" + userImage;
+            }
         }
         
         // determine proper image to use based on the current screen resolution
@@ -143,17 +149,27 @@ public class AlertsTrailRequestEntry extends AlertsEntry {
 
     @Override
     public String getWhoochImageUrl() {
-        return whoochImageUriDefault;
+        return whoochImageUriSmall;
     }
 
     @Override
     public String getUserImageUrl() {
-        return userImageUriDefault;
+        return userImageUriSmall;
     }
 
     @Override
-    public String getMessage() {
-        return userName + " would like you to trail " + whoochName;
+    public String getAlertType() {
+        return " has sent you a request to trail...";
+    }
+    
+    @Override
+    public String getUserName() {
+        return userName;
+    }
+    
+    @Override
+    public String getWhoochName() {
+        return whoochName;
     }
 
     public OnClickListener getAcceptClickListener() {

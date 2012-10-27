@@ -25,13 +25,14 @@
     
      <Button
         android:id="@+id/main_create"
-        android:layout_width="120dip"
+        android:layout_width="50dip"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/main_update"
         android:background="@drawable/title_button"
-        android:text="Create Whooch"
+        android:text="Create"
         android:textColor="@color/whoochblue"
+        android:textStyle="bold"
         android:textSize="12sp"/>
 
     <ProgressBar

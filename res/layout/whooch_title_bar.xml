@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="right"
+    android:orientation="horizontal" >
+
+    <LinearLayout
+        android:id="@+id/wheader_whoochinfo"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingLeft="5dip"
+        android:visibility="gone" >
+
+        <ImageView
+            android:id="@+id/wheader_whooch_image"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_launcher" />
+
+        <LinearLayout
+            android:id="@+id/wheader_info_block"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingLeft="5dip"
+            android:paddingTop="6dip" >
+
+            <TextView
+                android:id="@+id/wheader_whooch_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Whooch Name"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/wheader_whooch_leader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Whooch Leader"
+                android:textColor="@color/gray4"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/main_loader"
+        android:layout_width="35dip"
+        android:layout_height="35dip"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dip"
+        android:layout_toRightOf="@+id/wheader_whoochinfo"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/wheader_options_button"
+        android:layout_width="60dip"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@+id/wheader_update_button"
+        android:background="@drawable/title_button"
+        android:text="Options"
+        android:textColor="@color/whoochblue"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <ImageButton
+        android:id="@+id/wheader_update_button"
+        android:layout_width="50dip"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/title_button"
+        android:visibility="gone" />
+
+</RelativeLayout>

@@ -11,12 +11,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.helpers.ActionBarHelper;
 import com.whooch.app.helpers.Settings;
@@ -36,75 +36,9 @@ public class ListsActivity extends SherlockActivity {
     private ArrayList<ListsEntry> mWorkingListArray = new ArrayList<ListsEntry>();
     private ListsArrayAdapter mWorkingAdapter = null;
     
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-
-	//	SubMenu sub = menu.addSubMenu("Settings");
-	//	sub.setIcon(R.drawable.abs__ic_menu_moreoverflow_holo_dark);
-
-		menu.add(Menu.NONE, 1, 0, "Leading")
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-		menu.add(Menu.NONE, 2, 0, "Contributing")
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		
-		menu.add(Menu.NONE, 3, 0, "Trailing")
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		
-		return true;
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		WhoochApiCallTask task = null;
-		switch (item.getItemId()) {
-		case 1:
-			if(mLeadingArray.isEmpty())
-			{
-				mWorkingListArray.clear();
-				mWorkingAdapter.notifyDataSetChanged();
-				task = new WhoochApiCallTask(getActivityContext(), new LoadList(1), true);
-				task.execute();
-			}
-			else
-			{
-				setWhoochList(mLeadingArray);
-				mWorkingAdapter.notifyDataSetChanged();
-			}
-            return true;
-		case 2:
-			if(mContributingArray.isEmpty())
-			{
-				mWorkingListArray.clear();
-				mWorkingAdapter.notifyDataSetChanged();
-				task = new WhoochApiCallTask(getActivityContext(), new LoadList(2), true);
-				task.execute();
-			}
-			else
-			{
-				setWhoochList(mContributingArray);
-				mWorkingAdapter.notifyDataSetChanged();
-			}
-            return true;
-		case 3:
-			if(mTrailingArray.isEmpty())
-			{
-				mWorkingListArray.clear();
-				mWorkingAdapter.notifyDataSetChanged();
-				task = new WhoochApiCallTask(getActivityContext(), new LoadList(3), true);
-				task.execute();
-			}
-			else
-			{
-				setWhoochList(mTrailingArray);
-				mWorkingAdapter.notifyDataSetChanged();
-			}
-            return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-		
-	}
+    private Button mLeadingButton = null;
+    private Button mContributingButton = null;
+    private Button mTrailingButton = null;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -128,7 +62,91 @@ public class ListsActivity extends SherlockActivity {
         
 		WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new LoadList(1), true);
 		task.execute();
-       
+		
+		mLeadingButton = (Button) findViewById(R.id.leading_action);
+		mContributingButton = (Button) findViewById(R.id.contributing_action);
+		mTrailingButton = (Button) findViewById(R.id.trailing_action);
+		
+		mLeadingButton.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				 if (!mLeadingButton.isSelected()){
+			            mLeadingButton.setSelected(true);
+			            mContributingButton.setSelected(false);
+			            mTrailingButton.setSelected(false);
+			            
+						if(mLeadingArray.isEmpty())
+						{
+							mWorkingListArray.clear();
+							mWorkingAdapter.notifyDataSetChanged();
+							WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new LoadList(1), true);
+							task.execute();
+						}
+						else
+						{
+							setWhoochList(mLeadingArray);
+							mWorkingAdapter.notifyDataSetChanged();
+						}
+			        } 	
+			}
+			
+		});
+		
+		mContributingButton.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				 if (!mContributingButton.isSelected()){
+			            mLeadingButton.setSelected(false);
+			            mContributingButton.setSelected(true);
+			            mTrailingButton.setSelected(false);
+			            
+						if(mContributingArray.isEmpty())
+						{
+							mWorkingListArray.clear();
+							mWorkingAdapter.notifyDataSetChanged();
+							WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new LoadList(2), true);
+							task.execute();
+						}
+						else
+						{
+							setWhoochList(mContributingArray);
+							mWorkingAdapter.notifyDataSetChanged();
+						}
+			        } 
+			}
+			
+		});
+		
+		mTrailingButton.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				 if (!mTrailingButton.isSelected()){
+			            mLeadingButton.setSelected(false);
+			            mContributingButton.setSelected(false);
+			            mTrailingButton.setSelected(true);
+			            
+						if(mTrailingArray.isEmpty())
+						{
+							mWorkingListArray.clear();
+							mWorkingAdapter.notifyDataSetChanged();
+							WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new LoadList(3), true);
+							task.execute();
+						}
+						else
+						{
+							setWhoochList(mTrailingArray);
+							mWorkingAdapter.notifyDataSetChanged();
+						}
+			        } 
+			}
+			
+		});
+		
+        mLeadingButton.setSelected(true);
+	
     }
     
     @Override

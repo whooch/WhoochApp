@@ -11,7 +11,9 @@ abstract public class AlertsEntry {
 
     abstract public String getUserImageUrl();
     abstract public String getWhoochImageUrl();
-    abstract public String getMessage();
+    abstract public String getAlertType();
+    abstract public String getUserName();
+    abstract public String getWhoochName();
     abstract public OnClickListener getAcceptClickListener();
     abstract public OnClickListener getDeclineClickListener();
     

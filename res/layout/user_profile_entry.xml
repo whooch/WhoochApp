@@ -45,13 +45,14 @@
             android:layout_marginBottom="2dip"
             android:text="Name"
             android:textSize="15sp"
-            android:textColor="@color/gray1" />
+            android:textColor="@color/gray4" />
 
         <TextView
             android:id="@+id/profile_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Name"
+            android:textStyle="bold"
             android:textSize="15sp" />
 
         <TextView
@@ -62,13 +63,14 @@
             android:layout_marginBottom="2dip"
             android:text="Location"
             android:textSize="15sp"
-            android:textColor="@color/gray1" />
+            android:textColor="@color/gray4" />
 
         <TextView
             android:id="@+id/profile_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Location"
+            android:textStyle="bold"
             android:textSize="15sp" />
 
         <TextView
@@ -79,13 +81,14 @@
             android:layout_marginBottom="2dip"
             android:text="About"
             android:textSize="15sp"
-            android:textColor="@color/gray1" />
+            android:textColor="@color/gray4" />
 
         <TextView
             android:id="@+id/profile_bio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="About"
+            android:textStyle="bold"
             android:textSize="15sp" />
     </LinearLayout>
 
@@ -98,6 +101,7 @@
         android:layout_marginLeft="20dip"
         android:layout_marginRight="20dip"
         android:background="@drawable/lists_button_selector"
+        android:text="Alerts"
         android:textColor="@color/white"
         android:textSize="15dip"
         android:visibility="gone" />

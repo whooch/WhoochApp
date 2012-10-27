@@ -1,5 +1,30 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="AppTheme" parent="android:Theme.Light" />
+
+    <style name="Theme.Styled" parent="Theme.Sherlock.Light">
+        <item name="android:actionBarSize">48dip</item>
+        <item name="actionBarSize">48dip</item>
+        <item name="android:actionBarTabStyle">@style/TabStyle</item>
+        <item name="actionBarTabStyle">@style/TabStyle</item>
+         <item name="android:actionBarStyle">@style/ActionBarStyle</item>
+        <item name="actionBarStyle">@style/ActionBarStyle</item>
+
+        <item name="android:spinnerItemStyle">@style/SpinnerItem</item>
+    </style>
+
+    <style name="SpinnerItem" parent="@android:style/Widget.TextView.SpinnerItem"></style>
+
+    <style name="ActionBarStyle" parent="Widget.Sherlock.Light.ActionBar.Solid">
+		<item name="android:displayOptions">showHome|useLogo</item>
+		<item name="displayOptions">showHome|useLogo</item>
+    </style>
+
+    <style name="TabStyle" parent="@android:style/Widget.Holo.ActionBar.TabBar">
+        <item name="android:tabStripEnabled">false</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingLeft">5dip</item>
+        <item name="android:paddingRight">5dip</item>
+    </style>
 
 </resources>

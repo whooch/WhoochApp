@@ -21,27 +21,28 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.Html;
-import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.koushikdutta.urlimageviewhelper.UrlImageGetter;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.helpers.ActionBarHelper;
 import com.whooch.app.helpers.Settings;
@@ -51,13 +52,10 @@ import com.whooch.app.helpers.WhoochHelperFunctions;
 import com.whooch.app.json.StreamEntry;
 import com.whooch.app.ui.StreamArrayAdapter;
 
-import eu.erikw.PullToRefreshListView;
-import eu.erikw.PullToRefreshListView.OnRefreshListener;
-
 public class ReactionsActivity extends SherlockListActivity implements
 		OnScrollListener {
 
-	private PullToRefreshListView mListView;
+	private ListView mListView;
 
 	private ArrayList<StreamEntry> mWhoochArray = new ArrayList<StreamEntry>();
 	private StreamArrayAdapter mAdapter;
@@ -76,6 +74,9 @@ public class ReactionsActivity extends SherlockListActivity implements
 	private int mLastSelectedPosition = -1;
 
 	private String mReactionsType = "received";
+	
+    private Button mReceivedButton = null;
+    private Button mSentButton = null;
 
 	View mLoadingFooterView;
 
@@ -83,68 +84,27 @@ public class ReactionsActivity extends SherlockListActivity implements
 	int mNextDialogId = 0;
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-
-		menu.add(Menu.NONE, 1, 0, "Received").setShowAsAction(
-				MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-		menu.add(Menu.NONE, 2, 0, "Sent").setShowAsAction(
-				MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case 1:
-			if (mReactionsType == "sent") {
-				mReactionsType = "received";
-				mWhoochArray.clear();
-				mAdapter.notifyDataSetChanged();
-				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new ReactionsInitiate(), true);
-				task.execute();
-			}
-			return true;
-		case 2:
-			if (mReactionsType == "received") {
-				mReactionsType = "sent";
-				mWhoochArray.clear();
-				mAdapter.notifyDataSetChanged();
-				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new ReactionsInitiate(), true);
-				task.execute();
-			}
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-
-	}
-
-	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.stream);
+		setContentView(R.layout.feedback_reactions);
 
 		ActionBarHelper.setupActionBar(getSupportActionBar(),
 				new ActionBarHelper.TabListener(getApplicationContext()), 3);
 
-		mListView = (PullToRefreshListView) getListView();
+		mListView = getListView();
 		mListView.setOnScrollListener(this);
-		mListView.setOnRefreshListener(new OnRefreshListener() {
-			@Override
-			public void onRefresh() {
-				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new ReactionsInitiate(), false);
-				task.execute();
-			}
-		});
+
+		// Add and remove loading footer before setting adapter
+		// Footer won't show up unless one is present when adapter is set
+		mLoadingFooterView = this.getLayoutInflater().inflate(
+				R.layout.stream_loading_footer, null);
+		mListView.addFooterView(mLoadingFooterView);
 
 		mAdapter = new StreamArrayAdapter(this, mWhoochArray, false);
 		setListAdapter(mAdapter);
+
+		mListView.removeFooterView(mLoadingFooterView);
 
 		ActionBarHelper.selectTab(getSupportActionBar(), 3);
 
@@ -153,6 +113,55 @@ public class ReactionsActivity extends SherlockListActivity implements
 					getActivityContext(), new ReactionsInitiate(), true);
 			task.execute();
 		}
+		
+		mReceivedButton = (Button) findViewById(R.id.received_action);
+		mSentButton = (Button) findViewById(R.id.sent_action);
+		
+		mReceivedButton.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				
+				if (mReactionsType == "sent") {
+					mReceivedButton.setSelected(true);
+		            mSentButton.setSelected(false);
+		            
+					mReactionsType = "received";
+					mWhoochArray.clear();
+					mAdapter.notifyDataSetChanged();
+					WhoochApiCallTask task = new WhoochApiCallTask(
+							getActivityContext(),
+							new ReactionsInitiate(), true);
+					task.execute();
+				}
+	
+			}
+			
+		});
+		
+		mSentButton.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				
+				if (mReactionsType == "received") {
+					mSentButton.setSelected(true);
+		            mReceivedButton.setSelected(false);
+		            
+					mReactionsType = "sent";
+					mWhoochArray.clear();
+					mAdapter.notifyDataSetChanged();
+					WhoochApiCallTask task = new WhoochApiCallTask(
+							getActivityContext(),
+							new ReactionsInitiate(), true);
+					task.execute();
+				}
+				
+			}
+			
+		});
+		
+        mReceivedButton.setSelected(true);
 	}
 
 	@Override
@@ -209,7 +218,6 @@ public class ReactionsActivity extends SherlockListActivity implements
 					}
 
 					mAdapter.notifyDataSetChanged();
-					mListView.onRefreshComplete();
 
 				} catch (OptionalDataException e) {
 					// TODO Auto-generated catch block
@@ -238,6 +246,12 @@ public class ReactionsActivity extends SherlockListActivity implements
 		super.onResume();
 
 		ActionBarHelper.selectTab(getSupportActionBar(), 3);
+
+		if (mReactionsInitiated) {
+			WhoochApiCallTask task = new WhoochApiCallTask(
+					getActivityContext(), new ReactionsInitiate(), false);
+			task.execute();
+		}
 	}
 
 	private Context getActivityContext() {
@@ -278,8 +292,9 @@ public class ReactionsActivity extends SherlockListActivity implements
 	@Override
 	protected Dialog onCreateDialog(int id, Bundle b) {
 
-		final StreamEntry entry = mWhoochArray.get(b.getInt("POSITION") - 1);
-		mLastSelectedPosition = b.getInt("POSITION") - 1;
+		final StreamEntry entry = mWhoochArray.get(b.getInt("POSITION"));
+		mLastSelectedPosition = b.getInt("POSITION");
+		mShowConvoCurrentUpdate = entry;
 
 		// create the menu
 		ArrayList<String> names = new ArrayList<String>();
@@ -302,8 +317,8 @@ public class ReactionsActivity extends SherlockListActivity implements
 					i.putExtra("REACTION_TYPE", "whooch");
 					i.putExtra("CONTENT", entry.content);
 					i.putExtra("USER_NAME", entry.userName);
-	                i.putExtra("WHOOCH_NAME", entry.whoochName);
-	                i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriLarge);
+					i.putExtra("WHOOCH_NAME", entry.whoochName);
+					i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriLarge);
 					startActivity(i);
 				}
 			});
@@ -320,6 +335,7 @@ public class ReactionsActivity extends SherlockListActivity implements
 					i.putExtra("WHOOCH_NUMBER", entry.whoochNumber);
 					i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriLarge);
 					i.putExtra("WHOOCH_NAME", entry.whoochName);
+					i.putExtra("USER_NAME", entry.userName);
 					startActivity(i);
 				}
 			});
@@ -332,7 +348,6 @@ public class ReactionsActivity extends SherlockListActivity implements
 					Log.d("StreamActivity", "Show Conversation");
 					mShowConvoId = entry.whoochId;
 					mShowConvoNumber = entry.reactionTo;
-					mShowConvoCurrentUpdate = entry;
 
 					WhoochApiCallTask task = new WhoochApiCallTask(
 							getActivityContext(), new ShowConversation(), true);
@@ -352,7 +367,22 @@ public class ReactionsActivity extends SherlockListActivity implements
 					i.putExtra("WHOOCH_NUMBER", entry.whoochNumber);
 					i.putExtra("IMAGE_TYPE", "whooch");
 					i.putExtra("IMAGE_NAME", entry.image);
+					i.putExtra("WHOOCH_NAME", entry.whoochName);
+					i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriMedium);
+					i.putExtra("USER_NAME", entry.userName);
 					startActivity(i);
+				}
+			});
+		}
+		
+		if (!entry.userName.equalsIgnoreCase(currentUserName)
+				&& entry.isFan.equals("0")) {
+			names.add("I'm a fan of this update");
+			handlers.add(new Runnable() {
+				public void run() {
+					WhoochApiCallTask task = new WhoochApiCallTask(
+							getActivityContext(), new AddFan(), true);
+					task.execute();
 				}
 			});
 		}
@@ -412,13 +442,61 @@ public class ReactionsActivity extends SherlockListActivity implements
 		final Runnable[] handlersArray = handlers.toArray(new Runnable[handlers
 				.size()]);
 
-		return new AlertDialog.Builder(getActivityContext()).setItems(
-				namesArray, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						Log.d("StreamActivity", "Something Was Clicked");
-						handlersArray[which].run();
-					}
-				}).create();
+		return assembleUpdateDialog(namesArray, handlersArray);
+	}
+
+	private Dialog assembleUpdateDialog(final String[] namesArray,
+			final Runnable[] handlersArray) {
+		Builder dialog = new AlertDialog.Builder(getActivityContext());
+
+		LayoutInflater inflater = (LayoutInflater) getActivityContext()
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+		View view = inflater.inflate(R.layout.stream_entry, null);
+
+		dialog.setCustomTitle(view);
+
+		dialog.setItems(namesArray, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				handlersArray[which].run();
+			}
+		});
+
+		ImageView iv1 = (ImageView) view.findViewById(R.id.entry_whooch_image);
+		UrlImageViewHelper.setUrlDrawable(iv1,
+				mShowConvoCurrentUpdate.whoochImageUriLarge);
+
+		TextView tv1 = (TextView) view.findViewById(R.id.entry_whooch_title);
+		tv1.setText(mShowConvoCurrentUpdate.whoochName);
+
+		TextView tv2 = (TextView) view.findViewById(R.id.entry_posted_user);
+		tv2.setText(mShowConvoCurrentUpdate.userName);
+
+		TextView tv3 = (TextView) view.findViewById(R.id.entry_whooch_content);
+		tv3.setText(WhoochHelperFunctions.getSpannedFromHtmlContent(
+				mShowConvoCurrentUpdate.content, tv3, getActivityContext()));
+		tv3.setMovementMethod(LinkMovementMethod.getInstance());
+
+		TextView tv4 = (TextView) view.findViewById(R.id.entry_whooch_foot);
+		tv4.setText(WhoochHelperFunctions.toRelativeTime(Long
+				.parseLong(mShowConvoCurrentUpdate.timestamp)));
+		
+		TextView tvFan = (TextView) view.findViewById(R.id.entry_whooch_foot_fans);
+		if(mShowConvoCurrentUpdate.fanString != null)
+		{
+			tvFan.setText(mShowConvoCurrentUpdate.fanString);
+			tvFan.setVisibility(View.VISIBLE);
+		}
+		else
+		{
+			tvFan.setVisibility(View.GONE);
+		}
+
+		LinearLayout ll1 = (LinearLayout) view
+				.findViewById(R.id.entry_update_extras);
+		ll1.setVisibility(View.GONE);
+
+		return dialog.create();
 	}
 
 	@Override
@@ -429,15 +507,15 @@ public class ReactionsActivity extends SherlockListActivity implements
 
 		private String mResponseString = null;
 
-        public void preExecute() {
-        	
-        	mReactionsInitiated = false;
-        	mReactionsHasMoreUpdates = true;
-        	mLoadMoreItemsInProgress = false;
-        	mReactionsNextPage = 1;
-        	
-        }
-        
+		public void preExecute() {
+
+			mReactionsInitiated = false;
+			mReactionsHasMoreUpdates = true;
+			mLoadMoreItemsInProgress = false;
+			mReactionsNextPage = 1;
+
+		}
+
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl
 					+ "/reactions/1?page=0&type=user&" + mReactionsType
@@ -457,7 +535,7 @@ public class ReactionsActivity extends SherlockListActivity implements
 				if (!mResponseString.equals("null")) {
 					try {
 						JSONArray jsonArray = new JSONArray(mResponseString);
-						
+
 						if (jsonArray.length() < 25) {
 							mReactionsHasMoreUpdates = false;
 						}
@@ -478,13 +556,12 @@ public class ReactionsActivity extends SherlockListActivity implements
 						// TODO: error handling
 					}
 				} else {
-						mReactionsHasMoreUpdates = false;
+					mReactionsHasMoreUpdates = false;
 				}
 
 			}
 
 			mAdapter.notifyDataSetChanged();
-			mListView.onRefreshComplete();
 
 			mReactionsInitiated = true;
 		}
@@ -494,8 +571,9 @@ public class ReactionsActivity extends SherlockListActivity implements
 
 		private String mResponseString = null;
 
-        public void preExecute() {}
-        
+		public void preExecute() {
+		}
+
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl + "/reactions/1?page="
 					+ mReactionsNextPage + "&type=user&" + mReactionsType
@@ -543,7 +621,6 @@ public class ReactionsActivity extends SherlockListActivity implements
 			mReactionsNextPage++;
 
 			mAdapter.notifyDataSetChanged();
-			mListView.onRefreshComplete();
 
 			// dismiss the 'loading more items' footer
 			mListView.removeFooterView(mLoadingFooterView);
@@ -557,10 +634,10 @@ public class ReactionsActivity extends SherlockListActivity implements
 
 		private String mResponseString = null;
 
-        public void preExecute() {
-        	
-        }
-        
+		public void preExecute() {
+
+		}
+
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl + "/whooch/" + mShowConvoId
 					+ "?single=1&whoochNumber=" + mShowConvoNumber);
@@ -571,7 +648,7 @@ public class ReactionsActivity extends SherlockListActivity implements
 		}
 
 		public void postExecute(int statusCode) {
-			
+
 			if (statusCode == 200) {
 
 				// parse the response as JSON and update the Content Array
@@ -596,22 +673,32 @@ public class ReactionsActivity extends SherlockListActivity implements
 										dialog.dismiss();
 									}
 								});
-
+						
 						LayoutInflater inflater = (LayoutInflater) getActivityContext()
-								.getSystemService(
-										Context.LAYOUT_INFLATER_SERVICE);
+								.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-						View view = inflater.inflate(
-								R.layout.show_conversation, null);
-
-						ImageView iv1A = (ImageView) view
-								.findViewById(R.id.entry_whooch_imageA);
-						UrlImageViewHelper.setUrlDrawable(iv1A,
+						View view = inflater.inflate(R.layout.show_conversation_title, null);
+						
+						ImageView iv1 = (ImageView) view
+								.findViewById(R.id.show_conversation_whoochimage);
+						UrlImageViewHelper.setUrlDrawable(iv1,
 								entry.whoochImageUriLarge);
 
 						TextView tv1A = (TextView) view
-								.findViewById(R.id.entry_whooch_titleA);
+								.findViewById(R.id.show_conversation_whoochname);
 						tv1A.setText(entry.whoochName);
+
+						builder.setCustomTitle(view);
+
+
+
+						view = inflater.inflate(
+								R.layout.show_conversation, null);
+						
+						ImageView iv1A = (ImageView) view
+								.findViewById(R.id.entry_user_imageA);
+						UrlImageViewHelper.setUrlDrawable(iv1A,
+								entry.userImageUriLarge);
 
 						TextView tv2A = (TextView) view
 								.findViewById(R.id.entry_posted_userA);
@@ -619,21 +706,30 @@ public class ReactionsActivity extends SherlockListActivity implements
 
 						TextView tv3A = (TextView) view
 								.findViewById(R.id.entry_whooch_contentA);
-						tv3A.setText(WhoochHelperFunctions.getSpannedFromHtmlContent(entry.content, tv3A, getActivityContext()));
+						tv3A.setText(WhoochHelperFunctions
+								.getSpannedFromHtmlContent(entry.content, tv3A,
+										getActivityContext()));
 
 						TextView tv4A = (TextView) view
 								.findViewById(R.id.entry_whooch_footA);
 						tv4A.setText(WhoochHelperFunctions.toRelativeTime(Long
 								.parseLong(entry.timestamp)));
 
-						ImageView iv1B = (ImageView) view
-								.findViewById(R.id.entry_whooch_imageB);
-						UrlImageViewHelper.setUrlDrawable(iv1B,
-								mShowConvoCurrentUpdate.whoochImageUriLarge);
+						TextView tvFanA = (TextView) view.findViewById(R.id.entry_whooch_foot_fansA);
+						if(entry.fanString != null)
+						{
+							tvFanA.setText(entry.fanString);
+							tvFanA.setVisibility(View.VISIBLE);
+						}
+						else
+						{
+							tvFanA.setVisibility(View.GONE);
+						}
 
-						TextView tv1B = (TextView) view
-								.findViewById(R.id.entry_whooch_titleB);
-						tv1B.setText(mShowConvoCurrentUpdate.whoochName);
+						ImageView iv1B = (ImageView) view
+								.findViewById(R.id.entry_user_imageB);
+						UrlImageViewHelper.setUrlDrawable(iv1B,
+								mShowConvoCurrentUpdate.userImageUriLarge);
 
 						TextView tv2B = (TextView) view
 								.findViewById(R.id.entry_posted_userB);
@@ -641,12 +737,26 @@ public class ReactionsActivity extends SherlockListActivity implements
 
 						TextView tv3B = (TextView) view
 								.findViewById(R.id.entry_whooch_contentB);
-						tv3B.setText(WhoochHelperFunctions.getSpannedFromHtmlContent(mShowConvoCurrentUpdate.content, tv3B, getActivityContext()));
+						tv3B.setText(WhoochHelperFunctions
+								.getSpannedFromHtmlContent(
+										mShowConvoCurrentUpdate.content, tv3B,
+										getActivityContext()));
 
 						TextView tv4B = (TextView) view
 								.findViewById(R.id.entry_whooch_footB);
 						tv4B.setText(WhoochHelperFunctions.toRelativeTime(Long
 								.parseLong(mShowConvoCurrentUpdate.timestamp)));
+
+						TextView tvFanB = (TextView) view.findViewById(R.id.entry_whooch_foot_fansB);
+						if(mShowConvoCurrentUpdate.fanString != null)
+						{
+							tvFanB.setText(mShowConvoCurrentUpdate.fanString);
+							tvFanB.setVisibility(View.VISIBLE);
+						}
+						else
+						{
+							tvFanB.setVisibility(View.GONE);
+						}
 
 						builder.setView(view);
 
@@ -670,8 +780,9 @@ public class ReactionsActivity extends SherlockListActivity implements
 
 	private class DeleteUpdate implements WhoochApiCallInterface {
 
-        public void preExecute() {}
-        
+		public void preExecute() {
+		}
+
 		public HttpRequestBase getHttpRequest() {
 			HttpPost request = new HttpPost(Settings.apiUrl + "/whooch/delete");
 
@@ -696,14 +807,76 @@ public class ReactionsActivity extends SherlockListActivity implements
 		}
 
 		public void postExecute(int statusCode) {
-			
+
 			if (statusCode == 200) {
 				mWhoochArray.remove(mLastSelectedPosition);
 				mAdapter.notifyDataSetChanged();
 			}
-			
+
 			mDeleteWhoochId = null;
 			mDeleteWhoochNumber = null;
+
+		}
+	}
+	
+	private class AddFan implements WhoochApiCallInterface {
+
+		private int fanCount = 0;
+		private int lastPosition = -1;
+
+		public void preExecute() {
+			fanCount = Integer.parseInt(mShowConvoCurrentUpdate.fans, 10);
+			lastPosition = mLastSelectedPosition;
+		}
+
+		public HttpRequestBase getHttpRequest() {
+			HttpPost request = new HttpPost(Settings.apiUrl + "/whooch/addfan");
+
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+			nameValuePairs.add(new BasicNameValuePair("whoochId",
+					mShowConvoCurrentUpdate.whoochId));
+			nameValuePairs.add(new BasicNameValuePair("whoochNumber",
+					mShowConvoCurrentUpdate.whoochNumber));
+
+			try {
+				request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+				// TODO error handling
+			}
+
+			return request;
+		}
+
+		public void handleResponse(String responseString) {
+
+		}
+
+		public void postExecute(int statusCode) {
+
+			if (statusCode == 200) {
+
+				fanCount++;
+				
+				StreamEntry entry = mWhoochArray.get(lastPosition);
+				
+				if (fanCount == 1) {
+					entry.fanString = "(1 fan)";
+				} else {
+					entry.fanString = "(" + fanCount + " fans)";
+				}
+				
+				mAdapter.notifyDataSetChanged();
+				
+				Toast.makeText(getActivityContext(),
+						"You are now a fan of this update",
+						Toast.LENGTH_LONG).show();
+
+			} else {
+				Toast.makeText(getActivityContext(),
+						"Something went wrong, please try again",
+						Toast.LENGTH_LONG).show();
+			}
 
 		}
 	}

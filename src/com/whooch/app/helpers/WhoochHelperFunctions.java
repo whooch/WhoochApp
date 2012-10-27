@@ -1,14 +1,35 @@
 package com.whooch.app.helpers;
 
-import com.koushikdutta.urlimageviewhelper.UrlImageGetter;
-
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Base64;
+import android.view.Display;
 import android.widget.TextView;
 
+import com.koushikdutta.urlimageviewhelper.UrlImageGetter;
+
+@TargetApi(8)
 public class WhoochHelperFunctions {
+	
+	public int getScreenOrientation(Activity a)
+	{
+	    Display getOrient = a.getWindowManager().getDefaultDisplay();
+	    int orientation = Configuration.ORIENTATION_UNDEFINED;
+	    if(getOrient.getWidth()==getOrient.getHeight()){
+	        orientation = Configuration.ORIENTATION_SQUARE;
+	    } else{ 
+	        if(getOrient.getWidth() < getOrient.getHeight()){
+	            orientation = Configuration.ORIENTATION_PORTRAIT;
+	        }else { 
+	             orientation = Configuration.ORIENTATION_LANDSCAPE;
+	        }
+	    }
+	    return orientation;
+	}
 
 	public static String getB64Auth(String login, String pass) {
 		String source = login + ":" + pass;
@@ -29,23 +50,29 @@ public class WhoochHelperFunctions {
 		}
 
 		String units = "millisecond";
-		if (delta > 1000) {
+		if (delta >= 1000) {
 			units = "second";
 			delta = delta / 1000;
-			if (delta > 60) {
+			
+			if (delta >= 60) {
 				units = "minute";
 				delta = delta / 60;
-				if (delta > 60) {
+				
+				if (delta >= 60) {
 					units = "hour";
 					delta = delta / 60;
-					if (delta > 24) {
+					
+					if (delta >= 24) {
 						units = "day";
 						delta = delta / 24;
-						if (delta > 30) {
+						
+						if (delta >= 30) {
 							units = "month";
-							delta = delta / 12;
-							if (delta > 12) {
+							delta = delta / 30;
+							
+							if (delta >= 12) {
 								units = "year";
+								delta = delta / 12;
 							}
 						}
 					}
@@ -67,7 +94,13 @@ public class WhoochHelperFunctions {
 		String styledContent = strippedContent
 				.replaceAll("<a class=\"highlightedUser\"(.+?)</a>",
 						"<font color=\"#00639F\"><a class=\"highlightedUser\"$1</a></font>");
+		
+		String hashUrl = styledContent.replaceAll(">\\s+<", "><");
+		String hashContent = hashUrl
+				.replaceAll("<a class=\"whoochhash\" href=\"/search\\?type=hash&query=%23(.+?)\">(.+?)</a>",
+						"<a class=\"whoochhash\" href=\"com.whooch.updatesearch://#$1\">$2</a>");
+		
 		UrlImageGetter imageGetter = new UrlImageGetter(tv, ctx);
-		return Html.fromHtml(styledContent, imageGetter, null);
+		return Html.fromHtml(hashContent, imageGetter, null);
 	}
 }

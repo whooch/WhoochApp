@@ -14,12 +14,15 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.whooch.app.LoginActivity;
 import com.whooch.app.R;
 
 public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
@@ -38,7 +41,8 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 
 	@Override
 	protected void onPreExecute() {
-		if (mShowProgressDialog) {
+		WhoochHelperFunctions whoochHelper = new WhoochHelperFunctions();
+		if (mShowProgressDialog && (whoochHelper.getScreenOrientation((Activity)mActivityContext) == Configuration.ORIENTATION_PORTRAIT)) {
 			Activity a = (Activity) mActivityContext;
 			View loader = a.findViewById(R.id.main_loader);
 			if (loader != null) {
@@ -133,22 +137,34 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 
 		// do error handling
 		if (statusCode == 407 || statusCode == 400) {
+			
+			if(!(mActivityContext instanceof LoginActivity))
+			{
 			Toast.makeText(mActivityContext,
-					"bad user credentials, please log in again",
+					"Login information is no longer valid",
 					Toast.LENGTH_LONG).show();
-			// TODO: force user back to log in screen
+			
+			SharedPreferences settings = mActivityContext
+					.getSharedPreferences("whooch_preferences", 0);
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putString("username", null);
+			editor.putString("userid", null);
+			editor.putString("password", null);
+			editor.commit();
+
+			Intent i = new Intent(mActivityContext, LoginActivity.class);
+			mActivityContext.startActivity(i);
+			}
+
 		} else if (statusCode == -1) {
-			Toast.makeText(mActivityContext, "Error 37-1", Toast.LENGTH_LONG)
-					.show();
+
 		} else if (statusCode == -2) {
-			Toast.makeText(mActivityContext, "Error 37-2", Toast.LENGTH_LONG)
-					.show();
+
 		} else if (statusCode == -3) {
-			Toast.makeText(mActivityContext, "Error 37-3", Toast.LENGTH_LONG)
-					.show();
+
 		} else if (statusCode == -4) {
-			Toast.makeText(mActivityContext, "Error 37-4", Toast.LENGTH_LONG)
-					.show();
+
 		}
 	}
+
 }

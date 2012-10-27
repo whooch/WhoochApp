@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.FloatMath;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
@@ -43,14 +45,6 @@ public class WhoochProfileArrayAdapter extends ArrayAdapter<WhoochProfileEntry> 
         
 		WhoochProfileEntry whoochProfileEntry = mData.get(position);
 		
-		ImageView iv1 = (ImageView) view.findViewById(R.id.wprofile_whoochimage);
-		UrlImageViewHelper.setUrlDrawable(iv1,
-				whoochProfileEntry.whoochImageUriLarge);
-
-		TextView tv1 = (TextView) view.findViewById(R.id.wprofile_whoochname);
-		tv1.setText(whoochProfileEntry.whoochName);
-		
-		
 		ImageView iv2 = (ImageView) view.findViewById(R.id.wprofile_leaderimage);
 		UrlImageViewHelper.setUrlDrawable(iv2,
 				whoochProfileEntry.leaderImageUriDefault);
@@ -71,8 +65,9 @@ public class WhoochProfileArrayAdapter extends ArrayAdapter<WhoochProfileEntry> 
         	TextView tvTrail = (TextView) view.findViewById(R.id.wprofile_users_trailing);
         	tvTrail.setText(whoochProfileEntry.trailingCount);
         	
-        	TextView tvRating = (TextView) view.findViewById(R.id.wprofile_rating);
-        	tvRating.setText(whoochProfileEntry.rating);
+        	RatingBar tvRating = (RatingBar) view.findViewById(R.id.wprofile_rating);
+        	float starRating = FloatMath.ceil(((float)Integer.parseInt(whoochProfileEntry.rating, 10))/(float)20);
+        	tvRating.setRating(starRating);
         }
         else
         {
@@ -94,6 +89,13 @@ public class WhoochProfileArrayAdapter extends ArrayAdapter<WhoochProfileEntry> 
 		Button ibtn1 = (Button) view.findViewById(R.id.wprofile_inviteuser);
 		Button ibtn2 = (Button) view.findViewById(R.id.wprofile_updatephoto);
 		Button ibtn3 = (Button) view.findViewById(R.id.wprofile_trailwhooch);
+		Button ibtn4 = (Button) view.findViewById(R.id.wprofile_whoochsettings);
+		Button ibtn5 = (Button) view.findViewById(R.id.wprofile_ratewhooch);
+		Button ibtn6 = (Button) view.findViewById(R.id.wprofile_feedback);
+		Button ibtn7 = (Button) view.findViewById(R.id.wprofile_contributors);
+		
+    	ibtn7.setVisibility(View.VISIBLE);
+    	ibtn7.setOnClickListener(whoochProfileEntry.getShowContributorsClickListener());
 		
 		if(whoochProfileEntry.isContributing.equals("1"))
 		{
@@ -101,9 +103,11 @@ public class WhoochProfileArrayAdapter extends ArrayAdapter<WhoochProfileEntry> 
 	        ibtn1.setOnClickListener(whoochProfileEntry.getInviteUserClickListener());
 		}
 
-		
         SharedPreferences settings = mContext.getSharedPreferences("whooch_preferences", 0);
         String currentUserName = settings.getString("username", null);
+        
+		ibtn4.setVisibility(View.VISIBLE);
+		ibtn4.setOnClickListener(whoochProfileEntry.getWhoochSettingsClickListener());
         
         if (whoochProfileEntry.isContributing.equals("1") && whoochProfileEntry.leaderName.equalsIgnoreCase(currentUserName)) 
         {
@@ -118,6 +122,8 @@ public class WhoochProfileArrayAdapter extends ArrayAdapter<WhoochProfileEntry> 
         		ibtn3.setText("Trail whooch");
         		ibtn3.setVisibility(View.VISIBLE);
         		ibtn3.setOnClickListener(whoochProfileEntry.getTrailWhoochClickListener());
+        		
+        		ibtn4.setVisibility(View.GONE);
         	}
         	else
         	{
@@ -125,6 +131,26 @@ public class WhoochProfileArrayAdapter extends ArrayAdapter<WhoochProfileEntry> 
         		ibtn3.setVisibility(View.VISIBLE);
         		ibtn3.setOnClickListener(whoochProfileEntry.getStopTrailWhoochClickListener());
         	}
+        }
+        
+        if(whoochProfileEntry.type.equals("open") && whoochProfileEntry.isContributing.equals("1"))
+        {
+        	ibtn6.setVisibility(View.VISIBLE);
+        	ibtn6.setOnClickListener(whoochProfileEntry.getViewWhoochFeedbackClickListener());
+        }
+        else
+        {
+        	ibtn6.setVisibility(View.GONE);
+        }
+        
+        if(whoochProfileEntry.type.equals("open") && whoochProfileEntry.didUserRate.equals("0"))
+        {
+        	ibtn5.setVisibility(View.VISIBLE);
+        	ibtn5.setOnClickListener(whoochProfileEntry.getRateWhoochClickListener());
+        }
+        else
+        {
+        	ibtn5.setVisibility(View.GONE);
         }
         
 		return view;

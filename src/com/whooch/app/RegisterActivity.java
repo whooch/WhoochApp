@@ -46,7 +46,7 @@ public class RegisterActivity extends SherlockActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.login);
+		setContentView(R.layout.register);
 
 		UsernameText = (EditText) findViewById(R.id.reg_username);
 		FirstnameText = (EditText) findViewById(R.id.reg_firstname);
@@ -205,10 +205,8 @@ public class RegisterActivity extends SherlockActivity {
 				task.execute();
 				
 			} else {
-			//LAC
-			//TODO: Need to display reason why registration failed
 				Toast.makeText(getApplicationContext(),
-						"Registration failed", Toast.LENGTH_LONG)
+						mRegistrationResponse, Toast.LENGTH_LONG)
 						.show();
 			}
 		}

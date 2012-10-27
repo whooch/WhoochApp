@@ -5,46 +5,22 @@
     android:orientation="vertical" >
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dip"
-        android:orientation="horizontal" >
-
-        <ImageView
-            android:id="@+id/wprofile_whoochimage"
-            android:layout_width="50dip"
-            android:layout_height="50dip"
-            android:src="@drawable/ic_launcher" />
-
-        <TextView
-            android:id="@+id/wprofile_whoochname"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="5dip"
-            android:text="WhoochName"
-            android:textColor="@color/whoochblue"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0dip"
         android:layout_marginBottom="20dip"
-        android:layout_marginRight="10dip"
         android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:layout_marginTop="10dip"
         android:orientation="vertical" >
 
         <TextView
             android:id="@+id/wprofile_leader_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dip"
             android:layout_marginBottom="2dip"
+            android:layout_marginTop="5dip"
             android:text="Leader"
-            android:textColor="@color/gray1"
+            android:textColor="@color/gray4"
             android:textSize="15sp" />
 
         <RelativeLayout
@@ -65,6 +41,7 @@
                 android:layout_marginLeft="5dip"
                 android:layout_toRightOf="@+id/wprofile_leaderimage"
                 android:text="Leader"
+                android:textStyle="bold"
                 android:textSize="15sp" />
         </RelativeLayout>
 
@@ -72,10 +49,10 @@
             android:id="@+id/wprofile_type_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dip"
             android:layout_marginBottom="2dip"
+            android:layout_marginTop="5dip"
             android:text="Type"
-            android:textColor="@color/gray1"
+            android:textColor="@color/gray4"
             android:textSize="15sp" />
 
         <RelativeLayout
@@ -94,6 +71,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dip"
+                android:textStyle="bold"
                 android:layout_toRightOf="@+id/wprofile_typeimage"
                 android:text="Type"
                 android:textSize="15sp" />
@@ -110,10 +88,10 @@
                 android:id="@+id/wprofile_users_trailing_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dip"
                 android:layout_marginBottom="2dip"
+                android:layout_marginTop="5dip"
                 android:text="Users Trailing"
-                android:textColor="@color/gray1"
+                android:textColor="@color/gray4"
                 android:textSize="15sp" />
 
             <TextView
@@ -121,34 +99,37 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Users Trailing"
+                android:textStyle="bold"
                 android:textSize="15sp" />
 
             <TextView
                 android:id="@+id/wprofile_rating_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dip"
                 android:layout_marginBottom="2dip"
+                android:layout_marginTop="5dip"
                 android:text="Rating"
-                android:textColor="@color/gray1"
+                android:textColor="@color/gray4"
                 android:textSize="15sp" />
 
-            <TextView
+            <RatingBar
                 android:id="@+id/wprofile_rating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Rating"
-                android:textSize="15sp" />
+                style = "?android:attr/ratingBarStyleSmall"
+                android:numStars="5"
+                android:rating="4.0"
+                android:stepSize="1.0" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/wprofile_description_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dip"
             android:layout_marginBottom="2dip"
+            android:layout_marginTop="5dip"
             android:text="Description"
-            android:textColor="@color/gray1"
+            android:textColor="@color/gray4"
             android:textSize="15sp" />
 
         <TextView
@@ -156,8 +137,37 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Description"
+            android:textStyle="bold"
             android:textSize="15sp" />
     </LinearLayout>
+    
+        <Button
+        android:id="@+id/wprofile_contributors"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dip"
+        android:layout_marginLeft="20dip"
+        android:layout_marginRight="20dip"
+        android:layout_marginTop="10dip"
+        android:background="@drawable/lists_button_selector"
+        android:text="Show contributors"
+        android:textColor="@color/white"
+        android:textSize="15dip"
+        android:visibility="gone" />
+    
+      <Button
+        android:id="@+id/wprofile_feedback"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dip"
+        android:layout_marginLeft="20dip"
+        android:layout_marginRight="20dip"
+        android:layout_marginTop="10dip"
+        android:background="@drawable/lists_button_selector"
+        android:text="View feedback"
+        android:textColor="@color/white"
+        android:textSize="15dip"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/wprofile_inviteuser"
@@ -168,7 +178,7 @@
         android:layout_marginRight="20dip"
         android:layout_marginTop="10dip"
         android:background="@drawable/lists_button_selector"
-        android:text="Invite"
+        android:text="Invite user"
         android:textColor="@color/white"
         android:textSize="15dip"
         android:visibility="gone" />
@@ -196,6 +206,34 @@
         android:layout_marginRight="20dip"
         android:layout_marginTop="10dip"
         android:background="@drawable/lists_button_selector"
+        android:textColor="@color/white"
+        android:textSize="15dip"
+        android:visibility="gone" />
+    
+   <Button
+        android:id="@+id/wprofile_ratewhooch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dip"
+        android:layout_marginLeft="20dip"
+        android:layout_marginRight="20dip"
+        android:layout_marginTop="10dip"
+        android:background="@drawable/lists_button_selector"
+        android:text="Rate whooch"
+        android:textColor="@color/white"
+        android:textSize="15dip"
+        android:visibility="gone" />
+    
+    <Button
+        android:id="@+id/wprofile_whoochsettings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dip"
+        android:layout_marginLeft="20dip"
+        android:layout_marginRight="20dip"
+        android:layout_marginTop="10dip"
+        android:background="@drawable/lists_button_selector"
+        android:text="Whooch settings"
         android:textColor="@color/white"
         android:textSize="15dip"
         android:visibility="gone" />

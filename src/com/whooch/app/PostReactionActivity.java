@@ -14,12 +14,9 @@ import android.content.Intent;
 import android.graphics.Bitmap.CompressFormat;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
-import com.whooch.app.helpers.ActionBarHelper;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
 import com.whooch.app.helpers.WhoochApiCallTask;
@@ -35,22 +32,14 @@ public class PostReactionActivity extends PostBaseActivity {
     private String mWhoochNameExtra;
     private String mWhoochImageExtra;
     private TextView mReactingToText;
-    private ImageView mReactingToImage;
-    private TextView mReactingToWhoochName;
-    private TextView mReactingToUserName;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        ActionBarHelper.setupActionBar(getSupportActionBar(), new ActionBarHelper.TabListener(getApplicationContext()), 1);
-        
+               
         mLayoutType = "reaction";
         
 		mReactingToText = (TextView) findViewById(R.id.post_reacting_to);
-		mReactingToImage = (ImageView) findViewById(R.id.post_react_whooch_image);
-		mReactingToWhoochName = (TextView) findViewById(R.id.post_react_whooch_title);
-		mReactingToUserName = (TextView) findViewById(R.id.post_react_whooch_contributor);
         
         mReactLayout.setVisibility(View.VISIBLE);
 
@@ -72,11 +61,12 @@ public class PostReactionActivity extends PostBaseActivity {
             }
         });
         
+
         Intent i = getIntent();
         Bundle b = i.getExtras();
         
         if (b == null) {
-               Toast.makeText(getApplicationContext(), "Error: bad intent", Toast.LENGTH_SHORT).show();
+               Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
                finish();
         }
         
@@ -88,13 +78,12 @@ public class PostReactionActivity extends PostBaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-        ActionBarHelper.selectTab(getSupportActionBar(), 1);
         
         Intent i = getIntent();
         Bundle b = i.getExtras();
         
         if (b == null) {
-               Toast.makeText(getApplicationContext(), "Error: bad intent", Toast.LENGTH_SHORT).show();
+               Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
                finish();
         }
         
@@ -108,13 +97,10 @@ public class PostReactionActivity extends PostBaseActivity {
         
         if ( (mWhoochIdExtra == null) || (mReactionToExtra == null) || (mReactionTypeExtra == null) ||
                 (mContentExtra == null)  || (mUserNameExtra == null) || (mWhoochNameExtra == null) || (mWhoochImageExtra == null) ) {
-               Toast.makeText(getApplicationContext(), "Error: bad intent", Toast.LENGTH_SHORT).show();
+               Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
                finish();
         }
-        
-        mReactingToWhoochName.setText(mWhoochNameExtra);
-        mReactingToUserName.setText(mUserNameExtra);
-        UrlImageViewHelper.setUrlDrawable(mReactingToImage, mWhoochImageExtra);
+       
         mReactingToText.setText(WhoochHelperFunctions.getSpannedFromHtmlContent(mContentExtra, mPostText, getActivityContext()));
 
     }

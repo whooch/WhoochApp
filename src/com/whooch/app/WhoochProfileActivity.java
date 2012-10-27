@@ -14,14 +14,19 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListActivity;
-import com.whooch.app.helpers.ActionBarHelper;
+import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
 import com.whooch.app.helpers.WhoochApiCallTask;
@@ -45,7 +50,25 @@ public class WhoochProfileActivity extends SherlockListActivity implements OnScr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.whooch_profile);
          
-       ActionBarHelper.setupActionBar(getSupportActionBar(), new ActionBarHelper.TabListener(getApplicationContext()), 1);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(
+				Context.LAYOUT_INFLATER_SERVICE);
+	
+		getSupportActionBar().setDisplayShowCustomEnabled(true);
+		
+		View whoochTitle = inflater.inflate(
+				R.layout.whooch_title_bar, null);
+		getSupportActionBar().setCustomView(whoochTitle);
+		
+		getSupportActionBar().setDisplayShowHomeEnabled(false);
+		
+		
+		LinearLayout ll1 = (LinearLayout)findViewById(R.id.wheader_whoochinfo);
+		ll1.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	finish();
+            }
+        });
         
         mAdapter = new WhoochProfileArrayAdapter(this, mWhoochProfileArray);
         setListAdapter(mAdapter);
@@ -54,8 +77,6 @@ public class WhoochProfileActivity extends SherlockListActivity implements OnScr
     @Override
     public void onResume() {
         super.onResume();
-
-        ActionBarHelper.selectTab(getSupportActionBar(), 1);
 
         WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new ProfileInitiate(), true);
         task.execute();
@@ -114,7 +135,7 @@ public class WhoochProfileActivity extends SherlockListActivity implements OnScr
             Bundle b = i.getExtras();
             mWhoochId = b.getString("WHOOCH_ID");
             if (mWhoochId == null) {
-                Toast.makeText(getApplicationContext(), "Error: bad intent", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
                 finish();
             }
 
@@ -137,9 +158,22 @@ public class WhoochProfileActivity extends SherlockListActivity implements OnScr
                         
                         WhoochProfileEntry entry = new WhoochProfileEntry(jsonObject, getWindowManager());
                         
+						ImageView iv1 = (ImageView) findViewById(R.id.wheader_whooch_image);
+						UrlImageViewHelper.setUrlDrawable(iv1,
+								entry.whoochImageUriMedium);
+
+						TextView tv1 = (TextView) findViewById(R.id.wheader_whooch_title);
+						tv1.setText(entry.whoochName);
+
+						TextView tv2 = (TextView) findViewById(R.id.wheader_whooch_leader);
+						tv2.setText("Options");
+
+						LinearLayout ll1 = (LinearLayout) findViewById(R.id.wheader_whoochinfo);
+						ll1.setVisibility(View.VISIBLE);
+                       
                         mWhoochProfileArray.add(entry);   
-                
                         mAdapter.notifyDataSetChanged();
+                        
                     } catch (JSONException e) {
                         e.printStackTrace();
                         // TODO: error handling

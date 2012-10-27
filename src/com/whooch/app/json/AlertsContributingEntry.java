@@ -146,17 +146,27 @@ public class AlertsContributingEntry extends AlertsEntry {
 
     @Override
     public String getWhoochImageUrl() {
-        return whoochImageUriDefault;
+        return whoochImageUriSmall;
     }
 
     @Override
     public String getUserImageUrl() {
-        return leaderUserImageUriDefault;
+        return leaderUserImageUriSmall;
     }
 
     @Override
-    public String getMessage() {
-        return leaderUserName + " has invited you to contribute to " + whoochName;
+    public String getAlertType() {
+        return " has sent you an invitation to contribute to...";
+    }
+    
+    @Override
+    public String getUserName() {
+        return leaderUserName;
+    }
+    
+    @Override
+    public String getWhoochName() {
+        return whoochName;
     }
 
     public OnClickListener getAcceptClickListener() {

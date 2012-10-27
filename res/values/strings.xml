@@ -11,7 +11,7 @@
 		<item>closed</item>
 		<item>open</item>
 	</string-array>
-	
+
 	<string-array name="image_retrieval_type">
 		<item>Take a picture</item>
 		<item>Get image from library</item>
@@ -19,10 +19,32 @@
 
 	<!-- MAX_POST_LENGTH is also defined in Settings.java -->
 	<string name="MAX_POST_LENGTH">151</string>
-	
+
 	<string-array name="search_spinner">
-        <item>open whooches</item>
-        <item>users</item>
-    </string-array>
+		<item>open whooches</item>
+		<item>users</item>
+		<item>updates</item>
+	</string-array>
+
+	<string-array name="sent_received_spinner">
+		<item>received</item>
+		<item>sent</item>
+	</string-array>
+
+	<string-array name="lists_spinner">
+		<item>leading</item>
+		<item>contributing</item>
+		<item>trailing</item>
+	</string-array>
+
+	<string-array name="invite_type_spinner_closed">
+		<item>contribute</item>
+		<item>trail</item>
+	</string-array>
+
+	<string-array name="invite_type_spinner_open">
+		<item>contribute</item>
+		<item>ask to trail</item>
+	</string-array>
 
 </resources>

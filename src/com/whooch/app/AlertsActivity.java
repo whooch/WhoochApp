@@ -11,9 +11,12 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockListActivity;
-import com.whooch.app.helpers.ActionBarHelper;
+import com.actionbarsherlock.view.MenuItem;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
 import com.whooch.app.helpers.WhoochApiCallTask;
@@ -36,17 +39,24 @@ public class AlertsActivity extends SherlockListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.alerts);
         
-        ActionBarHelper.setupActionBar(getSupportActionBar(), new ActionBarHelper.TabListener(getApplicationContext()), 3);
-        
+		getSupportActionBar().setDisplayShowHomeEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		
+		LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View title_view = inflater.inflate(R.layout.title_bar_generic, null);
+		getSupportActionBar().setCustomView(title_view);
+		getSupportActionBar().setDisplayShowCustomEnabled(true);
+		TextView tvhead = (TextView)title_view.findViewById(R.id.header_generic_title);
+		tvhead.setText("Alerts");
+		 
         mAdapter = new AlertsArrayAdapter(this, mAlertsArray);
         setListAdapter(mAdapter);
+
     }
     
     @Override
     public void onResume() {
         super.onResume();
-        
-        ActionBarHelper.selectTab(getSupportActionBar(), 3);
         
         WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new AlertsInitiate(), true);
         task.execute();
@@ -92,6 +102,7 @@ public class AlertsActivity extends SherlockListActivity {
                         String alertType = jsonAlert.getString("alertType");
                         
                         AlertsEntry entry = null;
+                    
                         if (alertType.equals("friend")) {
                             entry = new AlertsFriendEntry(jsonArray.getJSONObject(i), getWindowManager(), AlertsActivity.this);
                         } else if (alertType.equals("trailing")) {
@@ -129,5 +140,18 @@ public class AlertsActivity extends SherlockListActivity {
         }
 
     }
+    
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+
+	    int itemId = item.getItemId();
+	    switch (itemId) {
+	    case android.R.id.home:
+	        finish();
+	        break;
+
+	    }
+
+	    return true;
+	}
 
 }

@@ -44,11 +44,18 @@ public class FriendsEntry {
             e.printStackTrace();
         }
         
-        // determine the URLs for the whooch image
+        
+        // determine the URLs for the user image
         if (userImage != null && userId != null) {
-            userImageUriSmall = Settings.cdnUrl + "u" + userId + "_s" + userImage;
-            userImageUriMedium = Settings.cdnUrl + "u" + userId + "_m" + userImage;
-            userImageUriLarge = Settings.cdnUrl + "u" + userId + "_l" + userImage;
+            if (userImage.equals("defaultUser.png")) {
+                userImageUriSmall = Settings.cdnUrl + "s_" + userImage;
+                userImageUriMedium = Settings.cdnUrl + "m_" + userImage;
+                userImageUriLarge = Settings.cdnUrl + "l_" + userImage;
+            } else {
+                userImageUriSmall = Settings.cdnUrl + "u" + userId + "_s" + userImage;
+                userImageUriMedium = Settings.cdnUrl + "u" + userId + "_m" + userImage;
+                userImageUriLarge = Settings.cdnUrl + "u" + userId + "_l" + userImage;
+            }
         }
         
         // determine proper image to use based on the current screen resolution

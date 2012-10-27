@@ -16,7 +16,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Searching for"
-            android:textColor="@color/gray1" />
+            android:layout_marginRight="3dip"
+            android:textColor="@color/black" />
 
         <Spinner
             android:id="@+id/search_spinner"

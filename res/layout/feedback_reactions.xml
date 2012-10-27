@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/feedreact_action" >
+    </ListView>
+
+    <LinearLayout
+        android:id="@+id/feedreact_action"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:weightSum="1.0" >
+
+        <Button
+            android:id="@+id/received_action"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight=".5"
+            android:background="@color/gray1"
+            android:text="Received"
+            android:textColor="@drawable/action_buttons"
+            android:textSize="14sp" >
+        </Button>
+
+        <Button
+            android:id="@+id/sent_action"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight=".5"
+            android:background="@color/gray1"
+            android:text="Sent"
+            android:textColor="@drawable/action_buttons"
+            android:textSize="14sp" >
+        </Button>
+
+    </LinearLayout>
+
+</RelativeLayout>

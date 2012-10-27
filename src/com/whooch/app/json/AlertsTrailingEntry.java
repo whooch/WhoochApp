@@ -113,9 +113,15 @@ public class AlertsTrailingEntry extends AlertsEntry {
         
         // determine the URLs for the user image
         if (leaderUserImage != null && leaderUserId != null) {
-            leaderUserImageUriSmall = Settings.cdnUrl + "u" + leaderUserId + "_s" + leaderUserImage;
-            leaderUserImageUriMedium = Settings.cdnUrl + "u" + leaderUserId + "_m" + leaderUserImage;
-            leaderUserImageUriLarge = Settings.cdnUrl + "u" + leaderUserId + "_l" + leaderUserImage;
+            if(leaderUserImage.equals("defaultUser.png")) {
+            	leaderUserImageUriSmall = Settings.cdnUrl + "s_" + leaderUserImage;
+            	leaderUserImageUriMedium = Settings.cdnUrl + "m_" + leaderUserImage;
+            	leaderUserImageUriLarge = Settings.cdnUrl + "l_" + leaderUserImage;
+            } else {
+                leaderUserImageUriSmall = Settings.cdnUrl + "u" + leaderUserId + "_s" + leaderUserImage;
+                leaderUserImageUriMedium = Settings.cdnUrl + "u" + leaderUserId + "_m" + leaderUserImage;
+                leaderUserImageUriLarge = Settings.cdnUrl + "u" + leaderUserId + "_l" + leaderUserImage;
+            }
         }
         
         // determine proper image to use based on the current screen resolution
@@ -136,17 +142,27 @@ public class AlertsTrailingEntry extends AlertsEntry {
 
     @Override
     public String getWhoochImageUrl() {
-        return whoochImageUriDefault;
+        return whoochImageUriSmall;
     }
 
     @Override
     public String getUserImageUrl() {
-        return leaderUserImageUriDefault;
+        return leaderUserImageUriSmall;
     }
     
     @Override
-    public String getMessage() {
-        return leaderUserName + " has invited you to trail " + whoochName;
+    public String getAlertType() {
+        return " has sent you an invitation to trail...";
+    }
+    
+    @Override
+    public String getUserName() {
+        return leaderUserName;
+    }
+    
+    @Override
+    public String getWhoochName() {
+        return whoochName;
     }
 
     public OnClickListener getAcceptClickListener() {

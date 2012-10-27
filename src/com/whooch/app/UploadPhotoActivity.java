@@ -28,16 +28,24 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
+import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
 import com.whooch.app.helpers.WhoochApiCallTask;
 
-public class UploadPhotoActivity extends Activity {
+public class UploadPhotoActivity extends SherlockActivity {
 
 	private static final int REQUEST_CODE_LIBRARY = 1;
 	private static final int REQUEST_CODE_CAMERA = 2;
@@ -64,7 +72,7 @@ public class UploadPhotoActivity extends Activity {
 		
 		mImageView = (ImageView) findViewById(R.id.imageView1);
 		mUploadPhotoButton = (Button) findViewById(R.id.upload_photo_button);
-
+		
 		mUploadPhotoButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -73,7 +81,7 @@ public class UploadPhotoActivity extends Activity {
 					task.execute();
 				} else { 
 					Toast.makeText(getApplicationContext(),
-							"Click the box above to first select a photo",
+							"Click the camera above to first select a photo",
 							Toast.LENGTH_SHORT).show();
 				}
 			}
@@ -85,6 +93,54 @@ public class UploadPhotoActivity extends Activity {
 				getPhoto(view);
 			}
 		});
+		
+		
+		if(mUploadPhotoType == UPLOAD_PHOTO_WHOOCH)
+		{
+		       LayoutInflater inflater = (LayoutInflater) getSystemService(
+						Context.LAYOUT_INFLATER_SERVICE);
+			
+				getSupportActionBar().setDisplayShowCustomEnabled(true);
+				
+				View whoochTitle = inflater.inflate(
+						R.layout.whooch_title_bar, null);
+				getSupportActionBar().setCustomView(whoochTitle);
+				
+				getSupportActionBar().setDisplayShowHomeEnabled(false);
+				
+				ImageView iv1 = (ImageView) findViewById(R.id.wheader_whooch_image);
+				UrlImageViewHelper.setUrlDrawable(iv1,
+						b.getString("WHOOCH_IMAGE"));
+
+				TextView tv1 = (TextView) findViewById(R.id.wheader_whooch_title);
+				tv1.setText(b.getString("WHOOCH_NAME"));
+
+				TextView tv2 = (TextView) findViewById(R.id.wheader_whooch_leader);
+				tv2.setText("Update whooch image");
+
+				LinearLayout ll1 = (LinearLayout) findViewById(R.id.wheader_whoochinfo);
+				ll1.setVisibility(View.VISIBLE);
+				
+				ll1.setOnClickListener(new OnClickListener() {
+		            @Override
+		            public void onClick(View v) {
+		            	finish();
+		            }
+		        });	
+		}
+		else
+		{
+			getSupportActionBar().setDisplayShowHomeEnabled(true);
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);	
+			
+			LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			View title_view = inflater.inflate(R.layout.title_bar_generic, null);
+			getSupportActionBar().setCustomView(title_view);
+			getSupportActionBar().setDisplayShowCustomEnabled(true);
+			TextView tvhead = (TextView)title_view.findViewById(R.id.header_generic_title);
+			tvhead.setText("Update profile image");
+		}
+		
 	}
 	
 	@Override
@@ -245,7 +301,7 @@ public class UploadPhotoActivity extends Activity {
 			builder.setPositiveButton("Ok",
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
-							mImageView.setImageResource(android.R.drawable.alert_light_frame);
+							mImageView.setImageResource(R.drawable.ic_camera_bl_128);
 							mImageBitmap = null;
 							mImageName =  null;
 						}
@@ -293,7 +349,14 @@ public class UploadPhotoActivity extends Activity {
 
 	private class UploadPhoto implements WhoochApiCallInterface {
 
-        public void preExecute() {}
+        public void preExecute() {
+        	
+        	ImageView iv1 = (ImageView)findViewById(R.id.imageView1);
+        	iv1.setVisibility(View.GONE);
+        	ProgressBar pb1 = (ProgressBar)findViewById(R.id.upload_photo_loader);
+        	pb1.setVisibility(View.VISIBLE);
+        	
+        }
         
 		public HttpRequestBase getHttpRequest() {
 			
@@ -352,6 +415,11 @@ public class UploadPhotoActivity extends Activity {
 				Toast.makeText(getApplicationContext(),
 						"Error uploading image, please try again",
 						Toast.LENGTH_SHORT).show();
+				
+	        	ProgressBar pb1 = (ProgressBar)findViewById(R.id.upload_photo_loader);
+	        	pb1.setVisibility(View.GONE);
+	        	ImageView iv1 = (ImageView)findViewById(R.id.imageView1);
+	        	iv1.setVisibility(View.VISIBLE);
 			}
 		}
 	}
@@ -368,6 +436,19 @@ public class UploadPhotoActivity extends Activity {
             return picturePath;
 
 	    }
+	 
+		public boolean onMenuItemSelected(int featureId, MenuItem item) {
+
+		    int itemId = item.getItemId();
+		    switch (itemId) {
+		    case android.R.id.home:
+		        finish();
+		        break;
+
+		    }
+
+		    return true;
+		}
 
 
 }

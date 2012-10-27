@@ -4,9 +4,6 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
-import android.text.Html;
-import android.text.Spanned;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +11,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.koushikdutta.urlimageviewhelper.UrlImageGetter;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.R;
 import com.whooch.app.helpers.WhoochHelperFunctions;
@@ -26,11 +22,14 @@ public class FeedbackArrayAdapter extends ArrayAdapter<FeedbackEntry> {
     private ArrayList<FeedbackEntry> mData = null;
     private LayoutInflater mInflater;
     
-    public FeedbackArrayAdapter(Context context, ArrayList<FeedbackEntry> data) {
+    private boolean mIsWhoochFeedback;
+    
+    public FeedbackArrayAdapter(Context context, ArrayList<FeedbackEntry> data, boolean isWhoochFeedback) {
         super(context, 0, data);
         mContext = context;
         mData = data;
         mInflater = ((Activity) mContext).getLayoutInflater();
+        mIsWhoochFeedback = isWhoochFeedback;
     }
     
     @Override
@@ -44,14 +43,16 @@ public class FeedbackArrayAdapter extends ArrayAdapter<FeedbackEntry> {
         
         FeedbackEntry feedbackEntry = mData.get(position);
         
-        ImageView iv1 = (ImageView) view.findViewById(R.id.entry_whooch_image);
-        // TODO: figure out what's up with this preloading
-        //UrlImageViewHelper.setUrlDrawable(iv1, whoochEntry.whoochImageUriLarge, R.drawable.ic_whooch_transparent);
-        UrlImageViewHelper.setUrlDrawable(iv1, feedbackEntry.whoochImageUriLarge);
-        
         TextView tv1 = (TextView) view.findViewById(R.id.entry_whooch_title);
-
-        tv1.setText(feedbackEntry.whoochName);
+        ImageView iv1 = (ImageView) view.findViewById(R.id.entry_whooch_image);
+        
+		if (mIsWhoochFeedback) {
+			tv1.setVisibility(View.GONE);
+			UrlImageViewHelper.setUrlDrawable(iv1, feedbackEntry.userImageUriLarge);
+		} else {
+		    tv1.setText(feedbackEntry.whoochName);
+	        UrlImageViewHelper.setUrlDrawable(iv1, feedbackEntry.whoochImageUriLarge);
+		}
         
         TextView tv2 = (TextView) view.findViewById(R.id.entry_posted_user);
         tv2.setText(feedbackEntry.userName);
@@ -75,6 +76,9 @@ public class FeedbackArrayAdapter extends ArrayAdapter<FeedbackEntry> {
         
     	ImageView iv3 = (ImageView) view.findViewById(R.id.imagePlus);
     	iv3.setVisibility(View.GONE);
+    	
+		ImageView iv5 = (ImageView) view.findViewById(R.id.imageOpenClosed);
+		iv5.setVisibility(View.GONE);
         
         return view;
     }

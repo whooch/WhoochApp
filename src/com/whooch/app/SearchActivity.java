@@ -1,6 +1,7 @@
 package com.whooch.app;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,14 +16,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AbsListView;
@@ -30,6 +35,8 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -37,11 +44,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListActivity;
-import com.whooch.app.helpers.ActionBarHelper;
+import com.actionbarsherlock.view.MenuItem;
+import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
 import com.whooch.app.helpers.WhoochApiCallTask;
+import com.whooch.app.helpers.WhoochHelperFunctions;
 import com.whooch.app.json.SearchEntry;
+import com.whooch.app.json.StreamEntry;
 import com.whooch.app.ui.SearchArrayAdapter;
 
 public class SearchActivity extends SherlockListActivity implements
@@ -56,10 +66,15 @@ public class SearchActivity extends SherlockListActivity implements
 	boolean mSearchHasMoreUpdates = true;
 	boolean mLoadMoreItemsInProgress = false;
 
+	private String mShowConvoId = null;
+	private String mShowConvoNumber = null;
+	private SearchEntry mShowConvoCurrentUpdate = null;
+	private int mLastSelectedPosition = -1;
+
 	private int mSearchNextPage = 1;
 	private EditText mSearchQuery = null;
-	private String mSearchType = "open";
-	
+	private String mSearchType = null;
+
 	private Spinner mSearchSpinner = null;
 
 	View mLoadingFooterView;
@@ -73,46 +88,90 @@ public class SearchActivity extends SherlockListActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.search);
 
-		ActionBarHelper.setupActionBar(getSupportActionBar(),
-				new ActionBarHelper.TabListener(getApplicationContext()), 1);
+		getSupportActionBar().setDisplayShowHomeEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		
+		LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View title_view = inflater.inflate(R.layout.title_bar_generic, null);
+		getSupportActionBar().setCustomView(title_view);
+		getSupportActionBar().setDisplayShowCustomEnabled(true);
+		TextView tvhead = (TextView)title_view.findViewById(R.id.header_generic_title);
+		tvhead.setText("Search");
 
 		mSearchQuery = (EditText) findViewById(R.id.search_query);
 
 		mAdapter = new SearchArrayAdapter(this, mSearchArray);
 		setListAdapter(mAdapter);
-		
-		EditText et1 = (EditText)findViewById(R.id.search_query);
+
+		EditText et1 = (EditText) findViewById(R.id.search_query);
 		et1.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-		    @Override
-		    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-		        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+					if(mSearchQuery.getText().toString().trim().length() > 0)
+					{
 					WhoochApiCallTask task = new WhoochApiCallTask(
 							getActivityContext(), new SearchInitiate(), false);
 					task.execute();
-		            return true;
-		        }
-		        return false;
-		    }
+					}
+					else
+					{
+						Toast.makeText(getActivityContext(),
+								"Please provide a keyword to search for", Toast.LENGTH_LONG)
+								.show();
+					}
+					return true;
+					
+				}
+				return false;
+			}
 		});
-		
-		mSearchSpinner = (Spinner) findViewById(R.id.search_spinner);
-		mSearchSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		        if(position == 0)
-		        {
-		        	mSearchType = "open";
-		        }
-		        else
-		        {
-		        	mSearchType = "user";
-		        }
-		    }
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) {
-		       
-		    }
+		Uri data = getIntent().getData();
+
+		mSearchSpinner = (Spinner) findViewById(R.id.search_spinner);
+
+		if (data != null) {
+			mSearchType = "hash";
+			mSearchSpinner.setSelection(2);
+
+			mSearchQuery.setText(data.toString().replaceAll(
+					"com.whooch.updatesearch://(.+)", "$1"));
+			mSearchQuery.setSelection(mSearchQuery.getText().length());
+
+			WhoochApiCallTask task = new WhoochApiCallTask(
+					getActivityContext(), new SearchInitiate(), false);
+			task.execute();
+		} else {
+			mSearchType = "open";
+			mSearchSpinner.setSelection(0);
+		}
+
+		mSearchSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parentView,
+					View selectedItemView, int position, long id) {
+				if (position == 0) {
+					mSearchType = "open";
+				} else if (position == 1) {
+					mSearchType = "user";
+				} else {
+					mSearchType = "hash";
+				}
+				
+				if(mSearchQuery.getText().toString().trim().length() > 0)
+				{
+					WhoochApiCallTask task = new WhoochApiCallTask(
+							getActivityContext(), new SearchInitiate(), false);
+					task.execute();
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parentView) {
+
+			}
 
 		});
 
@@ -121,8 +180,6 @@ public class SearchActivity extends SherlockListActivity implements
 	@Override
 	public void onResume() {
 		super.onResume();
-
-		ActionBarHelper.selectTab(getSupportActionBar(), 1);
 
 		mSearchInitiated = false;
 		mSearchHasMoreUpdates = true;
@@ -167,26 +224,123 @@ public class SearchActivity extends SherlockListActivity implements
 	protected Dialog onCreateDialog(int id, Bundle b) {
 
 		final SearchEntry entry = mSearchArray.get(b.getInt("POSITION"));
-
-		// create the menu
-		ArrayList<String> names = new ArrayList<String>();
-		ArrayList<Runnable> handlers = new ArrayList<Runnable>();
+		mLastSelectedPosition = b.getInt("POSITION");
+		mShowConvoCurrentUpdate = entry;
 
 		if (mSearchType == "open") {
 
-			if (entry.isTrailing.equals("0")) {
-				names.add("Trail whooch");
+			Intent i = new Intent(getApplicationContext(), WhoochActivity.class);
+			i.putExtra("WHOOCH_ID", entry.whoochId);
+			startActivity(i);
+			
+			return null;
+
+		} else if (mSearchType == "user") {
+
+			Intent i = new Intent(getApplicationContext(),
+					UserProfileActivity.class);
+			i.putExtra("USER_ID", entry.userId);
+			i.putExtra("FORCE_FOREIGN", "true");
+			startActivity(i);
+			
+			return null;
+
+		} else {
+			
+			// create the menu
+			ArrayList<String> names = new ArrayList<String>();
+			ArrayList<Runnable> handlers = new ArrayList<Runnable>();
+
+			SharedPreferences settings = getActivityContext()
+					.getSharedPreferences("whooch_preferences", 0);
+			String currentUserName = settings.getString("username", null);
+
+			if (entry.isContributor.equals("1")
+					&& !entry.userName.equalsIgnoreCase(currentUserName)) {
+				names.add("React");
 				handlers.add(new Runnable() {
 					public void run() {
+						Log.d("StreamActivity", "React");
+						Intent i = new Intent(getApplicationContext(),
+								PostReactionActivity.class);
+						i.putExtra("WHOOCH_ID", entry.whoochId);
+						i.putExtra("REACTION_TO", entry.whoochNumber);
+						i.putExtra("REACTION_TYPE", "whooch");
+						i.putExtra("CONTENT", entry.content);
+						i.putExtra("USER_NAME", entry.userName);
+						i.putExtra("WHOOCH_NAME", entry.whoochName);
+						i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriLarge);
+						startActivity(i);
+					}
+				});
+			}
+
+			// All updates in search are open, so just check contribute status
+			if (entry.isContributor.equals("0")) {
+				names.add("Send Feedback");
+				handlers.add(new Runnable() {
+					public void run() {
+						Log.d("StreamActivity", "Send Feedback");
+						Intent i = new Intent(getApplicationContext(),
+								PostFeedbackActivity.class);
+						i.putExtra("WHOOCH_ID", entry.whoochId);
+						i.putExtra("WHOOCH_NUMBER", entry.whoochNumber);
+						i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriLarge);
+						i.putExtra("WHOOCH_NAME", entry.whoochName);
+						i.putExtra("USER_NAME", entry.userName);
+						startActivity(i);
+					}
+				});
+			}
+
+			if (entry.reactionType.equals("whooch")) {
+				names.add("Show Conversation");
+				handlers.add(new Runnable() {
+					public void run() {
+						Log.d("StreamActivity", "Show Conversation");
+						mShowConvoId = entry.whoochId;
+						mShowConvoNumber = entry.reactionTo;
+
 						WhoochApiCallTask task = new WhoochApiCallTask(
-								getActivityContext(), new TrailWhooch(
-										entry.whoochId), true);
+								getActivityContext(), new ShowConversation(),
+								true);
 						task.execute();
 					}
 				});
 			}
 
-			names.add("Go to whooch");
+			if (!entry.image.equals("null")) {
+				names.add("View Photo");
+				handlers.add(new Runnable() {
+					public void run() {
+						Log.d("StreamActivity", "View Photo");
+						Intent i = new Intent(getApplicationContext(),
+								ViewPhotoActivity.class);
+						i.putExtra("WHOOCH_ID", entry.whoochId);
+						i.putExtra("WHOOCH_NUMBER", entry.whoochNumber);
+						i.putExtra("IMAGE_TYPE", "whooch");
+						i.putExtra("IMAGE_NAME", entry.image);
+						i.putExtra("WHOOCH_NAME", entry.whoochName);
+						i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriMedium);
+						i.putExtra("USER_NAME", entry.userName);
+						startActivity(i);
+					}
+				});
+			}
+
+			if (!entry.userName.equalsIgnoreCase(currentUserName)
+					&& entry.isFan.equals("0")) {
+				names.add("I'm a fan of this update");
+				handlers.add(new Runnable() {
+					public void run() {
+						WhoochApiCallTask task = new WhoochApiCallTask(
+								getActivityContext(), new AddFan(), true);
+						task.execute();
+					}
+				});
+			}
+
+			names.add("Go to Whooch");
 			handlers.add(new Runnable() {
 				public void run() {
 					Intent i = new Intent(getApplicationContext(),
@@ -195,49 +349,77 @@ public class SearchActivity extends SherlockListActivity implements
 					startActivity(i);
 				}
 			});
+			
+			final String[] namesArray = names.toArray(new String[names.size()]);
+			final Runnable[] handlersArray = handlers.toArray(new Runnable[handlers
+					.size()]);
 
-		} else {
-
-			SharedPreferences settings = getActivityContext()
-					.getSharedPreferences("whooch_preferences", 0);
-			String currentUserName = settings.getString("username", null);
-
-			if (entry.isFriend.equals("0")
-					&& !entry.userName.equalsIgnoreCase(currentUserName)) {
-				names.add("Send Friend Request");
-				handlers.add(new Runnable() {
-					public void run() {
-						WhoochApiCallTask task = new WhoochApiCallTask(
-								getActivityContext(), new SendFriendRequest(
-										entry.userId), true);
-						task.execute();
-					}
-				});
+			if (mSearchType.equals("hash")) {
+				return assembleUpdateDialog(namesArray, handlersArray);
+			} else {
+				return new AlertDialog.Builder(getActivityContext()).setItems(
+						namesArray, new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								Log.d("StreamActivity", "Something Was Clicked");
+								handlersArray[which].run();
+							}
+						}).create();
 			}
-
-			names.add("Go to profile");
-			handlers.add(new Runnable() {
-				public void run() {
-					Intent i = new Intent(getApplicationContext(),
-							UserProfileActivity.class);
-					i.putExtra("USER_ID", entry.userId);
-					startActivity(i);
-				}
-			});
-
 		}
 
-		final String[] namesArray = names.toArray(new String[names.size()]);
-		final Runnable[] handlersArray = handlers.toArray(new Runnable[handlers
-				.size()]);
 
-		return new AlertDialog.Builder(getActivityContext()).setItems(
-				namesArray, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						Log.d("StreamActivity", "Something Was Clicked");
-						handlersArray[which].run();
-					}
-				}).create();
+	}
+
+	private Dialog assembleUpdateDialog(final String[] namesArray,
+			final Runnable[] handlersArray) {
+		Builder dialog = new AlertDialog.Builder(getActivityContext());
+
+		LayoutInflater inflater = (LayoutInflater) getActivityContext()
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+		View view = inflater.inflate(R.layout.stream_entry, null);
+
+		dialog.setCustomTitle(view);
+
+		dialog.setItems(namesArray, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				handlersArray[which].run();
+			}
+		});
+
+		ImageView iv1 = (ImageView) view.findViewById(R.id.entry_whooch_image);
+		UrlImageViewHelper.setUrlDrawable(iv1,
+				mShowConvoCurrentUpdate.whoochImageUriLarge);
+
+		TextView tv1 = (TextView) view.findViewById(R.id.entry_whooch_title);
+		tv1.setText(mShowConvoCurrentUpdate.whoochName);
+
+		TextView tv2 = (TextView) view.findViewById(R.id.entry_posted_user);
+		tv2.setText(mShowConvoCurrentUpdate.userName);
+
+		TextView tv3 = (TextView) view.findViewById(R.id.entry_whooch_content);
+		tv3.setText(WhoochHelperFunctions.getSpannedFromHtmlContent(
+				mShowConvoCurrentUpdate.content, tv3, getActivityContext()));
+		tv3.setMovementMethod(LinkMovementMethod.getInstance());
+
+		TextView tv4 = (TextView) view.findViewById(R.id.entry_whooch_foot);
+		tv4.setText(WhoochHelperFunctions.toRelativeTime(Long
+				.parseLong(mShowConvoCurrentUpdate.timestamp)));
+
+		TextView tvFan = (TextView) view
+				.findViewById(R.id.entry_whooch_foot_fans);
+		if (mShowConvoCurrentUpdate.fanString != null) {
+			tvFan.setText(mShowConvoCurrentUpdate.fanString);
+			tvFan.setVisibility(View.VISIBLE);
+		} else {
+			tvFan.setVisibility(View.GONE);
+		}
+
+		LinearLayout ll1 = (LinearLayout) view
+				.findViewById(R.id.entry_update_extras);
+		ll1.setVisibility(View.GONE);
+
+		return dialog.create();
 	}
 
 	@Override
@@ -249,19 +431,22 @@ public class SearchActivity extends SherlockListActivity implements
 		private String mResponseString = null;
 		private ProgressBar mSearchLoader = null;
 
-        public void preExecute() {
-        	
-        	mSearchLoader = (ProgressBar)findViewById(R.id.search_loader);
-        	mSearchLoader.setVisibility(View.VISIBLE);
-        	mSearchArray.clear();
+		public void preExecute() {
+
+			mSearchLoader = (ProgressBar) findViewById(R.id.search_loader);
+			mSearchLoader.setVisibility(View.VISIBLE);
+			mSearchArray.clear();
 			mAdapter.notifyDataSetChanged();
-        	
-        }
-        
+
+		}
+
 		public HttpRequestBase getHttpRequest() {
-			return new HttpGet(Settings.apiUrl + "/search/1?page=0&type="
-					+ mSearchType + "&query="
-					+ mSearchQuery.getText().toString().trim());
+			return new HttpGet(Settings.apiUrl
+					+ "/search/1?page=0&type="
+					+ mSearchType
+					+ "&query="
+					+ URLEncoder.encode(mSearchQuery.getText().toString()
+							.trim()));
 		}
 
 		public void handleResponse(String responseString) {
@@ -311,8 +496,8 @@ public class SearchActivity extends SherlockListActivity implements
 				}
 			}
 
-        	mSearchLoader = (ProgressBar)findViewById(R.id.search_loader);
-        	mSearchLoader.setVisibility(View.GONE);
+			mSearchLoader = (ProgressBar) findViewById(R.id.search_loader);
+			mSearchLoader.setVisibility(View.GONE);
 			mAdapter.notifyDataSetChanged();
 
 			mSearchInitiated = true;
@@ -323,8 +508,9 @@ public class SearchActivity extends SherlockListActivity implements
 
 		private String mResponseString = null;
 
-        public void preExecute() {}
-        
+		public void preExecute() {
+		}
+
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl + "/search/1?page="
 					+ mSearchNextPage + "&type=" + mSearchType + "&query="
@@ -385,33 +571,17 @@ public class SearchActivity extends SherlockListActivity implements
 		}
 	}
 
-	private class TrailWhooch implements WhoochApiCallInterface {
+	private class ShowConversation implements WhoochApiCallInterface {
 
-		private String mWhoochId = null;
 		private String mResponseString = null;
 
-        public void preExecute() {}
-        
-		public TrailWhooch(String whoochId) {
-			mWhoochId = whoochId;
+		public void preExecute() {
+
 		}
 
 		public HttpRequestBase getHttpRequest() {
-
-			HttpPost request = new HttpPost(Settings.apiUrl
-					+ "/whooch/starttrailingopen");
-
-			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-			nameValuePairs.add(new BasicNameValuePair("whoochId", mWhoochId));
-
-			try {
-				request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-				// TODO error handling
-			}
-
-			return request;
+			return new HttpGet(Settings.apiUrl + "/whooch/" + mShowConvoId
+					+ "?single=1&whoochNumber=" + mShowConvoNumber);
 		}
 
 		public void handleResponse(String responseString) {
@@ -421,59 +591,148 @@ public class SearchActivity extends SherlockListActivity implements
 		public void postExecute(int statusCode) {
 
 			if (statusCode == 200) {
-				// parse the response as JSON and update the Content Array
-				if ((mResponseString != null)
-						&& (!mResponseString.equals("null"))) {
-					try {
-						JSONObject jsonObject = new JSONObject(mResponseString);
-						String trailStatus = jsonObject
-								.getString("trailingStatus");
 
-						if ((trailStatus != null)
-								&& (trailStatus.equals("true"))) {
-							Toast.makeText(getApplicationContext(),
-									"You are now trailing this whooch",
-									Toast.LENGTH_SHORT).show();
+				// parse the response as JSON and update the Content Array
+				if (!mResponseString.equals("null")) {
+					try {
+						JSONArray jsonArray = new JSONArray(mResponseString);
+
+						// create an object that will be used to populate the
+						// List View and add it to the array
+						StreamEntry entry = new StreamEntry(
+								jsonArray.getJSONObject(0), getWindowManager());
+
+						AlertDialog.Builder builder = new AlertDialog.Builder(
+								getActivityContext());
+
+						builder.setPositiveButton("OK",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int id) {
+										mShowConvoId = null;
+										mShowConvoNumber = null;
+										dialog.dismiss();
+									}
+								});
+
+						LayoutInflater inflater = (LayoutInflater) getActivityContext()
+								.getSystemService(
+										Context.LAYOUT_INFLATER_SERVICE);
+
+						View view = inflater.inflate(
+								R.layout.show_conversation_title, null);
+
+						ImageView iv1 = (ImageView) view
+								.findViewById(R.id.show_conversation_whoochimage);
+						UrlImageViewHelper.setUrlDrawable(iv1,
+								entry.whoochImageUriLarge);
+
+						TextView tv1A = (TextView) view
+								.findViewById(R.id.show_conversation_whoochname);
+						tv1A.setText(entry.whoochName);
+
+						builder.setCustomTitle(view);
+
+						view = inflater.inflate(R.layout.show_conversation,
+								null);
+
+						ImageView iv1A = (ImageView) view
+								.findViewById(R.id.entry_user_imageA);
+						UrlImageViewHelper.setUrlDrawable(iv1A,
+								entry.userImageUriLarge);
+
+						TextView tv2A = (TextView) view
+								.findViewById(R.id.entry_posted_userA);
+						tv2A.setText(entry.userName);
+
+						TextView tv3A = (TextView) view
+								.findViewById(R.id.entry_whooch_contentA);
+						tv3A.setText(WhoochHelperFunctions
+								.getSpannedFromHtmlContent(entry.content, tv3A,
+										getActivityContext()));
+
+						TextView tv4A = (TextView) view
+								.findViewById(R.id.entry_whooch_footA);
+						tv4A.setText(WhoochHelperFunctions.toRelativeTime(Long
+								.parseLong(entry.timestamp)));
+
+						TextView tvFanA = (TextView) view
+								.findViewById(R.id.entry_whooch_foot_fansA);
+						if (entry.fanString != null) {
+							tvFanA.setText(entry.fanString);
+							tvFanA.setVisibility(View.VISIBLE);
 						} else {
-							Toast.makeText(getApplicationContext(),
-									"Something went wrong, try again",
-									Toast.LENGTH_SHORT).show();
+							tvFanA.setVisibility(View.GONE);
 						}
+
+						ImageView iv1B = (ImageView) view
+								.findViewById(R.id.entry_user_imageB);
+						UrlImageViewHelper.setUrlDrawable(iv1B,
+								mShowConvoCurrentUpdate.userImageUriLarge);
+
+						TextView tv2B = (TextView) view
+								.findViewById(R.id.entry_posted_userB);
+						tv2B.setText(mShowConvoCurrentUpdate.userName);
+
+						TextView tv3B = (TextView) view
+								.findViewById(R.id.entry_whooch_contentB);
+						tv3B.setText(WhoochHelperFunctions
+								.getSpannedFromHtmlContent(
+										mShowConvoCurrentUpdate.content, tv3B,
+										getActivityContext()));
+
+						TextView tv4B = (TextView) view
+								.findViewById(R.id.entry_whooch_footB);
+						tv4B.setText(WhoochHelperFunctions.toRelativeTime(Long
+								.parseLong(mShowConvoCurrentUpdate.timestamp)));
+
+						TextView tvFanB = (TextView) view
+								.findViewById(R.id.entry_whooch_foot_fansB);
+						if (mShowConvoCurrentUpdate.fanString != null) {
+							tvFanB.setText(mShowConvoCurrentUpdate.fanString);
+							tvFanB.setVisibility(View.VISIBLE);
+						} else {
+							tvFanB.setVisibility(View.GONE);
+						}
+
+						builder.setView(view);
+
+						AlertDialog dialog = builder.create();
+
+						dialog.show();
 
 					} catch (JSONException e) {
 						e.printStackTrace();
 						// TODO: error handling
 					}
 				} else {
-					Toast.makeText(getApplicationContext(),
-							"Something went wrong, try again",
-							Toast.LENGTH_SHORT).show();
+					// if it is null we don't mind, there just wasn't anything
+					// there
 				}
-			} else {
-				Toast.makeText(getApplicationContext(),
-						"Something went wrong, try again",
-						Toast.LENGTH_SHORT).show();
+
 			}
+
 		}
 	}
 
-	private class SendFriendRequest implements WhoochApiCallInterface {
+	private class AddFan implements WhoochApiCallInterface {
 
-		private String mUserId = null;
+		private int fanCount = 0;
+		private int lastPosition = -1;
 
-        public void preExecute() {}
-
-		public SendFriendRequest(String userId) {
-			mUserId = userId;
+		public void preExecute() {
+			fanCount = Integer.parseInt(mShowConvoCurrentUpdate.fans, 10);
+			lastPosition = mLastSelectedPosition;
 		}
 
 		public HttpRequestBase getHttpRequest() {
-
-			HttpPost request = new HttpPost(Settings.apiUrl
-					+ "/friends/request");
+			HttpPost request = new HttpPost(Settings.apiUrl + "/whooch/addfan");
 
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-			nameValuePairs.add(new BasicNameValuePair("userId", mUserId));
+			nameValuePairs.add(new BasicNameValuePair("whoochId",
+					mShowConvoCurrentUpdate.whoochId));
+			nameValuePairs.add(new BasicNameValuePair("whoochNumber",
+					mShowConvoCurrentUpdate.whoochNumber));
 
 			try {
 				request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
@@ -486,21 +745,48 @@ public class SearchActivity extends SherlockListActivity implements
 		}
 
 		public void handleResponse(String responseString) {
-			
+
 		}
 
 		public void postExecute(int statusCode) {
 
-			// parse the response as JSON and update the Content Array
 			if (statusCode == 200) {
-				Toast.makeText(getApplicationContext(), "Friend request sent",
-						Toast.LENGTH_SHORT).show();
-			} else {
-				Toast.makeText(getApplicationContext(),
-						"Something went wrong, try again", Toast.LENGTH_SHORT)
+
+				fanCount++;
+
+				SearchEntry entry = mSearchArray.get(lastPosition);
+
+				if (fanCount == 1) {
+					entry.fanString = "(1 fan)";
+				} else {
+					entry.fanString = "(" + fanCount + " fans)";
+				}
+
+				mAdapter.notifyDataSetChanged();
+
+				Toast.makeText(getActivityContext(),
+						"You are now a fan of this update", Toast.LENGTH_LONG)
 						.show();
+
+			} else {
+				Toast.makeText(getActivityContext(),
+						"Something went wrong, please try again",
+						Toast.LENGTH_LONG).show();
 			}
 
 		}
+	}
+
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+
+		int itemId = item.getItemId();
+		switch (itemId) {
+		case android.R.id.home:
+			finish();
+			break;
+
+		}
+
+		return true;
 	}
 }

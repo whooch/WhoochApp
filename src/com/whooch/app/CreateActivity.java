@@ -15,14 +15,16 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
-import com.whooch.app.helpers.ActionBarHelper;
+import com.actionbarsherlock.view.MenuItem;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
 import com.whooch.app.helpers.WhoochApiCallTask;
@@ -38,8 +40,15 @@ public class CreateActivity extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.create);
 
-		ActionBarHelper.setupActionBar(getSupportActionBar(),
-				new ActionBarHelper.TabListener(getApplicationContext()), 1);
+		getSupportActionBar().setDisplayShowHomeEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		
+		LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View title_view = inflater.inflate(R.layout.title_bar_generic, null);
+		getSupportActionBar().setCustomView(title_view);
+		getSupportActionBar().setDisplayShowCustomEnabled(true);
+		TextView tvhead = (TextView)title_view.findViewById(R.id.header_generic_title);
+		tvhead.setText("Create Whooch");
 
 		mWhoochNameText = (EditText) findViewById(R.id.create_whooch_name);
 		mSpinner = (Spinner) findViewById(R.id.create_spinner);
@@ -68,7 +77,6 @@ public class CreateActivity extends SherlockActivity {
 	public void onResume() {
 		super.onResume();
 
-		ActionBarHelper.selectTab(getSupportActionBar(), 1);
 	}
 
 	private Context getActivityContext() {
@@ -146,5 +154,18 @@ public class CreateActivity extends SherlockActivity {
 				// TODO: error handling
 			}
 		}
+	}
+	
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+
+	    int itemId = item.getItemId();
+	    switch (itemId) {
+	    case android.R.id.home:
+	        finish();
+	        break;
+
+	    }
+
+	    return true;
 	}
 }

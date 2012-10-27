@@ -31,8 +31,10 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -43,12 +45,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
 import com.whooch.app.helpers.WhoochApiCallTask;
@@ -58,18 +62,15 @@ public class PostBaseActivity extends SherlockActivity {
 
 	private static final int REQUEST_CODE_LIBRARY = 1;
 	private static final int REQUEST_CODE_CAMERA = 2;
-	private static final int ImagePreviewHeight = 75;
-	private static final int ImagePreviewWidth = 75;
+	private static final int ImagePreviewHeight = 60;
+	private static final int ImagePreviewWidth = 60;
 	protected LinearLayout mUserSearchLayout;
 	protected AutoCompleteTextView mSearchUsersAutoText;
 
 	protected LinearLayout mWhoochSelectorLayout;
 	protected Spinner mWhoochSelector;
-	protected RelativeLayout mWhoochFeedbackLayout;
 	protected RelativeLayout mUpdateActionLayout;
 	protected RelativeLayout mReactLayout;
-	protected ImageView mWhoochImage;
-	protected TextView mWhoochName;
 
 	protected EditText mPostText;
 	protected TextView mCharCountText;
@@ -94,6 +95,50 @@ public class PostBaseActivity extends SherlockActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post);
+		
+		
+	       LayoutInflater inflater = (LayoutInflater) getSystemService(
+					Context.LAYOUT_INFLATER_SERVICE);
+		
+			getSupportActionBar().setDisplayShowCustomEnabled(true);
+			
+			View whoochTitle = inflater.inflate(
+					R.layout.whooch_title_bar, null);
+			getSupportActionBar().setCustomView(whoochTitle);
+			
+			getSupportActionBar().setDisplayShowHomeEnabled(false);
+			
+			
+	        Intent i = getIntent();
+	        Bundle b = i.getExtras();
+	        
+	        if (b == null) {
+	               Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+	               finish();
+	        }
+
+			
+			ImageView iv1 = (ImageView) findViewById(R.id.wheader_whooch_image);
+			UrlImageViewHelper.setUrlDrawable(iv1,
+					b.getString("WHOOCH_IMAGE"));
+
+			TextView tv1 = (TextView) findViewById(R.id.wheader_whooch_title);
+			tv1.setText(b.getString("WHOOCH_NAME"));
+
+			TextView tv2 = (TextView) findViewById(R.id.wheader_whooch_leader);
+			tv2.setText(b.getString("USER_NAME"));
+
+			LinearLayout ll1 = (LinearLayout) findViewById(R.id.wheader_whoochinfo);
+			ll1.setVisibility(View.VISIBLE);
+			
+			ll1.setOnClickListener(new OnClickListener() {
+	            @Override
+	            public void onClick(View v) {
+	            	finish();
+	            }
+	        });
+		
+		
 
 		// ///////////////
 		// User Search //
@@ -120,14 +165,16 @@ public class PostBaseActivity extends SherlockActivity {
 			public void onClick(View view) {
 
 				mWhoochSelectorLayout.setVisibility(View.GONE);
-				mWhoochFeedbackLayout.setVisibility(View.GONE);
 				mReactLayout.setVisibility(View.GONE);
 				mPostText.setVisibility(View.GONE);
 				mUpdateActionLayout.setVisibility(View.GONE);
 
 				mUserSearchLayout.setVisibility(View.VISIBLE);
-
+				
 				mSearchUsersAutoText.setText("");
+				
+				ProgressBar pb1 = (ProgressBar)findViewById(R.id.post_searchuser_loader);
+				pb1.setVisibility(View.GONE);
 
 				InputMethodManager imm = (InputMethodManager) getActivityContext()
 						.getSystemService(Service.INPUT_METHOD_SERVICE);
@@ -146,14 +193,21 @@ public class PostBaseActivity extends SherlockActivity {
 				.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 					public void onItemClick(AdapterView<?> parent, View view,
 							int position, long id) {
-						restoreLayout();
-						String userString = ">"
-								+ mSearchUsersArray.get(position) + " ";
-						int start = mPostText.getSelectionStart();
-						int end = mPostText.getSelectionEnd();
-						mPostText.getText().replace(Math.min(start, end),
-								Math.max(start, end), userString, 0,
-								userString.length());
+						if (!mSearchUsersArray.get(position).equals(
+								"No users found")) {
+							restoreLayout();
+							String userString = ">"
+									+ mSearchUsersArray.get(position) + " ";
+							int start = mPostText.getSelectionStart();
+							int end = mPostText.getSelectionEnd();
+							mPostText.getText().replace(Math.min(start, end),
+									Math.max(start, end), userString, 0,
+									userString.length());
+						}
+						else
+						{
+							mSearchUsersAutoText.setText("");
+						}
 					}
 				});
 
@@ -194,10 +248,6 @@ public class PostBaseActivity extends SherlockActivity {
 		// //////////////////////////////
 		mWhoochSelectorLayout = (LinearLayout) findViewById(R.id.post_select_whooch_layout);
 		mWhoochSelector = (Spinner) findViewById(R.id.post_whooch_spinner);
-
-		mWhoochFeedbackLayout = (RelativeLayout) findViewById(R.id.post_whooch_feedback_layout);
-		mWhoochImage = (ImageView) findViewById(R.id.post_whooch_image);
-		mWhoochName = (TextView) findViewById(R.id.post_whooch_title);
 
 		if (mWhoochSelector != null) {
 			mWhoochSelector.setOnTouchListener(new View.OnTouchListener() {
@@ -327,6 +377,8 @@ public class PostBaseActivity extends SherlockActivity {
 		private String mResponseString = null;
 
 		public void preExecute() {
+			ProgressBar pb1 = (ProgressBar)findViewById(R.id.post_searchuser_loader);
+			pb1.setVisibility(View.VISIBLE);
 		}
 
 		public GetUsers(String term) {
@@ -347,6 +399,9 @@ public class PostBaseActivity extends SherlockActivity {
 		}
 
 		public void postExecute(int statusCode) {
+			
+			ProgressBar pb1 = (ProgressBar)findViewById(R.id.post_searchuser_loader);
+			pb1.setVisibility(View.GONE);
 
 			if (statusCode == 200) {
 				mSearchUsersArray.clear();
@@ -569,14 +624,10 @@ public class PostBaseActivity extends SherlockActivity {
 		if (mLayoutType == "regular") {
 			if (mUpdateType == "regular") {
 				mWhoochSelectorLayout.setVisibility(View.VISIBLE);
-			} else {
-				mWhoochFeedbackLayout.setVisibility(View.VISIBLE);
-			}
+			} 
 		} else if (mLayoutType == "reaction") {
 			mReactLayout.setVisibility(View.VISIBLE);
-		} else if (mLayoutType == "feedback") {
-			mWhoochFeedbackLayout.setVisibility(View.VISIBLE);
-		}
+		} 
 
 		mPostText.setVisibility(View.VISIBLE);
 		mUpdateActionLayout.setVisibility(View.VISIBLE);

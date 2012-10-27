@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Settings" >
+        <CheckBoxPreference
+            android:key="mainNotifications"
+            android:title="Android Notifications"
+            android:summary="Enable notifications for Whooch" />
+        <CheckBoxPreference
+            android:key="whoochInvitations"
+            android:title="Whooch Invitations"
+            android:summary="Notify me when I receive a whooch invitation" />
+        <CheckBoxPreference
+            android:key="friendRequests"
+            android:title="Friend Requests"
+            android:summary="Notify me when I receive a friend request" />
+        <CheckBoxPreference
+            android:key="reactions"
+            android:title="Reactions"
+            android:summary="Notify me when someone reacts to one of my updates" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

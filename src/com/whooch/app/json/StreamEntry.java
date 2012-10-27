@@ -33,6 +33,9 @@ public class StreamEntry implements Serializable {
     public String whoochName = null;
     public String whoochNumber = null;
     public FeedbackEntry feedbackInfo = null;
+    public String fans = null;
+    public String isFan = null;
+    public String fanString = null;
     
     // derived attributes
     
@@ -139,6 +142,29 @@ public class StreamEntry implements Serializable {
         
         try {
             whoochNumber = json.getString("whoochNumber");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        
+        try {
+            fans = json.getString("fans");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        
+		if (Integer.parseInt(fans, 10) > 0) {
+			if(Integer.parseInt(fans, 10) == 1)
+			{
+				fanString = "(1 fan)";
+			}
+			else
+			{
+				fanString = "(" + fans + " fans)";
+			}
+		}
+        
+        try {
+            isFan = json.getString("isFan");
         } catch (JSONException e) {
             e.printStackTrace();
         }

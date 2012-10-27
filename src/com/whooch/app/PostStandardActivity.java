@@ -22,8 +22,7 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
-import com.whooch.app.helpers.ActionBarHelper;
+import com.actionbarsherlock.view.MenuItem;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
 import com.whooch.app.helpers.WhoochApiCallTask;
@@ -59,23 +58,22 @@ public class PostStandardActivity extends PostBaseActivity {
 			mWhoochNameExtra = b.getString("WHOOCH_NAME");
 			mUpdateType = "whooch";
 
-			mWhoochFeedbackLayout.setVisibility(View.VISIBLE);
-
 			if ((mWhoochIdExtra == null) || (mWhoochImageExtra == null)
 					|| (mWhoochNameExtra == null)) {
-				Toast.makeText(getApplicationContext(), "Error: bad intent",
+				Toast.makeText(getApplicationContext(), "Something went wrong",
 						Toast.LENGTH_SHORT).show();
 				finish();
 				return;
 			}
 
-			UrlImageViewHelper.setUrlDrawable(mWhoochImage, mWhoochImageExtra);
-			mWhoochName.setText(mWhoochNameExtra);
 		} else {
 			// add the invalid "No Whooch Selected" entry. This will be rendered
 			// by
 			// the adapter.
 
+			getSupportActionBar().setDisplayShowHomeEnabled(true);
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+			
 			mWhoochSelectorLayout.setVisibility(View.VISIBLE);
 
 			mUpdateType = "regular";
@@ -84,15 +82,11 @@ public class PostStandardActivity extends PostBaseActivity {
 			mWhoochSelectorAdapter = new ContributingArrayAdapter(this,
 					android.R.layout.simple_spinner_item, mContributingArray);
 			mWhoochSelector.setAdapter(mWhoochSelectorAdapter);
-			mWhoochFeedbackLayout.setVisibility(View.GONE);
 
 			WhoochApiCallTask task = new WhoochApiCallTask(
 					getActivityContext(), new GetContributingList(), false);
 			task.execute();
 		}
-
-		ActionBarHelper.setupActionBar(getSupportActionBar(),
-				new ActionBarHelper.TabListener(getApplicationContext()), 1);
 
 		mSubmitButton.setText("Update");
 		mSubmitButton.setOnClickListener(new View.OnClickListener() {
@@ -120,7 +114,6 @@ public class PostStandardActivity extends PostBaseActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		ActionBarHelper.selectTab(getSupportActionBar(), 1);
 
 	}
 
@@ -251,6 +244,19 @@ public class PostStandardActivity extends PostBaseActivity {
 			}
 
 		}
+	}
+	
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+
+	    int itemId = item.getItemId();
+	    switch (itemId) {
+	    case android.R.id.home:
+	        finish();
+	        break;
+
+	    }
+
+	    return true;
 	}
 
 }
