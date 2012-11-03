@@ -17,15 +17,18 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
@@ -108,8 +111,24 @@ public class LoginActivity extends SherlockActivity {
 
 		@Override
 		protected void onPreExecute() {
-			this.mProgressDialog = ProgressDialog.show(mActivityContext, null,
-					"loading", true);
+			
+			ConnectivityManager cm = (ConnectivityManager) mActivityContext
+					.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+			if (cm.getActiveNetworkInfo() != null
+					&& cm.getActiveNetworkInfo().isConnectedOrConnecting()) {
+				
+				this.mProgressDialog = ProgressDialog.show(mActivityContext, null,
+						"loading", true);
+				
+			} else {
+				
+				this.cancel(true);
+				
+				Toast.makeText(mActivityContext,
+						"A connection to the server is not available",
+						Toast.LENGTH_LONG).show();
+			}
 		}
 
 		@Override
@@ -216,8 +235,23 @@ public class LoginActivity extends SherlockActivity {
 
 		@Override
 		protected void onPreExecute() {
-			this.mProgressDialog = ProgressDialog.show(mActivityContext, null,
-					"loading", true);
+			
+			ConnectivityManager cm = (ConnectivityManager) mActivityContext
+					.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+			if (cm.getActiveNetworkInfo() != null
+					&& cm.getActiveNetworkInfo().isConnectedOrConnecting()) {
+				
+				this.mProgressDialog = ProgressDialog.show(mActivityContext, null,
+						"loading", true);
+				
+			} else {
+				this.cancel(true);
+				
+				Toast.makeText(mActivityContext,
+						"A connection to the server is not available",
+						Toast.LENGTH_LONG).show();
+			}
 		}
 
 		@Override

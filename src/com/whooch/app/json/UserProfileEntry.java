@@ -177,7 +177,7 @@ public class UserProfileEntry {
     			builder.setTitle("Whooch");
     			builder.setMessage("Are you sure you want to remove this friend?");
 
-    			builder.setNegativeButton("CANCEL",
+    			builder.setNegativeButton("No",
     					new DialogInterface.OnClickListener() {
     						public void onClick(DialogInterface dialog,
     								int id) {
@@ -185,7 +185,7 @@ public class UserProfileEntry {
     						}
     					});
 
-    			builder.setPositiveButton("OK",
+    			builder.setPositiveButton("Yes",
     					new DialogInterface.OnClickListener() {
     						public void onClick(DialogInterface dialog,
     								int id) {
@@ -259,7 +259,7 @@ public class UserProfileEntry {
 				}
 			} else {
 				Toast.makeText(mContext,
-						"Something went wrong, try again", Toast.LENGTH_SHORT)
+						"Something went wrong, please try again", Toast.LENGTH_SHORT)
 						.show();
 			}
 

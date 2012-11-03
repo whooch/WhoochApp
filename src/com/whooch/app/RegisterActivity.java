@@ -21,6 +21,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -116,8 +117,22 @@ public class RegisterActivity extends SherlockActivity {
 
 		@Override
 		protected void onPreExecute() {
-			this.mProgressDialog = ProgressDialog.show(mActivityContext, null,
-					"loading", true);
+			ConnectivityManager cm = (ConnectivityManager) mActivityContext
+					.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+			if (cm.getActiveNetworkInfo() != null
+					&& cm.getActiveNetworkInfo().isConnectedOrConnecting()) {
+				
+				this.mProgressDialog = ProgressDialog.show(mActivityContext, null,
+						"loading", true);
+				
+			} else {
+				this.cancel(true);
+				
+				Toast.makeText(mActivityContext,
+						"A connection to the server is not available",
+						Toast.LENGTH_LONG).show();
+			}
 		}
 
 		@Override

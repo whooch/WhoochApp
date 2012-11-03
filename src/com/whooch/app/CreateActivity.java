@@ -42,12 +42,13 @@ public class CreateActivity extends SherlockActivity {
 
 		getSupportActionBar().setDisplayShowHomeEnabled(true);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		
-		LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View title_view = inflater.inflate(R.layout.title_bar_generic, null);
 		getSupportActionBar().setCustomView(title_view);
 		getSupportActionBar().setDisplayShowCustomEnabled(true);
-		TextView tvhead = (TextView)title_view.findViewById(R.id.header_generic_title);
+		TextView tvhead = (TextView) title_view
+				.findViewById(R.id.header_generic_title);
 		tvhead.setText("Create Whooch");
 
 		mWhoochNameText = (EditText) findViewById(R.id.create_whooch_name);
@@ -57,16 +58,13 @@ public class CreateActivity extends SherlockActivity {
 		mSubmitButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				if (mWhoochNameText.getText().toString().trim().length() <= 0)
-				{
+				if (mWhoochNameText.getText().toString().trim().length() <= 0) {
 					Toast.makeText(getActivityContext(),
-							"Please provide a name for your whooch", Toast.LENGTH_SHORT)
-							.show();
-				}
-				else
-				{
+							"Please provide a name for your whooch",
+							Toast.LENGTH_SHORT).show();
+				} else {
 					WhoochApiCallTask task = new WhoochApiCallTask(
-					getActivityContext(), new CreateWhooch(), true);
+							getActivityContext(), new CreateWhooch(), true);
 					task.execute();
 				}
 			}
@@ -87,30 +85,29 @@ public class CreateActivity extends SherlockActivity {
 
 		private String mResponseString = null;
 
-        public void preExecute() {}
-        
+		public void preExecute() {
+		}
+
 		public HttpRequestBase getHttpRequest() {
 
-				HttpPost request = new HttpPost(Settings.apiUrl + "/whooch");
+			HttpPost request = new HttpPost(Settings.apiUrl + "/whooch");
 
-				// Add data
-				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-				nameValuePairs.add(new BasicNameValuePair("action", "add"));
-				nameValuePairs.add(new BasicNameValuePair("whoochName",
-						mWhoochNameText.getText().toString()));
-				nameValuePairs.add(new BasicNameValuePair("type", mSpinner
-						.getSelectedItem().toString().toLowerCase()));
-				
-			
-				
-				try {
-					request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-				} catch (UnsupportedEncodingException e) {
-					e.printStackTrace();
-					// TODO error handling
-				}
+			// Add data
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+			nameValuePairs.add(new BasicNameValuePair("action", "add"));
+			nameValuePairs.add(new BasicNameValuePair("whoochName",
+					mWhoochNameText.getText().toString()));
+			nameValuePairs.add(new BasicNameValuePair("type", mSpinner
+					.getSelectedItem().toString().toLowerCase()));
 
-				return request;
+			try {
+				request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+				// TODO error handling
+			}
+
+			return request;
 		}
 
 		public void handleResponse(String responseString) {
@@ -139,7 +136,10 @@ public class CreateActivity extends SherlockActivity {
 					createdWhoochId = jsonObject.getString("whoochId");
 				} catch (JSONException e) {
 					e.printStackTrace();
-					// TODO: error handling
+					Toast.makeText(
+							getActivityContext(),
+							"Something went wrong, please try again",
+							Toast.LENGTH_LONG).show();
 				}
 
 				if (createdWhoochId != null) {
@@ -148,24 +148,30 @@ public class CreateActivity extends SherlockActivity {
 					i.putExtra("WHOOCH_ID", createdWhoochId);
 					startActivity(i);
 				} else {
-					// TODO: error handling
+					Toast.makeText(
+							getActivityContext(),
+							"Something went wrong, please try again",
+							Toast.LENGTH_LONG).show();
 				}
 			} else {
-				// TODO: error handling
+				Toast.makeText(
+						getActivityContext(),
+						"Something went wrong, please try again",
+						Toast.LENGTH_LONG).show();
 			}
 		}
 	}
-	
+
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 
-	    int itemId = item.getItemId();
-	    switch (itemId) {
-	    case android.R.id.home:
-	        finish();
-	        break;
+		int itemId = item.getItemId();
+		switch (itemId) {
+		case android.R.id.home:
+			finish();
+			break;
 
-	    }
+		}
 
-	    return true;
+		return true;
 	}
 }

@@ -66,7 +66,7 @@ public class PostReactionActivity extends PostBaseActivity {
         Bundle b = i.getExtras();
         
         if (b == null) {
-               Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+               Toast.makeText(getApplicationContext(), "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
                finish();
         }
         
@@ -83,7 +83,7 @@ public class PostReactionActivity extends PostBaseActivity {
         Bundle b = i.getExtras();
         
         if (b == null) {
-               Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+               Toast.makeText(getApplicationContext(), "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
                finish();
         }
         
@@ -97,7 +97,7 @@ public class PostReactionActivity extends PostBaseActivity {
         
         if ( (mWhoochIdExtra == null) || (mReactionToExtra == null) || (mReactionTypeExtra == null) ||
                 (mContentExtra == null)  || (mUserNameExtra == null) || (mWhoochNameExtra == null) || (mWhoochImageExtra == null) ) {
-               Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+               Toast.makeText(getApplicationContext(), "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
                finish();
         }
        

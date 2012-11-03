@@ -30,9 +30,6 @@ public class SettingsActivity extends PreferenceActivity {
 
 	View mLoadingFooterView;
 
-	// Unique id counter to prevent Android from reusing the same dialog.
-	int mNextDialogId = 0;
-
 	private boolean mInvitations = false;
 	private boolean mFriendRequests = false;
 	private boolean mReactions = false;

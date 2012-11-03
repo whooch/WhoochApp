@@ -57,7 +57,7 @@ public class PostFeedbackActivity extends PostBaseActivity {
 		Bundle b = i.getExtras();
 
 		if (b == null) {
-			Toast.makeText(getApplicationContext(), "Something went wrong",
+			Toast.makeText(getApplicationContext(), "Something went wrong, please try again",
 					Toast.LENGTH_SHORT).show();
 			finish();
 			return;
@@ -69,7 +69,7 @@ public class PostFeedbackActivity extends PostBaseActivity {
 
 		if ((mWhoochIdExtra == null) || (mWhoochImageExtra == null)
 				|| (mWhoochNameExtra == null)) {
-			Toast.makeText(getApplicationContext(), "Something went wrong",
+			Toast.makeText(getApplicationContext(), "Something went wrong, please try again",
 					Toast.LENGTH_SHORT).show();
 			finish();
 			return;

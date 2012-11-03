@@ -102,6 +102,14 @@ public class StreamArrayAdapter extends ArrayAdapter<StreamEntry> {
 			// R.drawable.ic_whooch_transparent);
 			UrlImageViewHelper.setUrlDrawable(iv2,
 					whoochEntry.feedbackInfo.userImageUriMedium);
+			
+			if (whoochEntry.feedbackInfo.image.equals("null")) {
+				ImageView iv6 = (ImageView) view.findViewById(R.id.feedbackImagePicture);
+				iv6.setVisibility(View.GONE);
+			} else {
+				ImageView iv6 = (ImageView) view.findViewById(R.id.imagePicture);
+				iv6.setVisibility(View.VISIBLE);
+			}
 		}
 
 		TextView tv4 = (TextView) view.findViewById(R.id.entry_whooch_foot);
@@ -151,7 +159,7 @@ public class StreamArrayAdapter extends ArrayAdapter<StreamEntry> {
 				iv5.setVisibility(View.VISIBLE);
 			}
 		}
-
+		
 		return view;
 	}
 

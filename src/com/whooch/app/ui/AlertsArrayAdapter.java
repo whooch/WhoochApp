@@ -62,11 +62,6 @@ public class AlertsArrayAdapter extends ArrayAdapter<AlertsEntry> {
 
 				view = mInflater.inflate(R.layout.alerts_entry, parent, false);
 
-			} else if (getItemViewType(position) == TYPE_EMPTY) {
-				view = mInflater.inflate(R.layout.alerts_empty_entry, parent,
-						false);
-			} else {
-				// TODO: error
 			}
 		}
 

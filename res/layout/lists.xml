@@ -5,51 +5,109 @@
     android:orientation="vertical" >
 
     <ListView
-        android:id="@+id/lists_main"
+        android:id="@android:id/list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/lists_action" >
+        android:layout_height="match_parent"
+        android:layout_above="@+id/lists_action"
+        android:layout_weight="1" >
     </ListView>
+
+    <LinearLayout
+        android:id="@android:id/empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dip"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip"
+            android:layout_marginTop="10dip"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <ImageView
+                android:layout_width="50dip"
+                android:layout_height="50dip"
+                android:layout_margin="10dip"
+                android:src="@drawable/ic_menu" />
+
+            <TextView
+                android:id="@+id/empty_text1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dip"
+                android:gravity="center"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/empty_text2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dip"
+                android:gravity="center"
+                android:textColor="@color/gray4"
+                android:textSize="15sp" />
+        </LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/lists_action"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dip"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
-        android:weightSum=".9" >
+        android:weightSum=".91" >
 
         <Button
             android:id="@+id/leading_action"
             android:layout_width="0dip"
             android:layout_height="match_parent"
             android:layout_weight=".3"
-            android:background="@color/gray1"
+            android:background="@drawable/action_buttons"
             android:text="Leading"
             android:textColor="@drawable/action_buttons"
-            android:textSize="14sp" >
+            android:textSize="14sp"
+            android:textStyle="bold" >
         </Button>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".005"
+            android:background="@color/white" />
 
         <Button
             android:id="@+id/contributing_action"
             android:layout_width="0dip"
             android:layout_height="match_parent"
             android:layout_weight=".3"
-            android:background="@color/gray1"
+            android:background="@drawable/action_buttons"
             android:text="Contributing"
             android:textColor="@drawable/action_buttons"
-            android:textSize="14sp" >
+            android:textSize="14sp"
+            android:textStyle="bold" >
         </Button>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".005"
+            android:background="@color/white" />
 
         <Button
             android:id="@+id/trailing_action"
             android:layout_width="0dip"
             android:layout_height="match_parent"
             android:layout_weight=".3"
-            android:background="@color/gray1"
+            android:background="@drawable/action_buttons"
             android:text="Trailing"
             android:textColor="@drawable/action_buttons"
-            android:textSize="14sp" >
+            android:textSize="14sp"
+            android:textStyle="bold" >
         </Button>
     </LinearLayout>
 

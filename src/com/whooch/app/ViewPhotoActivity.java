@@ -3,7 +3,6 @@ package com.whooch.app;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -42,7 +41,7 @@ public class ViewPhotoActivity extends SherlockListActivity {
         Bundle b = i.getExtras();
         
         if (b == null) {
-               Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+               Toast.makeText(getApplicationContext(), "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
                finish();
         }
 
@@ -85,8 +84,6 @@ public class ViewPhotoActivity extends SherlockListActivity {
         	imageName = b.getString("IMAGE_NAME");
             imageUri = Settings.cdnUrl + whoochId + "_" + whoochNumber + "_" + imageName;
         }
-        
-        Log.e("photourl", imageUri);
         
         ImageView ivMain = (ImageView) this.findViewById(R.id.viewAttachedImage);
 		UrlImageViewHelper.setUrlDrawable(ivMain, imageUri);

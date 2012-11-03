@@ -403,7 +403,7 @@ public class WhoochProfileEntry {
 				AlertDialog.Builder builder = new AlertDialog.Builder(
 						v.getContext());
 
-				builder.setTitle("Whooch");
+				builder.setTitle("Rate whooch");
 				builder.setMessage("Do you support this whooch?");
 
 				builder.setNegativeButton("No",
@@ -489,7 +489,7 @@ public class WhoochProfileEntry {
 							a.startActivity(intent);
 						} else {
 							Toast.makeText(mContext,
-									"Something went wrong, try again",
+									"Something went wrong, please try again",
 									Toast.LENGTH_SHORT).show();
 						}
 
@@ -498,11 +498,11 @@ public class WhoochProfileEntry {
 						// TODO: error handling
 					}
 				} else {
-					Toast.makeText(mContext, "Something went wrong, try again",
+					Toast.makeText(mContext, "Something went wrong, please try again",
 							Toast.LENGTH_SHORT).show();
 				}
 			} else {
-				Toast.makeText(mContext, "Something went wrong, try again",
+				Toast.makeText(mContext, "Something went wrong, please try again",
 						Toast.LENGTH_SHORT).show();
 			}
 		}
@@ -564,7 +564,7 @@ public class WhoochProfileEntry {
 							a.startActivity(intent);
 						} else {
 							Toast.makeText(mContext,
-									"Something went wrong, try again",
+									"Something went wrong, please try again",
 									Toast.LENGTH_SHORT).show();
 						}
 
@@ -573,11 +573,11 @@ public class WhoochProfileEntry {
 						// TODO: error handling
 					}
 				} else {
-					Toast.makeText(mContext, "Something went wrong, try again",
+					Toast.makeText(mContext, "Something went wrong, please try again",
 							Toast.LENGTH_SHORT).show();
 				}
 			} else {
-				Toast.makeText(mContext, "Something went wrong, try again",
+				Toast.makeText(mContext, "Something went wrong, please try again",
 						Toast.LENGTH_SHORT).show();
 			}
 		}

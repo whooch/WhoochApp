@@ -125,15 +125,14 @@ public class AlertsActivity extends SherlockListActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                     // TODO: error handling
+                    
                 }
-            } else {
-                // if it is null we don't mind, there just wasn't anything there
-            }
+            } 
             
-            // if the list is empty, add an empty entry. The adapter will see this and display that there
-            // are no items in the list
-            if (mAlertsArray.size() == 0) {
-                mAlertsArray.add(new AlertsTrailRequestEntry());
+            if(mAlertsArray.isEmpty())
+            {
+				TextView tvE1 = (TextView)findViewById(R.id.empty_text1);
+				tvE1.setText("You do not have any alerts.");	
             }
             
             mAdapter.notifyDataSetChanged();

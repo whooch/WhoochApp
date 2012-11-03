@@ -28,7 +28,7 @@
         android:layout_gravity="right"
         android:layout_margin="50dip"
         android:background="@drawable/lists_button_selector"
-        android:text="Upload Photo"
+        android:text="Upload image"
         android:textColor="@color/white"
         android:textSize="15dip" />
 

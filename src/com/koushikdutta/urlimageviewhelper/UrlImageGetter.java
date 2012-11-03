@@ -9,7 +9,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Bitmap.Config;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -95,10 +102,14 @@ public class UrlImageGetter implements ImageGetter {
            
             // change the reference of the current drawable to the result
             // from the HTTP call
-            urlDrawable.drawable = result;
+           if(urlDrawable.drawable != result)
+           {
+        	   urlDrawable.drawable = result;//getRoundedCornerDrawable(c, result);
+        	   
+               // redraw the image by invalidating the container
+               UrlImageGetter.this.container.invalidate();
+           }
           
-            // redraw the image by invalidating the container
-            UrlImageGetter.this.container.invalidate();
         }
 
         /***
@@ -122,7 +133,7 @@ public class UrlImageGetter implements ImageGetter {
             }
             
             drawable.setBounds(0, 0, 30, 30); //drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-            return drawable;
+            return drawable;//getRoundedCornerDrawable(c, drawable);
         }
 
         private InputStream fetch(String urlString) throws MalformedURLException, IOException {
@@ -132,4 +143,44 @@ public class UrlImageGetter implements ImageGetter {
             return response.getEntity().getContent();
         }
     }
+    
+	public static Drawable getRoundedCornerDrawable(Context context, Drawable d) {
+
+		if (d != null) {
+
+			int pixels = 4;
+
+			Bitmap bmd = ((BitmapDrawable) d).getBitmap();
+			Bitmap input = bmd.copy(Bitmap.Config.ARGB_8888, true);
+
+			int w = input.getWidth(), h = input.getHeight();
+
+			Bitmap output = Bitmap.createBitmap(w, h, Config.ARGB_8888);
+			Canvas canvas = new Canvas(output);
+			final float densityMultiplier = context.getResources()
+					.getDisplayMetrics().density;
+
+			final int color = 0xff424242;
+			final Paint paint = new Paint();
+			final Rect rect = new Rect(0, 0, w, h);
+			final RectF rectF = new RectF(rect);
+
+			// make sure that our rounded corner is scaled appropriately
+			final float roundPx = pixels * densityMultiplier;
+
+			paint.setAntiAlias(true);
+			canvas.drawARGB(0, 0, 0, 0);
+			paint.setColor(color);
+			canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+
+			paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+			canvas.drawBitmap(input, 0, 0, paint);
+
+			Drawable roundedDrawable = new BitmapDrawable(
+					context.getResources(), output);
+			return roundedDrawable;
+		} else {
+			return d;
+		}
+	}
 }

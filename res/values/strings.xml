@@ -13,8 +13,8 @@
 	</string-array>
 
 	<string-array name="image_retrieval_type">
-		<item>Take a picture</item>
-		<item>Get image from library</item>
+		<item>Capture image with camera</item>
+		<item>Select image from library</item>
 	</string-array>
 
 	<!-- MAX_POST_LENGTH is also defined in Settings.java -->
@@ -46,5 +46,15 @@
 		<item>contribute</item>
 		<item>ask to trail</item>
 	</string-array>
+	
+	<string name="modal_react">React</string>
+	<string name="modal_feedback">Send feedback</string>
+	<string name="modal_showconversation">Show conversation</string>
+	<string name="modal_image">View image</string>
+	<string name="modal_feedbackimage">View feedback image</string>
+	<string name="modal_fan">I\'m a fan of this update</string>
+	<string name="modal_whooch">Go to whooch</string>
+	<string name="modal_delete">Delete update</string>
+	<string name="modal_removefeedback">Remove feedback</string>
 
 </resources>

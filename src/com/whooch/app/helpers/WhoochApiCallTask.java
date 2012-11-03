@@ -17,9 +17,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.whooch.app.LoginActivity;
@@ -42,16 +44,48 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 	@Override
 	protected void onPreExecute() {
 		WhoochHelperFunctions whoochHelper = new WhoochHelperFunctions();
-		if (mShowProgressDialog && (whoochHelper.getScreenOrientation((Activity)mActivityContext) == Configuration.ORIENTATION_PORTRAIT)) {
+		if (mShowProgressDialog
+				&& (whoochHelper
+						.getScreenOrientation((Activity) mActivityContext) == Configuration.ORIENTATION_PORTRAIT)) {
 			Activity a = (Activity) mActivityContext;
 			View loader = a.findViewById(R.id.main_loader);
 			if (loader != null) {
 				loader.setVisibility(View.VISIBLE);
 			}
 		}
-		
-		mWhoochApiCall.preExecute();
-		
+
+		ConnectivityManager cm = (ConnectivityManager) mActivityContext
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+		if (cm.getActiveNetworkInfo() != null
+				&& cm.getActiveNetworkInfo().isConnectedOrConnecting()) {
+			mWhoochApiCall.preExecute();
+		} else {
+			this.cancel(true);
+			
+			
+			Activity a = (Activity)mActivityContext;
+			TextView tvE1 = (TextView) a.findViewById(R.id.empty_text1);
+			TextView tvE2 = (TextView) a.findViewById(R.id.empty_text2);
+			if((tvE1 != null) && (tvE2 != null))
+			{
+			tvE1.setText("A connection to the server could not be made at this time.");
+			tvE2.setText("");
+			}
+			
+			
+			if (mShowProgressDialog) {
+				View loader = a.findViewById(R.id.main_loader);
+				if (loader != null) {
+					loader.setVisibility(View.GONE);
+				}
+			}
+			
+			Toast.makeText(mActivityContext,
+					"A connection to the server is not available",
+					Toast.LENGTH_LONG).show();
+		}
+
 	}
 
 	@Override
@@ -131,39 +165,30 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 				loader.setVisibility(View.GONE);
 			}
 		}
-		
-		// execute the post execute method for this task
-		mWhoochApiCall.postExecute(statusCode);
 
 		// do error handling
-		if (statusCode == 407 || statusCode == 400) {
-			
-			if(!(mActivityContext instanceof LoginActivity))
-			{
-			Toast.makeText(mActivityContext,
-					"Login information is no longer valid",
-					Toast.LENGTH_LONG).show();
-			
-			SharedPreferences settings = mActivityContext
-					.getSharedPreferences("whooch_preferences", 0);
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putString("username", null);
-			editor.putString("userid", null);
-			editor.putString("password", null);
-			editor.commit();
+		if (statusCode == 407) {
 
-			Intent i = new Intent(mActivityContext, LoginActivity.class);
-			mActivityContext.startActivity(i);
+			if (!(mActivityContext instanceof LoginActivity)) {
+				Toast.makeText(mActivityContext,
+						"Login information is no longer valid",
+						Toast.LENGTH_LONG).show();
+
+				SharedPreferences settings = mActivityContext
+						.getSharedPreferences("whooch_preferences", 0);
+				SharedPreferences.Editor editor = settings.edit();
+				editor.putString("username", null);
+				editor.putString("userid", null);
+				editor.putString("password", null);
+				editor.commit();
+
+				Intent i = new Intent(mActivityContext, LoginActivity.class);
+				mActivityContext.startActivity(i);
 			}
 
-		} else if (statusCode == -1) {
-
-		} else if (statusCode == -2) {
-
-		} else if (statusCode == -3) {
-
-		} else if (statusCode == -4) {
-
+		} else {
+			// execute the post execute method for this task
+			mWhoochApiCall.postExecute(statusCode);
 		}
 	}
 

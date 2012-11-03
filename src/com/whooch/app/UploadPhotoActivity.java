@@ -81,7 +81,7 @@ public class UploadPhotoActivity extends SherlockActivity {
 					task.execute();
 				} else { 
 					Toast.makeText(getApplicationContext(),
-							"Click the camera above to first select a photo",
+							"Click the camera above to first select an image",
 							Toast.LENGTH_SHORT).show();
 				}
 			}
@@ -116,7 +116,7 @@ public class UploadPhotoActivity extends SherlockActivity {
 				tv1.setText(b.getString("WHOOCH_NAME"));
 
 				TextView tv2 = (TextView) findViewById(R.id.wheader_whooch_leader);
-				tv2.setText("Update whooch image");
+				tv2.setText("Upload whooch image");
 
 				LinearLayout ll1 = (LinearLayout) findViewById(R.id.wheader_whoochinfo);
 				ll1.setVisibility(View.VISIBLE);
@@ -138,7 +138,7 @@ public class UploadPhotoActivity extends SherlockActivity {
 			getSupportActionBar().setCustomView(title_view);
 			getSupportActionBar().setDisplayShowCustomEnabled(true);
 			TextView tvhead = (TextView)title_view.findViewById(R.id.header_generic_title);
-			tvhead.setText("Update profile image");
+			tvhead.setText("Upload profile image");
 		}
 		
 	}
@@ -245,7 +245,7 @@ public class UploadPhotoActivity extends SherlockActivity {
 			intent.setAction(Intent.ACTION_GET_CONTENT);  
 			intent.addCategory(Intent.CATEGORY_OPENABLE);
 			mCameraIntent = true;
-			startActivityForResult(Intent.createChooser(intent, "Choose Picture"), REQUEST_CODE_LIBRARY);
+			startActivityForResult(Intent.createChooser(intent, "Select image"), REQUEST_CODE_LIBRARY);
 	}
 
 	public static boolean isIntentAvailable(Context context, String action) {
@@ -296,9 +296,9 @@ public class UploadPhotoActivity extends SherlockActivity {
 			AlertDialog.Builder builder = new AlertDialog.Builder(
 					view.getContext());
 
-			builder.setMessage("Remove photo?").setTitle("Whooch");
+			builder.setMessage("Remove image?").setTitle("Whooch");
 
-			builder.setPositiveButton("Ok",
+			builder.setPositiveButton("Yes",
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 							mImageView.setImageResource(R.drawable.ic_camera_bl_128);
@@ -307,7 +307,7 @@ public class UploadPhotoActivity extends SherlockActivity {
 						}
 					});
 			
-			builder.setNegativeButton("Cancel",
+			builder.setNegativeButton("No",
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 
@@ -326,7 +326,7 @@ public class UploadPhotoActivity extends SherlockActivity {
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(context);
 			
-		    builder.setTitle("Upload Image");
+		    builder.setTitle("Upload image");
 		    
 		    builder.setItems(R.array.image_retrieval_type, new DialogInterface.OnClickListener() {
 		               public void onClick(DialogInterface dialog, int which) {

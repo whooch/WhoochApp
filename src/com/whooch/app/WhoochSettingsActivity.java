@@ -32,9 +32,6 @@ public class WhoochSettingsActivity extends PreferenceActivity {
 
     View mLoadingFooterView;
     
-    // Unique id counter to prevent Android from reusing the same dialog.
-    int mNextDialogId = 0;
-    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         

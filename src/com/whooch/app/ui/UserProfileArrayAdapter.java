@@ -75,7 +75,7 @@ public class UserProfileArrayAdapter extends ArrayAdapter<UserProfileEntry> {
 
 		if (mProfileType == "local") {
 			Button ibtn1 = (Button) view.findViewById(R.id.profile_button);
-			ibtn1.setText("Update profile image");
+			ibtn1.setText("Upload profile image");
 			ibtn1.setVisibility(View.VISIBLE);
 			ibtn1.setOnClickListener(entry.getUpdatePhotoClickListener());
 

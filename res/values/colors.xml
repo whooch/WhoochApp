@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-   <color name="yellow1">#F9E60E</color>
-   <color name="yellow2">#F9F89D</color>
-   <color name="orange4">#F7BE45</color>
-   <color name="orange5">#F7D896</color>
-   <color name="blue25">#D9F7F2</color>
-   <color name="grey05">#ACA899</color>
-   
-   <color name="darkblue">#00639F</color>
-   
-   <color name="blue1">#5F9CC5</color> <!-- start button gradient -->
-   <color name="blue2">#396B9E</color> <!-- end button gradient -->
-   <color name="blue4">#456F9A</color> <!-- button border -->
-   <color name="blue5">#396B9E</color> <!-- start button down gradient -->
-   <color name="blue6">#4E89C5</color> <!-- end button down gradient -->
-   
-   <color name="gray1">#B0B0B0</color>
-   <color name="gray2">#E1E1E1</color>
-   <color name="gray3">#555555</color> <!-- start selected button gradient -->
-   <color name="gray4">#333333</color> <!-- end selected button gradient -->
-   
-   <color name="white">#FFFFFF</color>
-   <color name="black">#000000</color>
-   
-   <color name="whoochblue">#00639F</color> <!-- start button gradient -->
-   
+
+    <color name="yellow1">#F9E60E</color>
+    <color name="yellow2">#F9F89D</color>
+    <color name="orange4">#F7BE45</color>
+    <color name="orange5">#F7D896</color>
+    <color name="blue25">#D9F7F2</color>
+    <color name="grey05">#ACA899</color>
+    <color name="darkblue">#00639F</color>
+    <color name="blue1">#5F9CC5</color> <!-- start button gradient -->
+    <color name="blue2">#396B9E</color> <!-- end button gradient -->
+    <color name="blue4">#456F9A</color> <!-- button border -->
+    <color name="blue5">#396B9E</color> <!-- start button down gradient -->
+    <color name="blue6">#4E89C5</color> <!-- end button down gradient -->
+
+    <color name="gray1">#B0B0B0</color>
+    <color name="gray2">#E1E1E1</color>
+    <color name="gray3">#555555</color> <!-- start selected button gradient -->
+    <color name="gray4">#333333</color> <!-- end selected button gradient -->
+
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="whoochblue">#00639F</color> <!-- start button gradient -->
+
+    <drawable name="white">#FFFFFF</drawable>
+    <drawable name="whoochblue">#00639F</drawable>
+
 </resources>

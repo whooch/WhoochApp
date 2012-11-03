@@ -17,77 +17,90 @@ import com.whooch.app.helpers.Settings;
 import com.whooch.app.json.ContributingEntry;
 
 public class ContributingArrayAdapter extends ArrayAdapter<ContributingEntry> {
-    
-    private static final int TYPE_REGULAR = 0;
-    private static final int TYPE_FIRST = 1;
-    private static final int TYPE_MAX_COUNT = 2;
-    
-    private Context mContext; 
-    private ArrayList<ContributingEntry> mData = null;
-    private LayoutInflater mInflater;
-        
-    public ContributingArrayAdapter(Context context, int textViewResourceId, ArrayList<ContributingEntry> data) {
-        super(context, textViewResourceId, data);
-        mContext = context;
-        mData = data;
-        mInflater = ((Activity) mContext).getLayoutInflater();
-    }
-    
-    @Override
-    public int getItemViewType(int position) {
-        if (mData.get(position).whoochId == null) {
-            return TYPE_FIRST;
-        } else {
-            return TYPE_REGULAR;
-        }
-    }
-    
-    @Override
-    public int getViewTypeCount() {
-        return TYPE_MAX_COUNT;
-    }
-    
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        return getDropDownView(position, convertView, parent);
-    }
-    
-    @Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent) { 
-        
-        View view = convertView;
-        if (view == null) {
-            view = mInflater.inflate(R.layout.lists_entry, parent, false);
-        }
-        
-        ContributingEntry contributingEntry = mData.get(position);
-        
-        ImageView iv1 = (ImageView) view.findViewById(R.id.lists_entry_whooch_image);
-        TextView tv1 = (TextView) view.findViewById(R.id.lists_entry_whooch_title);
-        ImageView iv2 = (ImageView) view.findViewById(R.id.lists_entry_open_closed_image);
-        
-        TextView tv2 = (TextView) view.findViewById(R.id.lists_entry_whooch_leader);
 
-        if (getItemViewType(position) == TYPE_FIRST) {
-            UrlImageViewHelper.setUrlDrawable(iv1, Settings.defaultWhoochImageUriLarge);
-            tv1.setText("");
-            tv1.setPadding(0, 25, 0, 0);
-            tv1.setHint("Select a whooch to update");
-            iv2.setVisibility(View.GONE);
-            tv2.setVisibility(View.GONE);
-        } else {
-            UrlImageViewHelper.setUrlDrawable(iv1, contributingEntry.whoochImageUriLarge);
-            tv1.setText(contributingEntry.whoochName);
-            tv2.setText(contributingEntry.leaderName);
-            iv2.setVisibility(View.VISIBLE);
-            if (contributingEntry.type.equals("open")) {
-                iv2.setImageResource(R.drawable.ic_open_gr);
-            } else {
-                iv2.setImageResource(R.drawable.ic_closed_gr);
-            }
-        }
-        
-        return view;
-    }
+	private static final int TYPE_REGULAR = 0;
+	private static final int TYPE_FIRST = 1;
+	private static final int TYPE_MAX_COUNT = 2;
+
+	private Context mContext;
+	private ArrayList<ContributingEntry> mData = null;
+	private LayoutInflater mInflater;
+
+	public ContributingArrayAdapter(Context context, int textViewResourceId,
+			ArrayList<ContributingEntry> data) {
+		super(context, textViewResourceId, data);
+		mContext = context;
+		mData = data;
+		mInflater = ((Activity) mContext).getLayoutInflater();
+	}
+
+	@Override
+	public int getItemViewType(int position) {
+		if (mData.get(position).whoochId == null) {
+			return TYPE_FIRST;
+		} else {
+			return TYPE_REGULAR;
+		}
+	}
+
+	@Override
+	public int getViewTypeCount() {
+		return TYPE_MAX_COUNT;
+	}
+
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		return getDropDownView(position, convertView, parent);
+	}
+
+	@Override
+	public View getDropDownView(int position, View convertView, ViewGroup parent) {
+
+		View view = convertView;
+		if (view == null) {
+			view = mInflater.inflate(R.layout.lists_entry, parent, false);
+		}
+
+		ContributingEntry contributingEntry = mData.get(position);
+
+		ImageView iv1 = (ImageView) view
+				.findViewById(R.id.lists_entry_whooch_image);
+		TextView tv1 = (TextView) view
+				.findViewById(R.id.lists_entry_whooch_title);
+		ImageView iv2 = (ImageView) view
+				.findViewById(R.id.lists_entry_open_closed_image);
+
+		TextView tv2 = (TextView) view
+				.findViewById(R.id.lists_entry_whooch_leader);
+
+		if (getItemViewType(position) == TYPE_FIRST) {
+			UrlImageViewHelper.setUrlDrawable(iv1,
+					Settings.defaultWhoochImageUriLarge);
+			tv1.setText("");
+			tv1.setPadding(0, 25, 0, 0);
+			if (mData.size() == 1) {
+				tv1.setHint("You do not have any whooches to update");
+			} else {
+				tv1.setHint("Select a whooch to update");
+			}
+			iv2.setVisibility(View.GONE);
+			tv2.setVisibility(View.GONE);
+		} else {
+			tv1.setPadding(0, 0, 0, 0);
+			UrlImageViewHelper.setUrlDrawable(iv1,
+					contributingEntry.whoochImageUriLarge);
+			tv1.setText(contributingEntry.whoochName);
+			tv2.setText(contributingEntry.leaderName);
+			iv2.setVisibility(View.VISIBLE);
+			tv2.setVisibility(View.VISIBLE);
+			if (contributingEntry.type.equals("open")) {
+				iv2.setImageResource(R.drawable.ic_open_gr);
+			} else {
+				iv2.setImageResource(R.drawable.ic_closed_gr);
+			}
+		}
+
+		return view;
+	}
 
 }

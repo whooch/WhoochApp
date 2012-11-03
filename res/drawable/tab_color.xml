@@ -3,8 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:state_selected="true"
+        android:state_focused="true"
+        android:state_pressed="true"
 
-        android:color="@color/whoochblue" />
-    <item
         android:color="@color/white" />
+    <item
+        android:color="@color/whoochblue" />
 </selector>

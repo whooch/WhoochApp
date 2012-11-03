@@ -5,24 +5,18 @@
     <item android:state_pressed="true">
         <shape>
             <gradient
-                android:startColor="#F8F8F8"
-                android:endColor="#C8C8C8"
+                android:startColor="@color/whoochblue"
+                android:endColor="@color/blue1"
                 android:angle="270" />
-            <stroke
-                android:width=".5dip"
-                android:color="@color/gray4" />
         </shape>
     </item>
     
     <item android:state_selected="true">
         <shape>
             <gradient
-                android:startColor="#F8F8F8"
-                android:endColor="#C8C8C8"
+                android:startColor="@color/whoochblue"
+                android:endColor="@color/blue1"
                 android:angle="270" />
-            <stroke
-                android:width=".5dip"
-                android:color="@color/gray4" />
         </shape>
     </item>
     
@@ -32,9 +26,6 @@
                 android:startColor="@null"
                 android:endColor="@null"
                 android:angle="270" />
-            <stroke
-                android:width=".5dip"
-                android:color="#C8C8C8" />
         </shape>
     </item>
     

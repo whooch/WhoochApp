@@ -13,10 +13,10 @@
 
         <ImageView
             android:id="@+id/entry_whooch_image"
-            android:layout_height="50dp"
             android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/ic_launcher" />
-
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -38,26 +38,48 @@
                 android:layout_height="wrap_content"
                 android:text="User"
                 android:textColor="@color/gray1" />
-
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="5dip"
                 android:layout_marginTop="5dip" >
 
-                <TextView
-                    android:id="@+id/entry_feedback_content"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="2dip"
                     android:layout_marginRight="3dip"
-                    android:background="@drawable/ic_feedback_box"
                     android:layout_toLeftOf="@+id/entry_feedback_user_image"
-                    android:text="feedback content" />
+                    android:background="@drawable/ic_reactionmain"
+                    android:orientation="vertical" >
+
+                    <TextView
+                        android:id="@+id/entry_feedback_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="feedback content" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dip"
+                        android:gravity="right"
+                        android:orientation="horizontal" >
+
+                    <ImageView
+                            android:id="@+id/feedbackImagePicture"
+                            android:layout_width="16dip"
+                            android:layout_height="16dip"
+                            android:layout_marginRight="5dip"
+                            android:src="@drawable/ic_picture_gr" />
+                    </LinearLayout>
+                </LinearLayout>
 
                 <ImageView
                     android:id="@+id/entry_feedback_user_image"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_alignParentRight="true"
                     android:src="@drawable/ic_launcher" />
             </RelativeLayout>
@@ -69,14 +91,13 @@
                 android:layout_weight="3.57"
                 android:text="content goes here..." />
         </LinearLayout>
-
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="3dip"
         android:layout_marginBottom="3dip"
+        android:layout_marginLeft="3dip"
         android:orientation="horizontal" >
 
         <ImageView
@@ -94,13 +115,13 @@
             android:text="time"
             android:textColor="@color/gray1"
             android:textSize="12sp" />
-        
+
         <TextView
             android:id="@+id/entry_whooch_foot_fans"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="(2 fans)"
             android:layout_marginLeft="3dip"
+            android:text="(2 fans)"
             android:textColor="@color/gray1"
             android:textSize="12sp"
             android:visibility="gone" />
@@ -130,7 +151,7 @@
                 android:id="@+id/imageOpenClosed"
                 android:layout_width="16dip"
                 android:layout_height="16dip"
-                android:src="@drawable/ic_open_gr"/>
+                android:src="@drawable/ic_open_gr" />
         </LinearLayout>
     </LinearLayout>
 

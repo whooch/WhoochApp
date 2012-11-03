@@ -90,6 +90,7 @@ public class WhoochHelperFunctions {
 
 	public static Spanned getSpannedFromHtmlContent(String content,
 			TextView tv, Context ctx) {
+
 		String strippedContent = content.replaceAll(">\\s+<", "><");
 		String styledContent = strippedContent
 				.replaceAll("<a class=\"highlightedUser\"(.+?)</a>",

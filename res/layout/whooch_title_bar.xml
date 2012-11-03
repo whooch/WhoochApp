@@ -33,8 +33,13 @@
             <TextView
                 android:id="@+id/wheader_whooch_title"
                 android:layout_width="wrap_content"
+                android:maxWidth="170dip"
                 android:layout_height="wrap_content"
                 android:text="Whooch Name"
+                android:scrollHorizontally="true"
+				android:ellipsize="end" 
+				android:maxLines="1"
+				android:textColor="@color/white"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
@@ -43,7 +48,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Whooch Leader"
-                android:textColor="@color/gray4"
+                android:textColor="@color/white"
                 android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
@@ -62,9 +67,10 @@
         android:layout_width="60dip"
         android:layout_height="match_parent"
         android:layout_toLeftOf="@+id/wheader_update_button"
+        android:layout_marginLeft="5dip"
         android:background="@drawable/title_button"
         android:text="Options"
-        android:textColor="@color/whoochblue"
+        android:textColor="@color/white"
         android:textSize="12sp"
         android:textStyle="bold"
         android:visibility="gone" />

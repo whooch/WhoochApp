@@ -14,12 +14,15 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap.CompressFormat;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.view.MenuItem;
@@ -60,7 +63,7 @@ public class PostStandardActivity extends PostBaseActivity {
 
 			if ((mWhoochIdExtra == null) || (mWhoochImageExtra == null)
 					|| (mWhoochNameExtra == null)) {
-				Toast.makeText(getApplicationContext(), "Something went wrong",
+				Toast.makeText(getApplicationContext(), "Something went wrong, please try again",
 						Toast.LENGTH_SHORT).show();
 				finish();
 				return;
@@ -74,9 +77,17 @@ public class PostStandardActivity extends PostBaseActivity {
 			getSupportActionBar().setDisplayShowHomeEnabled(true);
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 			
+			LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			View title_view = inflater.inflate(R.layout.title_bar_generic, null);
+			getSupportActionBar().setCustomView(title_view);
+			getSupportActionBar().setDisplayShowCustomEnabled(true);
+			TextView tvhead = (TextView)title_view.findViewById(R.id.header_generic_title);
+			tvhead.setText("Update");
+			
 			mWhoochSelectorLayout.setVisibility(View.VISIBLE);
 
 			mUpdateType = "regular";
+			
 			mContributingArray.add(new ContributingEntry());
 
 			mWhoochSelectorAdapter = new ContributingArrayAdapter(this,

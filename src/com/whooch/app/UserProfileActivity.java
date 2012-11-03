@@ -16,9 +16,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
@@ -41,9 +41,6 @@ public class UserProfileActivity extends SherlockListActivity implements
 
 	private ArrayList<UserProfileEntry> mUserProfileArray = new ArrayList<UserProfileEntry>();
 	UserProfileArrayAdapter mAdapter;
-
-	// Unique id counter to prevent Android from reusing the same dialog.
-	int mNextDialogId = 0;
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
@@ -120,9 +117,7 @@ public class UserProfileActivity extends SherlockListActivity implements
 
 		if (mProfileType.equals("local")) {
 			ActionBarHelper
-					.setupActionBar(getSupportActionBar(),
-							new ActionBarHelper.TabListener(
-									getApplicationContext()), 4);
+					.setupActionBar(getSupportActionBar(), this, 4);
 		}
 		else
 		{
@@ -147,11 +142,6 @@ public class UserProfileActivity extends SherlockListActivity implements
 	@Override
 	public void onResume() {
 		super.onResume();
-
-		if (mProfileType.equals("local")) 
-		{
-			ActionBarHelper.selectTab(getSupportActionBar(), 4);
-		}
 
 		WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(),
 				new ProfileInitiate(), true);

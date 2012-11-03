@@ -113,7 +113,7 @@ public class PostBaseActivity extends SherlockActivity {
 	        Bundle b = i.getExtras();
 	        
 	        if (b == null) {
-	               Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+	               Toast.makeText(getApplicationContext(), "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
 	               finish();
 	        }
 
@@ -501,7 +501,7 @@ public class PostBaseActivity extends SherlockActivity {
 		intent.addCategory(Intent.CATEGORY_OPENABLE);
 
 		mCameraIntent = true;
-		startActivityForResult(Intent.createChooser(intent, "Choose Picture"),
+		startActivityForResult(Intent.createChooser(intent, "Select image"),
 				REQUEST_CODE_LIBRARY);
 	}
 
@@ -554,9 +554,9 @@ public class PostBaseActivity extends SherlockActivity {
 			AlertDialog.Builder builder = new AlertDialog.Builder(
 					view.getContext());
 
-			builder.setMessage("Remove photo?").setTitle("Whooch");
+			builder.setMessage("Remove image?").setTitle("Whooch");
 
-			builder.setPositiveButton("Ok",
+			builder.setPositiveButton("Yes",
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 							mImageView
@@ -566,7 +566,7 @@ public class PostBaseActivity extends SherlockActivity {
 						}
 					});
 
-			builder.setNegativeButton("Cancel",
+			builder.setNegativeButton("No",
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 
@@ -585,7 +585,7 @@ public class PostBaseActivity extends SherlockActivity {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
-		builder.setTitle("Upload Image");
+		builder.setTitle("Upload image");
 
 		builder.setItems(R.array.image_retrieval_type,
 				new DialogInterface.OnClickListener() {

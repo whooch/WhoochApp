@@ -12,35 +12,82 @@
     </ListView>
 
     <LinearLayout
+        android:id="@android:id/empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dip"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip"
+            android:layout_marginTop="10dip"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <ImageView
+                android:layout_width="50dip"
+                android:layout_height="50dip"
+                android:layout_margin="10dip"
+                android:src="@drawable/ic_menu" />
+
+            <TextView
+                android:id="@+id/empty_text1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dip"
+                android:gravity="center"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/empty_text2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dip"
+                android:gravity="center"
+                android:textColor="@color/gray4"
+                android:textSize="15sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/feedreact_action"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dip"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
-        android:weightSum="1.0" >
+        android:weightSum="1.005" >
 
         <Button
             android:id="@+id/received_action"
             android:layout_width="0dip"
             android:layout_height="match_parent"
             android:layout_weight=".5"
-            android:background="@color/gray1"
+            android:background="@drawable/action_buttons"
             android:text="Received"
             android:textColor="@drawable/action_buttons"
             android:textSize="14sp" >
         </Button>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".005"
+            android:background="@color/white" />
 
         <Button
             android:id="@+id/sent_action"
             android:layout_width="0dip"
             android:layout_height="match_parent"
             android:layout_weight=".5"
-            android:background="@color/gray1"
+            android:background="@drawable/action_buttons"
             android:text="Sent"
             android:textColor="@drawable/action_buttons"
             android:textSize="14sp" >
         </Button>
-
     </LinearLayout>
 
 </RelativeLayout>

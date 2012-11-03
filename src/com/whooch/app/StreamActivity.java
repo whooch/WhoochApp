@@ -22,7 +22,6 @@ import org.json.JSONException;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -76,9 +75,6 @@ public class StreamActivity extends SherlockListActivity implements
 
 	View mLoadingFooterView;
 
-	// Unique id counter to prevent Android from reusing the same dialog.
-	int mNextDialogId = 0;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
@@ -86,8 +82,7 @@ public class StreamActivity extends SherlockListActivity implements
 
 		setContentView(R.layout.stream);
 
-		ActionBarHelper.setupActionBar(getSupportActionBar(),
-				new ActionBarHelper.TabListener(getApplicationContext()), 0);
+		ActionBarHelper.setupActionBar(getSupportActionBar(), this, 0);
 
 		mListView = getListView();
 		mListView.setOnScrollListener(this);
@@ -102,8 +97,6 @@ public class StreamActivity extends SherlockListActivity implements
 		setListAdapter(mAdapter);
 
 		mListView.removeFooterView(mLoadingFooterView);
-
-		ActionBarHelper.selectTab(getSupportActionBar(), 0);
 
 		if (savedInstanceState == null) {
 
@@ -171,6 +164,14 @@ public class StreamActivity extends SherlockListActivity implements
 						mOldestTimestamp = mStreamArray
 								.get(mStreamArray.size() - 1).timestamp;
 					}
+					
+					if(mStreamArray.isEmpty())
+					{
+						TextView tvE1 = (TextView)findViewById(R.id.empty_text1);
+						tvE1.setText("This is your stream, all of your whooch updates will appear here.");
+						TextView tvE2 = (TextView)findViewById(R.id.empty_text2);
+						tvE2.setText("To get started, search for whooches that interest you or create your own.");
+					}
 
 					mAdapter.notifyDataSetChanged();
 
@@ -202,8 +203,6 @@ public class StreamActivity extends SherlockListActivity implements
 	public void onResume() {
 		super.onResume();
 
-		ActionBarHelper.selectTab(getSupportActionBar(), 0);
-
 		if (mStreamInitiated) {
 			WhoochApiCallTask task = new WhoochApiCallTask(
 					getActivityContext(), new StreamGetNewUpdates(), true);
@@ -218,16 +217,9 @@ public class StreamActivity extends SherlockListActivity implements
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		Bundle b = new Bundle();
-		b.putInt("POSITION", position);
-		showDialog(mNextDialogId++, b);
-	}
-
-	@Override
-	protected Dialog onCreateDialog(int id, Bundle b) {
-
-		final StreamEntry entry = mStreamArray.get(b.getInt("POSITION"));
-		mLastSelectedPosition = b.getInt("POSITION");
+	
+		final StreamEntry entry = mStreamArray.get(position);
+		mLastSelectedPosition = position;
 		mShowConvoCurrentUpdate = entry;
 
 		// create the menu
@@ -240,7 +232,7 @@ public class StreamActivity extends SherlockListActivity implements
 
 		if (entry.isContributor.equals("1")
 				&& !entry.userName.equalsIgnoreCase(currentUserName)) {
-			names.add("React");
+			names.add(getResources().getString(R.string.modal_react));
 			handlers.add(new Runnable() {
 				public void run() {
 					Log.d("StreamActivity", "React");
@@ -259,7 +251,7 @@ public class StreamActivity extends SherlockListActivity implements
 		}
 
 		if (entry.isContributor.equals("0") && entry.type.equals("open")) {
-			names.add("Send Feedback");
+			names.add(getResources().getString(R.string.modal_feedback));
 			handlers.add(new Runnable() {
 				public void run() {
 					Log.d("StreamActivity", "Send Feedback");
@@ -276,7 +268,7 @@ public class StreamActivity extends SherlockListActivity implements
 		}
 
 		if (entry.reactionType.equals("whooch")) {
-			names.add("Show Conversation");
+			names.add(getResources().getString(R.string.modal_showconversation));
 			handlers.add(new Runnable() {
 				public void run() {
 					Log.d("StreamActivity", "Show Conversation");
@@ -291,7 +283,7 @@ public class StreamActivity extends SherlockListActivity implements
 		}
 
 		if (!entry.image.equals("null")) {
-			names.add("View Photo");
+			names.add(getResources().getString(R.string.modal_image));
 			handlers.add(new Runnable() {
 				public void run() {
 					Log.d("StreamActivity", "View Photo");
@@ -308,10 +300,32 @@ public class StreamActivity extends SherlockListActivity implements
 				}
 			});
 		}
+		
+		if (entry.reactionType.equals("feedback")) {
+			
+		if (!entry.feedbackInfo.image.equals("null")) {
+			names.add(getResources().getString(R.string.modal_feedbackimage));
+			handlers.add(new Runnable() {
+				public void run() {
+					Log.d("StreamActivity", "View Feeedback Photo");
+					Intent i = new Intent(getApplicationContext(),
+							ViewPhotoActivity.class);
+					i.putExtra("FEEDBACK_ID", entry.feedbackInfo.feedbackId);
+					i.putExtra("IMAGE_TYPE", "feedback");
+					i.putExtra("IMAGE_NAME", entry.feedbackInfo.image);
+					i.putExtra("WHOOCH_NAME", entry.whoochName);
+					i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriMedium);
+					i.putExtra("USER_NAME", entry.feedbackInfo.userName);
+					startActivity(i);
+				}
+			});
+		}
+		
+		}
 
 		if (!entry.userName.equalsIgnoreCase(currentUserName)
 				&& entry.isFan.equals("0")) {
-			names.add("I'm a fan of this update");
+			names.add(getResources().getString(R.string.modal_fan));
 			handlers.add(new Runnable() {
 				public void run() {
 					WhoochApiCallTask task = new WhoochApiCallTask(
@@ -321,7 +335,7 @@ public class StreamActivity extends SherlockListActivity implements
 			});
 		}
 
-		names.add("Go to Whooch");
+		names.add(getResources().getString(R.string.modal_whooch));
 		handlers.add(new Runnable() {
 			public void run() {
 				Intent i = new Intent(getApplicationContext(),
@@ -332,7 +346,7 @@ public class StreamActivity extends SherlockListActivity implements
 		});
 
 		if (entry.userName.equalsIgnoreCase(currentUserName)) {
-			names.add("Delete Update");
+			names.add(getResources().getString(R.string.modal_delete));
 			handlers.add(new Runnable() {
 				public void run() {
 					Log.d("StreamActivity", "Delete Update");
@@ -343,7 +357,7 @@ public class StreamActivity extends SherlockListActivity implements
 					builder.setTitle("Whooch");
 					builder.setMessage("Are you sure you want to delete this update?");
 
-					builder.setNegativeButton("CANCEL",
+					builder.setNegativeButton("No",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
@@ -351,7 +365,7 @@ public class StreamActivity extends SherlockListActivity implements
 								}
 							});
 
-					builder.setPositiveButton("OK",
+					builder.setPositiveButton("Yes",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
@@ -376,21 +390,21 @@ public class StreamActivity extends SherlockListActivity implements
 		final Runnable[] handlersArray = handlers.toArray(new Runnable[handlers
 				.size()]);
 
-		return assembleUpdateDialog(namesArray, handlersArray);
+		assembleUpdateDialog(namesArray, handlersArray);
 	}
 
-	private Dialog assembleUpdateDialog(final String[] namesArray,
+	private void assembleUpdateDialog(final String[] namesArray,
 			final Runnable[] handlersArray) {
-		Builder dialog = new AlertDialog.Builder(getActivityContext());
+		Builder builder = new AlertDialog.Builder(getActivityContext());
 
 		LayoutInflater inflater = (LayoutInflater) getActivityContext()
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		View view = inflater.inflate(R.layout.stream_entry, null);
 
-		dialog.setCustomTitle(view);
+		builder.setCustomTitle(view);
 
-		dialog.setItems(namesArray, new DialogInterface.OnClickListener() {
+		builder.setItems(namesArray, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				handlersArray[which].run();
 			}
@@ -430,7 +444,9 @@ public class StreamActivity extends SherlockListActivity implements
 				.findViewById(R.id.entry_update_extras);
 		ll1.setVisibility(View.GONE);
 
-		return dialog.create();
+		AlertDialog dialog = builder.create();
+
+		dialog.show();
 	}
 
 	@Override
@@ -535,7 +551,7 @@ public class StreamActivity extends SherlockListActivity implements
 						// TODO: error handling
 					}
 				} else {
-					mStreamHasMoreUpdates = false;
+					mStreamHasMoreUpdates = false;	
 				}
 
 				if (mStreamArray.size() > 0) {
@@ -543,6 +559,14 @@ public class StreamActivity extends SherlockListActivity implements
 					mOldestTimestamp = mStreamArray
 							.get(mStreamArray.size() - 1).timestamp;
 				}
+			}
+
+			if(mStreamArray.isEmpty())
+			{
+				TextView tvE1 = (TextView)findViewById(R.id.empty_text1);
+				tvE1.setText("This is your stream, all of your whooch updates will appear here.");
+				TextView tvE2 = (TextView)findViewById(R.id.empty_text2);
+				tvE2.setText("To get started, search for whooches that interest you or create your own.");
 			}
 
 			mAdapter.notifyDataSetChanged();
@@ -817,8 +841,9 @@ public class StreamActivity extends SherlockListActivity implements
 						// TODO: error handling
 					}
 				} else {
-					// if it is null we don't mind, there just wasn't anything
-					// there
+					Toast.makeText(getActivityContext(),
+							"The original update has been deleted",
+							Toast.LENGTH_LONG).show();
 				}
 
 			}

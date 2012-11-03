@@ -7,17 +7,19 @@
         <item name="actionBarSize">48dip</item>
         <item name="android:actionBarTabStyle">@style/TabStyle</item>
         <item name="actionBarTabStyle">@style/TabStyle</item>
-         <item name="android:actionBarStyle">@style/ActionBarStyle</item>
+        <item name="android:actionBarStyle">@style/ActionBarStyle</item>
         <item name="actionBarStyle">@style/ActionBarStyle</item>
-
         <item name="android:spinnerItemStyle">@style/SpinnerItem</item>
+        <item name="android:actionDropDownStyle">@style/DropDownStyle</item>
+        <item name="actionDropDownStyle">@style/DropDownStyle</item>
     </style>
 
     <style name="SpinnerItem" parent="@android:style/Widget.TextView.SpinnerItem"></style>
 
     <style name="ActionBarStyle" parent="Widget.Sherlock.Light.ActionBar.Solid">
-		<item name="android:displayOptions">showHome|useLogo</item>
-		<item name="displayOptions">showHome|useLogo</item>
+        <item name="android:displayOptions">showHome|useLogo</item>
+        <item name="displayOptions">showHome|useLogo</item>
+        <item name="android:background">@drawable/actionbar_gradient</item>
     </style>
 
     <style name="TabStyle" parent="@android:style/Widget.Holo.ActionBar.TabBar">
@@ -25,6 +27,13 @@
         <item name="android:gravity">center</item>
         <item name="android:paddingLeft">5dip</item>
         <item name="android:paddingRight">5dip</item>
+    </style>
+
+    <style name="DropDownStyle" parent="@android:style/Widget.Holo.Light.Spinner">
+
+              <item name="android:popupBackground">@color/gray3</item>   
+		
+        
     </style>
 
 </resources>

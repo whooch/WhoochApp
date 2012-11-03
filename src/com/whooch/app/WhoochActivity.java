@@ -23,7 +23,6 @@ import org.json.JSONObject;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -84,61 +83,56 @@ public class WhoochActivity extends SherlockListActivity implements
 	private String mWhoochImage;
 
 	private String mLeaderName;
-	
+
 	private String mWhoochType = null;
 
 	private boolean mIsContributor = false;
 
 	View mLoadingFooterView;
 
-	// Unique id counter to prevent Android from reusing the same dialog.
-	int mNextDialogId = 0;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.whooch);
-		
-		LayoutInflater inflater = (LayoutInflater) getSystemService(
-				Context.LAYOUT_INFLATER_SERVICE);
-	
+
+		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
 		getSupportActionBar().setDisplayShowCustomEnabled(true);
-		
-		View whoochTitle = inflater.inflate(
-				R.layout.whooch_title_bar, null);
+
+		View whoochTitle = inflater.inflate(R.layout.whooch_title_bar, null);
 		getSupportActionBar().setCustomView(whoochTitle);
-		
+
 		getSupportActionBar().setDisplayShowHomeEnabled(false);
-		
-		
-		LinearLayout ll1 = (LinearLayout)findViewById(R.id.wheader_whoochinfo);
+
+		LinearLayout ll1 = (LinearLayout) findViewById(R.id.wheader_whoochinfo);
 		ll1.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            	finish();
-            }
-        });
+			@Override
+			public void onClick(View v) {
+				finish();
+			}
+		});
 
 		mListView = getListView();
 		mListView.setOnScrollListener(this);
-		
-		//Add and remove loading footer before setting adapter
-		//Footer won't show up unless one is present when adapter is set
+
+		// Add and remove loading footer before setting adapter
+		// Footer won't show up unless one is present when adapter is set
 		mLoadingFooterView = this.getLayoutInflater().inflate(
 				R.layout.stream_loading_footer, null);
 		mListView.addFooterView(mLoadingFooterView);
 
 		mAdapter = new StreamArrayAdapter(this, mWhoochArray, true);
 		setListAdapter(mAdapter);
-		
+
 		mListView.removeFooterView(mLoadingFooterView);
 
 		Intent i = getIntent();
 		Bundle b = i.getExtras();
 		mWhoochId = b.getString("WHOOCH_ID");
 		if (mWhoochId == null) {
-			Toast.makeText(getApplicationContext(), "Something went wrong",
+			Toast.makeText(getApplicationContext(),
+					"Something went wrong, please try again",
 					Toast.LENGTH_SHORT).show();
 			finish();
 		}
@@ -153,7 +147,7 @@ public class WhoochActivity extends SherlockListActivity implements
 			task.execute();
 
 		}
-	    
+
 	}
 
 	@Override
@@ -222,6 +216,11 @@ public class WhoochActivity extends SherlockListActivity implements
 						mOldestWhoochNum = mWhoochArray
 								.get(mWhoochArray.size() - 1).whoochNumber;
 					}
+					
+					if (mWhoochArray.isEmpty()) {
+						TextView tvE1 = (TextView) findViewById(R.id.empty_text1);
+						tvE1.setText("No updates have been shared yet.");
+					}
 
 					mAdapter.notifyDataSetChanged();
 					mWhoochInitiated = true;
@@ -270,14 +269,6 @@ public class WhoochActivity extends SherlockListActivity implements
 		return this;
 	}
 
-	@SuppressWarnings("deprecation")
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		Bundle b = new Bundle();
-		b.putInt("POSITION", position);
-		showDialog(mNextDialogId++, b);
-	}
-
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount) {
@@ -300,11 +291,12 @@ public class WhoochActivity extends SherlockListActivity implements
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
-	protected Dialog onCreateDialog(int id, Bundle b) {
+	protected void onListItemClick(ListView l, View v, int position, long id) {
 
-		final StreamEntry entry = mWhoochArray.get(b.getInt("POSITION"));
-		mLastSelectedPosition = b.getInt("POSITION");
+		final StreamEntry entry = mWhoochArray.get(position);
+		mLastSelectedPosition = position;
 		mShowConvoCurrentUpdate = entry;
 
 		// create the menu
@@ -317,7 +309,7 @@ public class WhoochActivity extends SherlockListActivity implements
 
 		if (entry.isContributor.equals("1")
 				&& !entry.userName.equalsIgnoreCase(currentUserName)) {
-			names.add("React");
+			names.add(getResources().getString(R.string.modal_react));
 			handlers.add(new Runnable() {
 				public void run() {
 
@@ -330,14 +322,14 @@ public class WhoochActivity extends SherlockListActivity implements
 					i.putExtra("USER_NAME", entry.userName);
 					i.putExtra("WHOOCH_NAME", entry.whoochName);
 					i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriLarge);
-					
+
 					startActivity(i);
 				}
 			});
 		}
 
 		if (entry.reactionType.equals("whooch")) {
-			names.add("Show Conversation");
+			names.add(getResources().getString(R.string.modal_showconversation));
 			handlers.add(new Runnable() {
 				public void run() {
 					Log.d("WhoochActivity", "Show Conversation");
@@ -352,7 +344,7 @@ public class WhoochActivity extends SherlockListActivity implements
 		}
 
 		if (!entry.image.equals("null")) {
-			names.add("View Photo");
+			names.add(getResources().getString(R.string.modal_image));
 			handlers.add(new Runnable() {
 				public void run() {
 					Log.d("WhoochActivity", "View Photo");
@@ -370,9 +362,31 @@ public class WhoochActivity extends SherlockListActivity implements
 			});
 		}
 
+		if (entry.reactionType.equals("feedback")) {
+
+			if (!entry.feedbackInfo.image.equals("null")) {
+				names.add(getResources().getString(R.string.modal_feedbackimage));
+				handlers.add(new Runnable() {
+					public void run() {
+						Log.d("StreamActivity", "View Feeedback Photo");
+						Intent i = new Intent(getApplicationContext(),
+								ViewPhotoActivity.class);
+						i.putExtra("FEEDBACK_ID", entry.feedbackInfo.feedbackId);
+						i.putExtra("IMAGE_TYPE", "feedback");
+						i.putExtra("IMAGE_NAME", entry.feedbackInfo.image);
+						i.putExtra("WHOOCH_NAME", entry.whoochName);
+						i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriMedium);
+						i.putExtra("USER_NAME", entry.feedbackInfo.userName);
+						startActivity(i);
+					}
+				});
+			}
+
+		}
+
 		if (!entry.userName.equalsIgnoreCase(currentUserName)
 				&& entry.isFan.equals("0")) {
-			names.add("I'm a fan of this update");
+			names.add(getResources().getString(R.string.modal_fan));
 			handlers.add(new Runnable() {
 				public void run() {
 					WhoochApiCallTask task = new WhoochApiCallTask(
@@ -383,7 +397,7 @@ public class WhoochActivity extends SherlockListActivity implements
 		}
 
 		if (entry.userName.equalsIgnoreCase(currentUserName)) {
-			names.add("Delete Update");
+			names.add(getResources().getString(R.string.modal_delete));
 			handlers.add(new Runnable() {
 				public void run() {
 					Log.d("WhoochActivity", "Delete Update");
@@ -394,7 +408,7 @@ public class WhoochActivity extends SherlockListActivity implements
 					builder.setTitle("Whooch");
 					builder.setMessage("Are you sure you want to delete this update?");
 
-					builder.setNegativeButton("CANCEL",
+					builder.setNegativeButton("No",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
@@ -402,7 +416,7 @@ public class WhoochActivity extends SherlockListActivity implements
 								}
 							});
 
-					builder.setPositiveButton("OK",
+					builder.setPositiveButton("Yes",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
@@ -428,31 +442,30 @@ public class WhoochActivity extends SherlockListActivity implements
 			final Runnable[] handlersArray = handlers
 					.toArray(new Runnable[handlers.size()]);
 
-			return assembleUpdateDialog(namesArray, handlersArray);
-		} else {
-			return assembleUpdateDialog(null, null);
+			assembleUpdateDialog(namesArray, handlersArray);
 		}
+
 	}
 
-	private Dialog assembleUpdateDialog(final String[] namesArray,
+	private void assembleUpdateDialog(final String[] namesArray,
 			final Runnable[] handlersArray) {
-		Builder dialog = new AlertDialog.Builder(getActivityContext());
+		Builder builder = new AlertDialog.Builder(getActivityContext());
 
 		LayoutInflater inflater = (LayoutInflater) getActivityContext()
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		View view = inflater.inflate(R.layout.stream_entry, null);
 
-		dialog.setCustomTitle(view);
+		builder.setCustomTitle(view);
 
 		if ((namesArray != null) && (handlersArray != null)) {
-			dialog.setItems(namesArray, new DialogInterface.OnClickListener() {
+			builder.setItems(namesArray, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					handlersArray[which].run();
 				}
 			});
 		} else {
-			dialog.setPositiveButton("OK",
+			builder.setPositiveButton("OK",
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 							dialog.dismiss();
@@ -492,7 +505,9 @@ public class WhoochActivity extends SherlockListActivity implements
 				.findViewById(R.id.entry_update_extras);
 		ll1.setVisibility(View.GONE);
 
-		return dialog.create();
+		AlertDialog dialog = builder.create();
+
+		dialog.show();
 	}
 
 	@Override
@@ -539,8 +554,6 @@ public class WhoochActivity extends SherlockListActivity implements
 
 						StreamEntry entry = new StreamEntry(
 								jsonArray.getJSONObject(0), getWindowManager());
-						mWhoochName = entry.whoochName;
-						mWhoochImage = entry.whoochImageUriLarge;
 
 						// the newest updates are at the front of the array, so
 						// loop over forwards
@@ -565,6 +578,11 @@ public class WhoochActivity extends SherlockListActivity implements
 					mOldestWhoochNum = mWhoochArray
 							.get(mWhoochArray.size() - 1).whoochNumber;
 				}
+			}
+
+			if (mWhoochArray.isEmpty()) {
+				TextView tvE1 = (TextView) findViewById(R.id.empty_text1);
+				tvE1.setText("No updates have been shared yet.");
 			}
 
 			mAdapter.notifyDataSetChanged();
@@ -828,8 +846,9 @@ public class WhoochActivity extends SherlockListActivity implements
 						// TODO: error handling
 					}
 				} else {
-					// if it is null we don't mind, there just wasn't anything
-					// there
+					Toast.makeText(getActivityContext(),
+							"The original update has been deleted",
+							Toast.LENGTH_LONG).show();
 				}
 
 			}
@@ -890,7 +909,8 @@ public class WhoochActivity extends SherlockListActivity implements
 			Bundle b = i.getExtras();
 			mWhoochId = b.getString("WHOOCH_ID");
 			if (mWhoochId == null) {
-				Toast.makeText(getApplicationContext(), "Something went wrong",
+				Toast.makeText(getApplicationContext(),
+						"Something went wrong, please try again",
 						Toast.LENGTH_SHORT).show();
 				finish();
 			}
@@ -913,7 +933,7 @@ public class WhoochActivity extends SherlockListActivity implements
 						JSONObject jsonObject = new JSONObject(mResponseString);
 						// create an object that will be used to populate the
 						// List View and add it to the array
-						
+
 						WhoochProfileEntry entry = new WhoochProfileEntry(
 								jsonObject, getWindowManager());
 
@@ -928,26 +948,28 @@ public class WhoochActivity extends SherlockListActivity implements
 						} else {
 							mWhoochType = "closed";
 						}
-						
+
+						mWhoochName = entry.whoochName;
+						mWhoochImage = entry.whoochImageUriLarge;
+						mLeaderName = entry.leaderName;
+
 						ImageButton ib1 = (ImageButton) findViewById(R.id.wheader_update_button);
 						Button b1 = (Button) findViewById(R.id.wheader_options_button);
-						
+
 						if (mIsContributor) {
-							ib1.setImageResource(R.drawable.ic_update_bl);
+							ib1.setImageResource(R.drawable.ic_update_w);
 							ib1.setVisibility(View.VISIBLE);
-						}
-						else if (mWhoochType == "open") {
-							ib1.setImageResource(R.drawable.ic_feedback_bl);
+						} else if (mWhoochType == "open") {
+							ib1.setImageResource(R.drawable.ic_feedback_w);
 							ib1.setVisibility(View.VISIBLE);
-						}
-						else
-						{
+						} else {
 							ib1.setVisibility(View.GONE);
-							
-							LayoutParams params = (LayoutParams)b1.getLayoutParams();
+
+							LayoutParams params = (LayoutParams) b1
+									.getLayoutParams();
 							params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 							b1.setLayoutParams(params);
-						}				
+						}
 
 						ib1.setOnClickListener(new OnClickListener() {
 							@Override
@@ -973,7 +995,7 @@ public class WhoochActivity extends SherlockListActivity implements
 								}
 							}
 						});
-						
+
 						b1.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View v) {
@@ -994,8 +1016,6 @@ public class WhoochActivity extends SherlockListActivity implements
 
 						TextView tv2 = (TextView) findViewById(R.id.wheader_whooch_leader);
 						tv2.setText(entry.leaderName);
-						
-						mLeaderName = entry.leaderName;
 
 						LinearLayout ll1 = (LinearLayout) findViewById(R.id.wheader_whoochinfo);
 						ll1.setVisibility(View.VISIBLE);

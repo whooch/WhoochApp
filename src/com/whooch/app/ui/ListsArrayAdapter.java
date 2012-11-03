@@ -54,11 +54,7 @@ public class ListsArrayAdapter extends ArrayAdapter<ListsEntry> {
         {
             if (getItemViewType(position) == TYPE_REGULAR) {
                 view = mInflater.inflate(R.layout.lists_entry, parent, false);
-            } else if (getItemViewType(position) == TYPE_EMPTY) {
-                view = mInflater.inflate(R.layout.lists_empty_entry, parent, false);
-            } else {
-                // TODO: error
-            }
+            } 
         }
         
         if (getItemViewType(position) == TYPE_REGULAR) {

@@ -22,7 +22,6 @@ import org.json.JSONException;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -68,9 +67,6 @@ public class WhoochFeedbackActivity extends SherlockListActivity implements
 	private FeedbackEntry mDialogCurrentUpdate = null;
 
 	View mLoadingFooterView;
-
-	// Unique id counter to prevent Android from reusing the same dialog.
-	int mNextDialogId = 0;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -187,6 +183,11 @@ public class WhoochFeedbackActivity extends SherlockListActivity implements
 					if (mFeedbackArray.size() < 25) {
 						mFeedbackHasMoreUpdates = false;
 					}
+					
+					if (mFeedbackArray.isEmpty()) {
+						TextView tvE1 = (TextView) findViewById(R.id.empty_text1);
+						tvE1.setText("No feedback has been sent to this whooch.");
+					}
 
 					mAdapter.notifyDataSetChanged();
 
@@ -227,14 +228,6 @@ public class WhoochFeedbackActivity extends SherlockListActivity implements
 		return this;
 	}
 
-	@SuppressWarnings("deprecation")
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		Bundle b = new Bundle();
-		b.putInt("POSITION", position);
-		showDialog(mNextDialogId++, b);
-	}
-
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount) {
@@ -258,18 +251,19 @@ public class WhoochFeedbackActivity extends SherlockListActivity implements
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
-	protected Dialog onCreateDialog(int id, Bundle b) {
-
-		final FeedbackEntry entry = mFeedbackArray.get(b.getInt("POSITION"));
-		mLastSelectedPosition = b.getInt("POSITION");
+	protected void onListItemClick(ListView l, View v, int position, long id) 
+	{
+		final FeedbackEntry entry = mFeedbackArray.get(position);
+		mLastSelectedPosition = position;
 		mDialogCurrentUpdate = entry;
 
 		// create the menu
 		ArrayList<String> names = new ArrayList<String>();
 		ArrayList<Runnable> handlers = new ArrayList<Runnable>();
 
-			names.add("React");
+			names.add(getResources().getString(R.string.modal_react));
 			handlers.add(new Runnable() {
 				public void run() {
 
@@ -287,7 +281,7 @@ public class WhoochFeedbackActivity extends SherlockListActivity implements
 			});
 
 		if (!entry.image.equals("null")) {
-			names.add("View Photo");
+			names.add(getResources().getString(R.string.modal_image));
 			handlers.add(new Runnable() {
 				public void run() {
 					Log.d("FeedbackActivity", "View Photo");
@@ -304,7 +298,7 @@ public class WhoochFeedbackActivity extends SherlockListActivity implements
 			});
 		}
 
-		names.add("Remove Feedback");
+		names.add(getResources().getString(R.string.modal_removefeedback));
 		handlers.add(new Runnable() {
 			public void run() {
 				Log.d("FeedbackActivity", "Remove Feedback");
@@ -315,14 +309,14 @@ public class WhoochFeedbackActivity extends SherlockListActivity implements
 				builder.setTitle("Whooch");
 				builder.setMessage("Are you sure you want to remove this feedback?");
 
-				builder.setNegativeButton("CANCEL",
+				builder.setNegativeButton("No",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 
 							}
 						});
 
-				builder.setPositiveButton("OK",
+				builder.setPositiveButton("Yes",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								mDeleteFeedbackId = entry.feedbackId;
@@ -343,12 +337,12 @@ public class WhoochFeedbackActivity extends SherlockListActivity implements
 		final Runnable[] handlersArray = handlers.toArray(new Runnable[handlers
 				.size()]);
 
-		return assembleUpdateDialog(namesArray, handlersArray);
+		assembleUpdateDialog(namesArray, handlersArray);
 	}
 	
-	private Dialog assembleUpdateDialog(final String[] namesArray, final Runnable[] handlersArray)
+	private void assembleUpdateDialog(final String[] namesArray, final Runnable[] handlersArray)
 	{
-		Builder dialog = new AlertDialog.Builder(getActivityContext());
+		Builder builder = new AlertDialog.Builder(getActivityContext());
 		
 		LayoutInflater inflater = (LayoutInflater) getActivityContext()
 				.getSystemService(
@@ -357,9 +351,9 @@ public class WhoochFeedbackActivity extends SherlockListActivity implements
 		View view = inflater.inflate(
 				R.layout.stream_entry, null);
 		
-		dialog.setCustomTitle(view);
+		builder.setCustomTitle(view);
 		
-		dialog.setItems(
+		builder.setItems(
 				namesArray, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						handlersArray[which].run();
@@ -395,7 +389,9 @@ public class WhoochFeedbackActivity extends SherlockListActivity implements
 		LinearLayout ll1 = (LinearLayout) view.findViewById(R.id.entry_update_extras);
 		ll1.setVisibility(View.GONE);
 		
-		return dialog.create();
+		AlertDialog dialog = builder.create();
+
+		dialog.show();
 	}
 
 	@Override
@@ -457,6 +453,11 @@ public class WhoochFeedbackActivity extends SherlockListActivity implements
 					mFeedbackHasMoreUpdates = false;
 				}
 
+			}
+			
+			if (mFeedbackArray.isEmpty()) {
+				TextView tvE1 = (TextView) findViewById(R.id.empty_text1);
+				tvE1.setText("No feedback has been sent to this whooch.");
 			}
 
 			mAdapter.notifyDataSetChanged();

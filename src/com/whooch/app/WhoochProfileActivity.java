@@ -7,13 +7,9 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,7 +17,6 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,9 +35,6 @@ public class WhoochProfileActivity extends SherlockListActivity implements OnScr
     WhoochProfileArrayAdapter mAdapter;
 
     View mLoadingFooterView;
-    
-    // Unique id counter to prevent Android from reusing the same dialog.
-    int mNextDialogId = 0;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,39 +77,11 @@ public class WhoochProfileActivity extends SherlockListActivity implements OnScr
     private Context getActivityContext() {
         return this;
     }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        Bundle b = new Bundle();
-        b.putInt("POSITION", position);
-        showDialog(mNextDialogId++, b);
-    }
     
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem,
                          int visibleItemCount, int totalItemCount) {
 
-    }
-    
-    @Override
-    protected Dialog onCreateDialog(int id, Bundle b) {
-        
-        // create the menu
-        ArrayList<String> names = new ArrayList<String>();
-        ArrayList<Runnable> handlers = new ArrayList<Runnable>();
-        
-        final String[] namesArray = names.toArray(new String[names.size()]);
-        final Runnable[] handlersArray = handlers.toArray(new Runnable[handlers.size()]);
-        
-        return new AlertDialog.Builder(getActivityContext())
-            .setItems(namesArray, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    Log.d("UserProfileActivity", "Something Was Clicked");
-                    handlersArray[which].run();
-                }
-            })
-            .create();
     }
     
     @Override
@@ -135,7 +99,7 @@ public class WhoochProfileActivity extends SherlockListActivity implements OnScr
             Bundle b = i.getExtras();
             mWhoochId = b.getString("WHOOCH_ID");
             if (mWhoochId == null) {
-                Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
                 finish();
             }
 

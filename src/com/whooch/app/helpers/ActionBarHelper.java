@@ -1,18 +1,20 @@
 package com.whooch.app.helpers;
 
+import java.util.ArrayList;
+
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.whooch.app.CreateActivity;
 import com.whooch.app.FeedbackActivity;
 import com.whooch.app.ListsActivity;
@@ -22,20 +24,86 @@ import com.whooch.app.ReactionsActivity;
 import com.whooch.app.SearchActivity;
 import com.whooch.app.StreamActivity;
 import com.whooch.app.UserProfileActivity;
+import com.whooch.app.json.NavigationEntry;
+import com.whooch.app.json.StreamEntry;
+import com.whooch.app.ui.NavigationArrayAdapter;
 
 public class ActionBarHelper {
 
-	private static final String[] TAB_NAMES = { "Stream", "Whooch", "Feedback",
-			"Reactions", "You" };
-	protected static Context mApplicationContext = null;
+	protected static Activity mActivityContext = null;
 
-	public static void setupActionBar(ActionBar actionBar,
-			ActionBar.TabListener tabListener, int selected) {
+	private static int currentItem = 0;
 
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+	private static OnNavigationListener mOnNavigationListener = new OnNavigationListener() {
+		public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+
+			if (currentItem != itemPosition) {
+
+				if (itemPosition == 0) {
+					Intent i = new Intent(mActivityContext,
+							StreamActivity.class);
+					i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					mActivityContext.startActivity(i);
+
+				} else if (itemPosition == 1) {
+					Intent i = new Intent(mActivityContext,
+							ListsActivity.class);
+					i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					mActivityContext.startActivity(i);
+
+				} else if (itemPosition == 2) {
+					Intent i = new Intent(mActivityContext,
+							FeedbackActivity.class);
+					i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					mActivityContext.startActivity(i);
+
+				} else if (itemPosition == 3) {
+					Intent i = new Intent(mActivityContext,
+							ReactionsActivity.class);
+					i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					mActivityContext.startActivity(i);
+
+				} else if (itemPosition == 4) {
+					Intent i = new Intent(mActivityContext,
+							UserProfileActivity.class);
+					SharedPreferences settings = mActivityContext
+							.getSharedPreferences("whooch_preferences", 0);
+					String userId = settings.getString("userid", null);
+					i.putExtra("USER_ID", userId);
+					i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					mActivityContext.startActivity(i);
+
+				}	
+			}
+			
+			return true;
+		}
+	};
+
+	public static void setupActionBar(ActionBar actionBar, Activity activityContext, int selected) {
+		
+		mActivityContext = activityContext;
+		
+		currentItem = selected;
+
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+
+		ArrayList<NavigationEntry> navArray = new ArrayList<NavigationEntry>();
+		navArray.add(new NavigationEntry(1));
+		navArray.add(new NavigationEntry(2));
+		navArray.add(new NavigationEntry(3));
+		navArray.add(new NavigationEntry(4));
+		navArray.add(new NavigationEntry(5));
+		NavigationArrayAdapter list = new NavigationArrayAdapter(
+				mActivityContext, navArray); 
+		actionBar.setListNavigationCallbacks(list, mOnNavigationListener);
+
+		actionBar.setSelectedNavigationItem(selected);
+
+		actionBar.setDisplayShowHomeEnabled(false);
 		actionBar.setDisplayShowCustomEnabled(true);
 
-		LayoutInflater inflater = (LayoutInflater) mApplicationContext
+		LayoutInflater inflater = (LayoutInflater) mActivityContext
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		View view = inflater.inflate(R.layout.title_bar, null);
@@ -51,121 +119,6 @@ public class ActionBarHelper {
 		ImageButton ibtn3 = (ImageButton) view.findViewById(R.id.main_update);
 		ibtn3.setOnClickListener(getUpdateClickListener());
 
-		for (int i = 0; i < TAB_NAMES.length; ++i) {
-			Tab tab = actionBar.newTab();
-			tab.setTag(TAB_NAMES[i]);
-
-			if (TAB_NAMES[i].equals("Stream")) {
-				tab.setCustomView(R.layout.stream_tab);
-			} else if (TAB_NAMES[i].equals("Whooch")) {
-				tab.setCustomView(R.layout.whooch_tab);
-			} else if (TAB_NAMES[i].equals("Feedback")) {
-				tab.setCustomView(R.layout.feedback_tab);
-			} else if (TAB_NAMES[i].equals("Reactions")) {
-				tab.setCustomView(R.layout.reactions_tab);
-			} else if (TAB_NAMES[i].equals("You")) {
-				tab.setCustomView(R.layout.you_tab);
-			}
-
-			tab.setTabListener(tabListener);
-			if (selected == i) {
-				actionBar.addTab(tab, true);
-			} else {
-				actionBar.addTab(tab, false);
-			}
-		}
-
-	}
-
-	public static void selectTab(ActionBar actionBar, int index) {
-		if (actionBar.getSelectedTab().getPosition() != index) {
-			Tab tab = actionBar.getTabAt(index);
-			actionBar.selectTab(tab);
-		}
-	}
-
-	public static class TabListener implements ActionBar.TabListener {
-
-		private boolean mTabDebounce = false;
-		private String lastUnselectedTab = "";
-
-		public TabListener(Context appContext) {
-			mApplicationContext = appContext;
-			mTabDebounce = false;
-		}
-
-		@Override
-		public void onTabReselected(Tab tab, FragmentTransaction transaction) {
-			Log.i("ActionBarHelper",
-					"onTabReselected called for tab: " + tab.getText());
-
-			mTabDebounce = true; // no tab has been unselected, but this is an
-									// explicit selection.
-
-			//onTabSelected(tab, transaction);
-		}
-
-		@Override
-		public void onTabSelected(Tab tab, FragmentTransaction transaction) {
-			Log.i("ActionBarHelper",
-					"onTabSelected called for tab: " + tab.getText());
-
-			// check to prevent an activity from firing when the action bar is
-			// first created
-			if (mTabDebounce) {
-
-				// check to prevent strange behavior when the back button is
-				// used, where the
-				// tab from the previous activity is unselected and then
-				// selected right after.
-				if (!tab.getTag().toString().equals(lastUnselectedTab)) {
-
-					if (tab.getTag().toString().equals(TAB_NAMES[0])) {
-						Intent i = new Intent(mApplicationContext,
-								StreamActivity.class);
-						i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						mApplicationContext.startActivity(i);
-
-					} else if (tab.getTag().toString().equals(TAB_NAMES[1])) {
-						Intent i = new Intent(mApplicationContext,
-								ListsActivity.class);
-						i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						mApplicationContext.startActivity(i);
-
-					} else if (tab.getTag().toString().equals(TAB_NAMES[2])) {
-						Intent i = new Intent(mApplicationContext,
-								FeedbackActivity.class);
-						i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						mApplicationContext.startActivity(i);
-
-					} else if (tab.getTag().toString().equals(TAB_NAMES[3])) {
-						Intent i = new Intent(mApplicationContext,
-								ReactionsActivity.class);
-						i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						mApplicationContext.startActivity(i);
-
-					} else if (tab.getTag().toString().equals(TAB_NAMES[4])) {
-						Intent i = new Intent(mApplicationContext,
-								UserProfileActivity.class);
-						SharedPreferences settings = mApplicationContext
-								.getSharedPreferences("whooch_preferences", 0);
-						String userId = settings.getString("userid", null);
-						i.putExtra("USER_ID", userId);
-						i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						mApplicationContext.startActivity(i);
-
-					}
-				}
-			}
-		}
-
-		@Override
-		public void onTabUnselected(Tab tab, FragmentTransaction transaction) {
-			Log.i("ActionBarHelper",
-					"onUnselected called for tab: " + tab.getTag());
-			mTabDebounce = true;
-			lastUnselectedTab = tab.getTag().toString();
-		}
 	}
 
 	public static OnClickListener getCreateWhoochClickListener() {

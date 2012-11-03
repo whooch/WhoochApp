@@ -17,7 +17,6 @@ import org.json.JSONObject;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -79,9 +78,6 @@ public class SearchActivity extends SherlockListActivity implements
 
 	View mLoadingFooterView;
 
-	// Unique id counter to prevent Android from reusing the same dialog.
-	int mNextDialogId = 0;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
@@ -90,12 +86,13 @@ public class SearchActivity extends SherlockListActivity implements
 
 		getSupportActionBar().setDisplayShowHomeEnabled(true);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		
-		LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View title_view = inflater.inflate(R.layout.title_bar_generic, null);
 		getSupportActionBar().setCustomView(title_view);
 		getSupportActionBar().setDisplayShowCustomEnabled(true);
-		TextView tvhead = (TextView)title_view.findViewById(R.id.header_generic_title);
+		TextView tvhead = (TextView) title_view
+				.findViewById(R.id.header_generic_title);
 		tvhead.setText("Search");
 
 		mSearchQuery = (EditText) findViewById(R.id.search_query);
@@ -109,20 +106,18 @@ public class SearchActivity extends SherlockListActivity implements
 			public boolean onEditorAction(TextView v, int actionId,
 					KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-					if(mSearchQuery.getText().toString().trim().length() > 0)
-					{
-					WhoochApiCallTask task = new WhoochApiCallTask(
-							getActivityContext(), new SearchInitiate(), false);
-					task.execute();
-					}
-					else
-					{
+					if (mSearchQuery.getText().toString().trim().length() > 0) {
+						WhoochApiCallTask task = new WhoochApiCallTask(
+								getActivityContext(), new SearchInitiate(),
+								true);
+						task.execute();
+					} else {
 						Toast.makeText(getActivityContext(),
-								"Please provide a keyword to search for", Toast.LENGTH_LONG)
-								.show();
+								"Please provide a keyword to search for",
+								Toast.LENGTH_LONG).show();
 					}
 					return true;
-					
+
 				}
 				return false;
 			}
@@ -141,7 +136,7 @@ public class SearchActivity extends SherlockListActivity implements
 			mSearchQuery.setSelection(mSearchQuery.getText().length());
 
 			WhoochApiCallTask task = new WhoochApiCallTask(
-					getActivityContext(), new SearchInitiate(), false);
+					getActivityContext(), new SearchInitiate(), true);
 			task.execute();
 		} else {
 			mSearchType = "open";
@@ -159,11 +154,10 @@ public class SearchActivity extends SherlockListActivity implements
 				} else {
 					mSearchType = "hash";
 				}
-				
-				if(mSearchQuery.getText().toString().trim().length() > 0)
-				{
+
+				if (mSearchQuery.getText().toString().trim().length() > 0) {
 					WhoochApiCallTask task = new WhoochApiCallTask(
-							getActivityContext(), new SearchInitiate(), false);
+							getActivityContext(), new SearchInitiate(), true);
 					task.execute();
 				}
 			}
@@ -190,14 +184,6 @@ public class SearchActivity extends SherlockListActivity implements
 		return this;
 	}
 
-	@SuppressWarnings("deprecation")
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		Bundle b = new Bundle();
-		b.putInt("POSITION", position);
-		showDialog(mNextDialogId++, b);
-	}
-
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount) {
@@ -210,7 +196,7 @@ public class SearchActivity extends SherlockListActivity implements
 
 				mLoadMoreItemsInProgress = true;
 				WhoochApiCallTask task = new WhoochApiCallTask(
-						getActivityContext(), new SearchGetMoreUpdates(), false);
+						getActivityContext(), new SearchGetMoreUpdates(), true);
 				task.execute();
 
 				mLoadingFooterView = this.getLayoutInflater().inflate(
@@ -220,11 +206,12 @@ public class SearchActivity extends SherlockListActivity implements
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
-	protected Dialog onCreateDialog(int id, Bundle b) {
+	protected void onListItemClick(ListView l, View v, int position, long id) {
 
-		final SearchEntry entry = mSearchArray.get(b.getInt("POSITION"));
-		mLastSelectedPosition = b.getInt("POSITION");
+		final SearchEntry entry = mSearchArray.get(position);
+		mLastSelectedPosition = position;
 		mShowConvoCurrentUpdate = entry;
 
 		if (mSearchType == "open") {
@@ -232,8 +219,6 @@ public class SearchActivity extends SherlockListActivity implements
 			Intent i = new Intent(getApplicationContext(), WhoochActivity.class);
 			i.putExtra("WHOOCH_ID", entry.whoochId);
 			startActivity(i);
-			
-			return null;
 
 		} else if (mSearchType == "user") {
 
@@ -242,11 +227,9 @@ public class SearchActivity extends SherlockListActivity implements
 			i.putExtra("USER_ID", entry.userId);
 			i.putExtra("FORCE_FOREIGN", "true");
 			startActivity(i);
-			
-			return null;
 
 		} else {
-			
+
 			// create the menu
 			ArrayList<String> names = new ArrayList<String>();
 			ArrayList<Runnable> handlers = new ArrayList<Runnable>();
@@ -257,7 +240,7 @@ public class SearchActivity extends SherlockListActivity implements
 
 			if (entry.isContributor.equals("1")
 					&& !entry.userName.equalsIgnoreCase(currentUserName)) {
-				names.add("React");
+				names.add(getResources().getString(R.string.modal_react));
 				handlers.add(new Runnable() {
 					public void run() {
 						Log.d("StreamActivity", "React");
@@ -277,7 +260,7 @@ public class SearchActivity extends SherlockListActivity implements
 
 			// All updates in search are open, so just check contribute status
 			if (entry.isContributor.equals("0")) {
-				names.add("Send Feedback");
+				names.add(getResources().getString(R.string.modal_feedback));
 				handlers.add(new Runnable() {
 					public void run() {
 						Log.d("StreamActivity", "Send Feedback");
@@ -294,7 +277,7 @@ public class SearchActivity extends SherlockListActivity implements
 			}
 
 			if (entry.reactionType.equals("whooch")) {
-				names.add("Show Conversation");
+				names.add(getResources().getString(R.string.modal_showconversation));
 				handlers.add(new Runnable() {
 					public void run() {
 						Log.d("StreamActivity", "Show Conversation");
@@ -310,7 +293,7 @@ public class SearchActivity extends SherlockListActivity implements
 			}
 
 			if (!entry.image.equals("null")) {
-				names.add("View Photo");
+				names.add(getResources().getString(R.string.modal_image));
 				handlers.add(new Runnable() {
 					public void run() {
 						Log.d("StreamActivity", "View Photo");
@@ -327,10 +310,32 @@ public class SearchActivity extends SherlockListActivity implements
 					}
 				});
 			}
+			
+			if (entry.reactionType.equals("feedback")) {
+				
+				if (!entry.feedbackInfo.image.equals("null")) {
+					names.add(getResources().getString(R.string.modal_feedbackimage));
+					handlers.add(new Runnable() {
+						public void run() {
+							Log.d("StreamActivity", "View Feeedback Photo");
+							Intent i = new Intent(getApplicationContext(),
+									ViewPhotoActivity.class);
+							i.putExtra("FEEDBACK_ID", entry.feedbackInfo.feedbackId);
+							i.putExtra("IMAGE_TYPE", "feedback");
+							i.putExtra("IMAGE_NAME", entry.feedbackInfo.image);
+							i.putExtra("WHOOCH_NAME", entry.whoochName);
+							i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriMedium);
+							i.putExtra("USER_NAME", entry.feedbackInfo.userName);
+							startActivity(i);
+						}
+					});
+				}
+				
+				}
 
 			if (!entry.userName.equalsIgnoreCase(currentUserName)
 					&& entry.isFan.equals("0")) {
-				names.add("I'm a fan of this update");
+				names.add(getResources().getString(R.string.modal_fan));
 				handlers.add(new Runnable() {
 					public void run() {
 						WhoochApiCallTask task = new WhoochApiCallTask(
@@ -340,7 +345,7 @@ public class SearchActivity extends SherlockListActivity implements
 				});
 			}
 
-			names.add("Go to Whooch");
+			names.add(getResources().getString(R.string.modal_whooch));
 			handlers.add(new Runnable() {
 				public void run() {
 					Intent i = new Intent(getApplicationContext(),
@@ -349,39 +354,29 @@ public class SearchActivity extends SherlockListActivity implements
 					startActivity(i);
 				}
 			});
-			
+
 			final String[] namesArray = names.toArray(new String[names.size()]);
-			final Runnable[] handlersArray = handlers.toArray(new Runnable[handlers
-					.size()]);
+			final Runnable[] handlersArray = handlers
+					.toArray(new Runnable[handlers.size()]);
 
-			if (mSearchType.equals("hash")) {
-				return assembleUpdateDialog(namesArray, handlersArray);
-			} else {
-				return new AlertDialog.Builder(getActivityContext()).setItems(
-						namesArray, new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int which) {
-								Log.d("StreamActivity", "Something Was Clicked");
-								handlersArray[which].run();
-							}
-						}).create();
-			}
+			assembleUpdateDialog(namesArray, handlersArray);
+
 		}
-
 
 	}
 
-	private Dialog assembleUpdateDialog(final String[] namesArray,
+	private void assembleUpdateDialog(final String[] namesArray,
 			final Runnable[] handlersArray) {
-		Builder dialog = new AlertDialog.Builder(getActivityContext());
+		Builder builder = new AlertDialog.Builder(getActivityContext());
 
 		LayoutInflater inflater = (LayoutInflater) getActivityContext()
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		View view = inflater.inflate(R.layout.stream_entry, null);
 
-		dialog.setCustomTitle(view);
+		builder.setCustomTitle(view);
 
-		dialog.setItems(namesArray, new DialogInterface.OnClickListener() {
+		builder.setItems(namesArray, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				handlersArray[which].run();
 			}
@@ -419,7 +414,9 @@ public class SearchActivity extends SherlockListActivity implements
 				.findViewById(R.id.entry_update_extras);
 		ll1.setVisibility(View.GONE);
 
-		return dialog.create();
+		AlertDialog dialog = builder.create();
+
+		dialog.show();
 	}
 
 	@Override
@@ -429,12 +426,9 @@ public class SearchActivity extends SherlockListActivity implements
 	private class SearchInitiate implements WhoochApiCallInterface {
 
 		private String mResponseString = null;
-		private ProgressBar mSearchLoader = null;
 
 		public void preExecute() {
 
-			mSearchLoader = (ProgressBar) findViewById(R.id.search_loader);
-			mSearchLoader.setVisibility(View.VISIBLE);
 			mSearchArray.clear();
 			mAdapter.notifyDataSetChanged();
 
@@ -462,22 +456,26 @@ public class SearchActivity extends SherlockListActivity implements
 				if (!mResponseString.equals("null")) {
 
 					try {
+						JSONObject jsonObject = new JSONObject(mResponseString);
+							JSONArray jsonArray = jsonObject
+									.getJSONArray(mSearchType);
+							// the newest updates are at the front of the array,
+							// so
+							// loop over forwards
 
-						JSONArray jsonArray = new JSONObject(mResponseString)
-								.getJSONArray(mSearchType);
-						// the newest updates are at the front of the array, so
-						// loop over forwards
-						for (int i = 0; i < jsonArray.length(); i++) {
+							for (int i = 0; i < jsonArray.length(); i++) {
 
-							// create an object that will be used to populate
-							// the List View and add it to the array
-							SearchEntry entry = new SearchEntry(
-									jsonArray.getJSONObject(i), mSearchType,
-									getWindowManager());
+								// create an object that will be used to
+								// populate
+								// the List View and add it to the array
+								SearchEntry entry = new SearchEntry(
+										jsonArray.getJSONObject(i),
+										mSearchType, getWindowManager());
 
-							mSearchArray.add(entry);
+								mSearchArray.add(entry);
 
-						}
+							}
+					
 					} catch (JSONException e) {
 						e.printStackTrace();
 						// TODO: error handling
@@ -495,9 +493,25 @@ public class SearchActivity extends SherlockListActivity implements
 					mSearchHasMoreUpdates = false;
 				}
 			}
+			
+			if(mSearchArray.isEmpty())
+			{
+				if (mSearchType.equals("user")) {
+					TextView tvE1 = (TextView) findViewById(R.id.empty_text1);
+					tvE1.setText("Sorry, we could not find any users.");
+				}
+				else if(mSearchType.equals("open"))
+				{
+					TextView tvE1 = (TextView) findViewById(R.id.empty_text1);
+					tvE1.setText("Sorry, we could not find any open whooches.");
+				}
+				else
+				{
+					TextView tvE1 = (TextView) findViewById(R.id.empty_text1);
+					tvE1.setText("Sorry, we could not find any updates.");
+				}
+			}
 
-			mSearchLoader = (ProgressBar) findViewById(R.id.search_loader);
-			mSearchLoader.setVisibility(View.GONE);
 			mAdapter.notifyDataSetChanged();
 
 			mSearchInitiated = true;
@@ -706,8 +720,9 @@ public class SearchActivity extends SherlockListActivity implements
 						// TODO: error handling
 					}
 				} else {
-					// if it is null we don't mind, there just wasn't anything
-					// there
+					Toast.makeText(getActivityContext(),
+							"The original update has been deleted",
+							Toast.LENGTH_LONG).show();
 				}
 
 			}
