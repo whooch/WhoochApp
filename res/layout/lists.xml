@@ -8,15 +8,13 @@
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/lists_action"
-        android:layout_weight="1" >
+        android:layout_above="@+id/lists_action">
     </ListView>
 
     <LinearLayout
         android:id="@android:id/empty"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1" >
+        android:layout_height="match_parent" >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -70,8 +68,7 @@
             android:background="@drawable/action_buttons"
             android:text="Leading"
             android:textColor="@drawable/action_buttons"
-            android:textSize="14sp"
-            android:textStyle="bold" >
+            android:textSize="14sp" >
         </Button>
 
         <View
@@ -88,8 +85,7 @@
             android:background="@drawable/action_buttons"
             android:text="Contributing"
             android:textColor="@drawable/action_buttons"
-            android:textSize="14sp"
-            android:textStyle="bold" >
+            android:textSize="14sp" >
         </Button>
 
         <View
@@ -106,8 +102,7 @@
             android:background="@drawable/action_buttons"
             android:text="Trailing"
             android:textColor="@drawable/action_buttons"
-            android:textSize="14sp"
-            android:textStyle="bold" >
+            android:textSize="14sp" >
         </Button>
     </LinearLayout>
 

@@ -117,6 +117,7 @@ public class RegisterActivity extends SherlockActivity {
 
 		@Override
 		protected void onPreExecute() {
+			
 			ConnectivityManager cm = (ConnectivityManager) mActivityContext
 					.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -244,6 +245,7 @@ public class RegisterActivity extends SherlockActivity {
 
 		@Override
 		protected void onPreExecute() {
+			
 			this.mProgressDialog = ProgressDialog.show(mActivityContext, null,
 					"loading", true);
 		}

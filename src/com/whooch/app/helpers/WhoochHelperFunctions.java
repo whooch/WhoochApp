@@ -15,7 +15,7 @@ import com.koushikdutta.urlimageviewhelper.UrlImageGetter;
 @TargetApi(8)
 public class WhoochHelperFunctions {
 	
-	public int getScreenOrientation(Activity a)
+	public static int getScreenOrientation(Activity a)
 	{
 	    Display getOrient = a.getWindowManager().getDefaultDisplay();
 	    int orientation = Configuration.ORIENTATION_UNDEFINED;

@@ -28,10 +28,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.whooch.app.helpers.GCMFunctions;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochHelperFunctions;
 
@@ -61,16 +61,16 @@ public class LoginActivity extends SherlockActivity {
 				task.execute();
 			}
 		});
-		
+
 		mActivationButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				VerifyActivationTask task = new VerifyActivationTask(getActivityContext());
+				VerifyActivationTask task = new VerifyActivationTask(
+						getActivityContext());
 				task.execute();
 			}
 		});
-		
-		
+
 	}
 
 	@Override
@@ -83,11 +83,12 @@ public class LoginActivity extends SherlockActivity {
 		String username = settings.getString("username", null);
 		String userid = settings.getString("userid", null);
 		String password = settings.getString("password", null);
-		
-		if ( (username != null) && (userid != null) && (password != null) ) { Intent i = new
-		Intent(getApplicationContext(), StreamActivity.class);
-		startActivity(i); }
-		 
+
+		if ((username != null) && (userid != null) && (password != null)) {
+			Intent i = new Intent(getApplicationContext(), StreamActivity.class);
+			startActivity(i);
+		}
+
 	}
 
 	private Context getActivityContext() {
@@ -111,20 +112,20 @@ public class LoginActivity extends SherlockActivity {
 
 		@Override
 		protected void onPreExecute() {
-			
+
 			ConnectivityManager cm = (ConnectivityManager) mActivityContext
 					.getSystemService(Context.CONNECTIVITY_SERVICE);
 
 			if (cm.getActiveNetworkInfo() != null
 					&& cm.getActiveNetworkInfo().isConnectedOrConnecting()) {
-				
-				this.mProgressDialog = ProgressDialog.show(mActivityContext, null,
-						"loading", true);
-				
+
+				this.mProgressDialog = ProgressDialog.show(mActivityContext,
+						null, "loading", true);
+
 			} else {
-				
+
 				this.cancel(true);
-				
+
 				Toast.makeText(mActivityContext,
 						"A connection to the server is not available",
 						Toast.LENGTH_LONG).show();
@@ -165,11 +166,9 @@ public class LoginActivity extends SherlockActivity {
 					content = response.getEntity().getContent();
 					BufferedReader reader = new BufferedReader(
 							new InputStreamReader(content));
-					
+
 					mUserId = reader.readLine();
-				}
-				else
-				{
+				} else {
 					mUserId = null;
 				}
 			} catch (IllegalStateException e) {
@@ -189,20 +188,10 @@ public class LoginActivity extends SherlockActivity {
 			if ((mUserId != null) && (mUserId.length() > 0)) {
 
 				if (result == 200) {
-					// verification successful, store username and password in
-					// shared prefs, and start the stream activity
-					SharedPreferences settings = getSharedPreferences(
-							"whooch_preferences", 0);
-					SharedPreferences.Editor editor = settings.edit();
-					editor.putString("username", mUsername);
-					mUserId = mUserId.replace("\"", "");
-					editor.putString("userid", mUserId);
-					editor.putString("password", mPassword);
-					editor.commit();
+					
+					GCMFunctions.setToken((Activity) getActivityContext(), mUserId, mUsername, mPassword);
 
-					Intent i = new Intent(getApplicationContext(),
-							StreamActivity.class);
-					startActivity(i);
+
 				} else if (result == 401) {
 					Toast.makeText(getApplicationContext(),
 							"Incorrect username or password", Toast.LENGTH_LONG)
@@ -219,7 +208,7 @@ public class LoginActivity extends SherlockActivity {
 			}
 		}
 	}
-	
+
 	public class VerifyActivationTask extends AsyncTask<Void, Void, Integer> {
 
 		private ProgressDialog mProgressDialog;
@@ -235,19 +224,19 @@ public class LoginActivity extends SherlockActivity {
 
 		@Override
 		protected void onPreExecute() {
-			
+
 			ConnectivityManager cm = (ConnectivityManager) mActivityContext
 					.getSystemService(Context.CONNECTIVITY_SERVICE);
 
 			if (cm.getActiveNetworkInfo() != null
 					&& cm.getActiveNetworkInfo().isConnectedOrConnecting()) {
-				
-				this.mProgressDialog = ProgressDialog.show(mActivityContext, null,
-						"loading", true);
-				
+
+				this.mProgressDialog = ProgressDialog.show(mActivityContext,
+						null, "loading", true);
+
 			} else {
 				this.cancel(true);
-				
+
 				Toast.makeText(mActivityContext,
 						"A connection to the server is not available",
 						Toast.LENGTH_LONG).show();
@@ -258,21 +247,22 @@ public class LoginActivity extends SherlockActivity {
 		protected Integer doInBackground(Void... params) {
 
 			// prepare the request
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-            
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
 			HttpPost postRequest = new HttpPost(Settings.apiUrl
 					+ "/user/activation");
-            
-            // Add data
-            nameValuePairs.add(new BasicNameValuePair("activationCode", mActivationCode));
 
-            try {
-                postRequest.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                // TODO error handling
-            }
-            
+			// Add data
+			nameValuePairs.add(new BasicNameValuePair("activationCode",
+					mActivationCode));
+
+			try {
+				postRequest.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+				// TODO error handling
+			}
+
 			// make the request
 			HttpClient client = new DefaultHttpClient();
 			HttpResponse response = null;
@@ -298,15 +288,13 @@ public class LoginActivity extends SherlockActivity {
 					content = response.getEntity().getContent();
 					BufferedReader reader = new BufferedReader(
 							new InputStreamReader(content));
-					
+
 					mActivationResponse = reader.readLine();
-				}
-				else
-				{
+				} else {
 					mActivationResponse = null;
 				}
 			} catch (IllegalStateException e) {
-				mActivationResponse= null;
+				mActivationResponse = null;
 			} catch (IOException e) {
 				mActivationResponse = null;
 			}
@@ -321,16 +309,15 @@ public class LoginActivity extends SherlockActivity {
 
 			mActivationResponse = mActivationResponse.replace("\"", "");
 			if (mActivationResponse.equals("true")) {
-				
-					Intent i = new Intent(getApplicationContext(),
-							RegisterActivity.class);
-					i.putExtra("activation_code", mActivationCode);
-					startActivity(i);
-					
+
+				Intent i = new Intent(getApplicationContext(),
+						RegisterActivity.class);
+				i.putExtra("activation_code", mActivationCode);
+				startActivity(i);
+
 			} else {
 				Toast.makeText(getApplicationContext(),
-						"Activation code not valid", Toast.LENGTH_LONG)
-						.show();
+						"Activation code not valid", Toast.LENGTH_LONG).show();
 			}
 		}
 	}

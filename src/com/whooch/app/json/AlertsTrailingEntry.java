@@ -152,7 +152,7 @@ public class AlertsTrailingEntry extends AlertsEntry {
     
     @Override
     public String getAlertType() {
-        return " has sent you an invitation to trail...";
+        return " has sent you an invitation to trail";
     }
     
     @Override

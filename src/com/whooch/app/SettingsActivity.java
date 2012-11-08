@@ -14,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
@@ -22,6 +23,7 @@ import android.preference.PreferenceActivity;
 import android.util.Log;
 import android.view.View;
 
+import com.urbanairship.push.PushManager;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
 import com.whooch.app.helpers.WhoochApiCallTask;
@@ -49,6 +51,29 @@ public class SettingsActivity extends PreferenceActivity {
 		checkMain.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
 		    public boolean onPreferenceClick(Preference preference) {
+		    	
+		    	CheckBoxPreference cbp = (CheckBoxPreference)preference;
+		    	
+		    	if(cbp.isChecked())
+		    	{
+					SharedPreferences settings = getSharedPreferences("whooch_preferences", 0);
+					SharedPreferences.Editor editor = settings.edit();
+					editor.putString("pushenabled", "true");
+					editor.commit();
+					
+					Log.e("test", "yes");
+		    		PushManager.enablePush();
+		    	}
+		    	else
+		    	{
+					SharedPreferences settings = getSharedPreferences("whooch_preferences", 0);
+					SharedPreferences.Editor editor = settings.edit();
+					editor.putString("pushenabled", "false");
+					editor.commit();
+					
+					Log.e("test", "no");
+		    		PushManager.disablePush();
+		    	}
 		    	
 		        return true; 
 		    }
@@ -125,7 +150,6 @@ public class SettingsActivity extends PreferenceActivity {
 
 		public void postExecute(int statusCode) {
 
-			Log.e("test", mResponseString);
 			if (statusCode == 200) {
 
 				// parse the response as JSON and update the Content Array
@@ -211,7 +235,16 @@ public class SettingsActivity extends PreferenceActivity {
 		CheckBoxPreference check;
 		
 		check = (CheckBoxPreference) findPreference("mainNotifications");
-		check.setChecked(true);
+		SharedPreferences settings = getSharedPreferences("whooch_preferences", 0);
+		String pushEnabled = settings.getString("pushenabled", "false");
+		if(pushEnabled.equals("false"))
+		{
+			check.setChecked(false);
+		}
+		else
+		{
+			check.setChecked(true);
+		}
 		
 		check = (CheckBoxPreference) findPreference("whoochInvitations");
 		check.setChecked(mInvitations);

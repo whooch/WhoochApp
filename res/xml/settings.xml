@@ -5,7 +5,8 @@
         <CheckBoxPreference
             android:key="mainNotifications"
             android:title="Android Notifications"
-            android:summary="Enable notifications for Whooch" />
+            android:summary="Enable notifications for Whooch"
+            android:defaultValue="0" />
         <CheckBoxPreference
             android:key="whoochInvitations"
             android:title="Whooch Invitations"

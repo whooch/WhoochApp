@@ -208,6 +208,7 @@ public class StreamActivity extends SherlockListActivity implements
 					getActivityContext(), new StreamGetNewUpdates(), true);
 			task.execute();
 		}
+		
 	}
 
 	private Context getActivityContext() {
@@ -781,6 +782,8 @@ public class StreamActivity extends SherlockListActivity implements
 						tv3A.setText(WhoochHelperFunctions
 								.getSpannedFromHtmlContent(entry.content, tv3A,
 										getActivityContext()));
+						
+						tv3A.setMovementMethod(LinkMovementMethod.getInstance());
 
 						TextView tv4A = (TextView) view
 								.findViewById(R.id.entry_whooch_footA);
@@ -813,6 +816,8 @@ public class StreamActivity extends SherlockListActivity implements
 								.getSpannedFromHtmlContent(
 										mShowConvoCurrentUpdate.content, tv3B,
 										getActivityContext()));
+						
+						tv3B.setMovementMethod(LinkMovementMethod.getInstance());
 
 						TextView tv4B = (TextView) view
 								.findViewById(R.id.entry_whooch_footB);
@@ -883,6 +888,15 @@ public class StreamActivity extends SherlockListActivity implements
 
 			if (statusCode == 200) {
 				mStreamArray.remove(mLastSelectedPosition);
+				
+				if(mStreamArray.isEmpty())
+				{
+					TextView tvE1 = (TextView)findViewById(R.id.empty_text1);
+					tvE1.setText("This is your stream, all of your whooch updates will appear here.");
+					TextView tvE2 = (TextView)findViewById(R.id.empty_text2);
+					tvE2.setText("To get started, search for whooches that interest you or create your own.");
+				}
+				
 				mAdapter.notifyDataSetChanged();
 			}
 
@@ -938,6 +952,8 @@ public class StreamActivity extends SherlockListActivity implements
 				} else {
 					entry.fanString = "(" + fanCount + " fans)";
 				}
+				
+				entry.isFan = "1";
 				
 				mAdapter.notifyDataSetChanged();
 				

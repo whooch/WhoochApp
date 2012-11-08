@@ -125,9 +125,9 @@ public class AlertsTrailRequestEntry extends AlertsEntry {
             	userImageUriMedium = Settings.cdnUrl + "m_" + userImage;
             	userImageUriLarge = Settings.cdnUrl + "l_" + userImage;
             } else {
-            	userImageUriSmall = Settings.cdnUrl + "w" + userId + "_s" + userImage;
-            	userImageUriMedium = Settings.cdnUrl + "w" + userId + "_m" + userImage;
-            	userImageUriLarge = Settings.cdnUrl + "w" + userId + "_l" + userImage;
+            	userImageUriSmall = Settings.cdnUrl + "u" + userId + "_s" + userImage;
+            	userImageUriMedium = Settings.cdnUrl + "u" + userId + "_m" + userImage;
+            	userImageUriLarge = Settings.cdnUrl + "u" + userId + "_l" + userImage;
             }
         }
         
@@ -159,7 +159,7 @@ public class AlertsTrailRequestEntry extends AlertsEntry {
 
     @Override
     public String getAlertType() {
-        return " has sent you a request to trail...";
+        return " has sent you a request to trail";
     }
     
     @Override

@@ -619,6 +619,26 @@ public class FeedbackActivity extends SherlockListActivity implements
 
 			if (statusCode == 200) {
 				mFeedbackArray.remove(mLastSelectedPosition);
+				
+				if(mFeedbackArray.isEmpty())
+				{
+					if (mFeedbackType.equals("sent")) {
+						TextView tvE1 = (TextView) findViewById(R.id.empty_text1);
+						tvE1.setText("All feedback that you send to open whooches will appear here.");
+						TextView tvE2 = (TextView) findViewById(R.id.empty_text2);
+						tvE2.setText("Feedback is a message that you send to the contributors of an open whooch. " +
+								"The contributors of the whooch can then react to the feedback in the whooch itself.");
+					}
+					else
+					{
+						TextView tvE1 = (TextView) findViewById(R.id.empty_text1);
+						tvE1.setText("All feedback that you receive from your open whooches will appear here.");
+						TextView tvE2 = (TextView) findViewById(R.id.empty_text2);
+						tvE2.setText("Feedback is a message that you send to the contributors of an open whooch. " +
+								"The contributors of the whooch can then react to the feedback in the whooch itself.");
+					}
+				}
+				
 				mAdapter.notifyDataSetChanged();
 			}
 

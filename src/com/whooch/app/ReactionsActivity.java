@@ -743,6 +743,7 @@ public class ReactionsActivity extends SherlockListActivity implements
 						tv3A.setText(WhoochHelperFunctions
 								.getSpannedFromHtmlContent(entry.content, tv3A,
 										getActivityContext()));
+						tv3A.setMovementMethod(LinkMovementMethod.getInstance());
 
 						TextView tv4A = (TextView) view
 								.findViewById(R.id.entry_whooch_footA);
@@ -775,6 +776,7 @@ public class ReactionsActivity extends SherlockListActivity implements
 								.getSpannedFromHtmlContent(
 										mShowConvoCurrentUpdate.content, tv3B,
 										getActivityContext()));
+						tv3B.setMovementMethod(LinkMovementMethod.getInstance());
 
 						TextView tv4B = (TextView) view
 								.findViewById(R.id.entry_whooch_footB);
@@ -845,6 +847,20 @@ public class ReactionsActivity extends SherlockListActivity implements
 
 			if (statusCode == 200) {
 				mWhoochArray.remove(mLastSelectedPosition);
+				
+				if(mWhoochArray.isEmpty())
+				{
+					if (mReactionsType.equals("sent")) {
+						TextView tvE1 = (TextView) findViewById(R.id.empty_text1);
+						tvE1.setText("All reactions that you send to other users will appear here.");
+					}
+					else
+					{
+						TextView tvE1 = (TextView) findViewById(R.id.empty_text1);
+						tvE1.setText("All reactions that you receive from other users will appear here.");
+					}
+				}
+				
 				mAdapter.notifyDataSetChanged();
 			}
 
@@ -900,6 +916,8 @@ public class ReactionsActivity extends SherlockListActivity implements
 				} else {
 					entry.fanString = "(" + fanCount + " fans)";
 				}
+				
+				entry.isFan = "1";
 				
 				mAdapter.notifyDataSetChanged();
 				

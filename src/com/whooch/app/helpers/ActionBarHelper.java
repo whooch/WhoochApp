@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 
@@ -25,7 +24,6 @@ import com.whooch.app.SearchActivity;
 import com.whooch.app.StreamActivity;
 import com.whooch.app.UserProfileActivity;
 import com.whooch.app.json.NavigationEntry;
-import com.whooch.app.json.StreamEntry;
 import com.whooch.app.ui.NavigationArrayAdapter;
 
 public class ActionBarHelper {

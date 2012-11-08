@@ -156,7 +156,7 @@ public class AlertsContributingEntry extends AlertsEntry {
 
     @Override
     public String getAlertType() {
-        return " has sent you an invitation to contribute to...";
+        return " has sent you an invitation to contribute";
     }
     
     @Override

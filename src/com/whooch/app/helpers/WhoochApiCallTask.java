@@ -14,8 +14,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
@@ -43,11 +43,19 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 
 	@Override
 	protected void onPreExecute() {
-		WhoochHelperFunctions whoochHelper = new WhoochHelperFunctions();
-		if (mShowProgressDialog
-				&& (whoochHelper
-						.getScreenOrientation((Activity) mActivityContext) == Configuration.ORIENTATION_PORTRAIT)) {
-			Activity a = (Activity) mActivityContext;
+		
+		Activity a = (Activity) mActivityContext;
+		
+		if(WhoochHelperFunctions.getScreenOrientation(a) == Configuration.ORIENTATION_PORTRAIT)
+		{
+			a.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		}
+		else if(WhoochHelperFunctions.getScreenOrientation(a) == Configuration.ORIENTATION_LANDSCAPE)
+		{
+			a.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		}
+		
+		if (mShowProgressDialog) {
 			View loader = a.findViewById(R.id.main_loader);
 			if (loader != null) {
 				loader.setVisibility(View.VISIBLE);
@@ -64,7 +72,6 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 			this.cancel(true);
 			
 			
-			Activity a = (Activity)mActivityContext;
 			TextView tvE1 = (TextView) a.findViewById(R.id.empty_text1);
 			TextView tvE2 = (TextView) a.findViewById(R.id.empty_text2);
 			if((tvE1 != null) && (tvE2 != null))
@@ -157,9 +164,12 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 
 	@Override
 	protected void onPostExecute(Integer statusCode) {
+		
+		Activity a = (Activity) mActivityContext;
+		
+		a.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 
 		if (mShowProgressDialog) {
-			Activity a = (Activity) mActivityContext;
 			View loader = a.findViewById(R.id.main_loader);
 			if (loader != null) {
 				loader.setVisibility(View.GONE);
@@ -173,17 +183,8 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 				Toast.makeText(mActivityContext,
 						"Login information is no longer valid",
 						Toast.LENGTH_LONG).show();
-
-				SharedPreferences settings = mActivityContext
-						.getSharedPreferences("whooch_preferences", 0);
-				SharedPreferences.Editor editor = settings.edit();
-				editor.putString("username", null);
-				editor.putString("userid", null);
-				editor.putString("password", null);
-				editor.commit();
-
-				Intent i = new Intent(mActivityContext, LoginActivity.class);
-				mActivityContext.startActivity(i);
+				
+				GCMFunctions.clearToken(a);
 			}
 
 		} else {

@@ -24,6 +24,7 @@ import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.whooch.app.helpers.ActionBarHelper;
+import com.whooch.app.helpers.GCMFunctions;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
 import com.whooch.app.helpers.WhoochApiCallTask;
@@ -45,9 +46,8 @@ public class UserProfileActivity extends SherlockListActivity implements
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 
-		WhoochHelperFunctions whoochHelper = new WhoochHelperFunctions();
 		if (mProfileType == "local"
-				&& (whoochHelper.getScreenOrientation(this) == Configuration.ORIENTATION_PORTRAIT)) {
+				&& (WhoochHelperFunctions.getScreenOrientation(this) == Configuration.ORIENTATION_PORTRAIT)) {
 
 			menu.add(Menu.NONE, 1, 0, "Settings").setShowAsAction(
 					MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -61,23 +61,17 @@ public class UserProfileActivity extends SherlockListActivity implements
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		Intent i = null;
 		switch (item.getItemId()) {
 		case 1:
+			Intent i = null;
 			i = new Intent(getActivityContext(), SettingsActivity.class);
 			startActivity(i);
 			return true;
 		case 2:
-			SharedPreferences settings = getActivityContext()
-					.getSharedPreferences("whooch_preferences", 0);
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putString("username", null);
-			editor.putString("userid", null);
-			editor.putString("password", null);
-			editor.commit();
-
-			i = new Intent(getActivityContext(), LoginActivity.class);
-			startActivity(i);
+			
+			//This function will sign out user
+			GCMFunctions.clearToken(this);
+			
 			return true;
 	    case android.R.id.home:
 	        finish();

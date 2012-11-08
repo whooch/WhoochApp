@@ -563,6 +563,12 @@ public class WhoochFeedbackActivity extends SherlockListActivity implements
 
 			if (statusCode == 200) {
 				mFeedbackArray.remove(mLastSelectedPosition);
+				
+				if (mFeedbackArray.isEmpty()) {
+					TextView tvE1 = (TextView) findViewById(R.id.empty_text1);
+					tvE1.setText("No feedback has been sent to this whooch.");
+				}
+				
 				mAdapter.notifyDataSetChanged();
 			}
 

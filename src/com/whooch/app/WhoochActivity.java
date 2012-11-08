@@ -444,6 +444,10 @@ public class WhoochActivity extends SherlockListActivity implements
 
 			assembleUpdateDialog(namesArray, handlersArray);
 		}
+		else
+		{
+			assembleUpdateDialog(null, null);
+		}
 
 	}
 
@@ -790,6 +794,8 @@ public class WhoochActivity extends SherlockListActivity implements
 						tv3A.setText(WhoochHelperFunctions
 								.getSpannedFromHtmlContent(entry.content, tv3A,
 										getActivityContext()));
+						
+						tv3A.setMovementMethod(LinkMovementMethod.getInstance());
 
 						TextView tv4A = (TextView) view
 								.findViewById(R.id.entry_whooch_footA);
@@ -821,6 +827,8 @@ public class WhoochActivity extends SherlockListActivity implements
 										mShowConvoCurrentUpdate.content, tv3B,
 										getActivityContext()));
 
+						tv3B.setMovementMethod(LinkMovementMethod.getInstance());
+						
 						TextView tv4B = (TextView) view
 								.findViewById(R.id.entry_whooch_footB);
 						tv4B.setText(WhoochHelperFunctions.toRelativeTime(Long
@@ -888,6 +896,12 @@ public class WhoochActivity extends SherlockListActivity implements
 
 			if (statusCode == 200) {
 				mWhoochArray.remove(mLastSelectedPosition);
+				
+				if (mWhoochArray.isEmpty()) {
+					TextView tvE1 = (TextView) findViewById(R.id.empty_text1);
+					tvE1.setText("No updates have been shared yet.");
+				}
+				
 				mAdapter.notifyDataSetChanged();
 			}
 
@@ -1081,6 +1095,8 @@ public class WhoochActivity extends SherlockListActivity implements
 				} else {
 					entry.fanString = "(" + fanCount + " fans)";
 				}
+				
+				entry.isFan = "1";
 
 				mAdapter.notifyDataSetChanged();
 
