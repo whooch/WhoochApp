@@ -1,18 +1,15 @@
 package com.whooch.app.helpers;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.text.Html;
 import android.text.Spanned;
-import android.util.Base64;
 import android.view.Display;
 import android.widget.TextView;
 
 import com.koushikdutta.urlimageviewhelper.UrlImageGetter;
 
-@TargetApi(8)
 public class WhoochHelperFunctions {
 	
 	public static int getScreenOrientation(Activity a)

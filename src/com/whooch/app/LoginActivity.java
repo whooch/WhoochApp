@@ -85,8 +85,36 @@ public class LoginActivity extends SherlockActivity {
 		String password = settings.getString("password", null);
 
 		if ((username != null) && (userid != null) && (password != null)) {
-			Intent i = new Intent(getApplicationContext(), StreamActivity.class);
-			startActivity(i);
+
+			Intent i = null;
+			String notification = null;
+			i = getIntent();
+			Bundle b = i.getExtras();
+
+			if (b != null) {
+				notification = b.getString("NOTIFICATION");
+			}
+
+			if (notification == null) {
+				i = new Intent(getApplicationContext(), StreamActivity.class);
+				startActivity(i);
+			} else if (notification.equals("alerts")) {
+				i = new Intent(getApplicationContext(),
+						UserProfileActivity.class);
+				String userId = settings.getString("userid", null);
+				i.putExtra("USER_ID", userId);
+				i.putExtra("NOTIFICATION", "alerts");
+				startActivity(i);
+			}
+			else if (notification.equals("reactions")) {
+				i = new Intent(getApplicationContext(), ReactionsActivity.class);
+				startActivity(i);
+			}
+			else if (notification.equals("feedback")) {
+				i = new Intent(getApplicationContext(), FeedbackActivity.class);
+				startActivity(i);
+			}
+
 		}
 
 	}
@@ -188,9 +216,9 @@ public class LoginActivity extends SherlockActivity {
 			if ((mUserId != null) && (mUserId.length() > 0)) {
 
 				if (result == 200) {
-					
-					GCMFunctions.setToken((Activity) getActivityContext(), mUserId, mUsername, mPassword);
 
+					GCMFunctions.setToken((Activity) getActivityContext(),
+							mUserId, mUsername, mPassword);
 
 				} else if (result == 401) {
 					Toast.makeText(getApplicationContext(),

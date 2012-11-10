@@ -68,14 +68,14 @@ public class UserProfileActivity extends SherlockListActivity implements
 			startActivity(i);
 			return true;
 		case 2:
-			
-			//This function will sign out user
+
+			// This function will sign out user
 			GCMFunctions.clearToken(this);
-			
+
 			return true;
-	    case android.R.id.home:
-	        finish();
-	        return true;
+		case android.R.id.home:
+			finish();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -97,36 +97,31 @@ public class UserProfileActivity extends SherlockListActivity implements
 		mUserId = b.getString("USER_ID");
 
 		if (mUserId.equals(userId)) {
-			if(b.containsKey("FORCE_FOREIGN"))
-			{
+			if (b.containsKey("FORCE_FOREIGN")) {
 				mProfileType = "localForeign";
-			}
-			else
-			{
+			} else {
 				mProfileType = "local";
-			}	
+			}
 		} else {
 			mProfileType = "foreign";
 		}
 
 		if (mProfileType.equals("local")) {
-			ActionBarHelper
-					.setupActionBar(getSupportActionBar(), this, 4);
-		}
-		else
-		{
+			ActionBarHelper.setupActionBar(getSupportActionBar(), this, 4);
+		} else {
 			getSupportActionBar().setDisplayShowHomeEnabled(true);
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-			
-			LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			View title_view = inflater.inflate(R.layout.title_bar_generic, null);
+
+			LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			View title_view = inflater
+					.inflate(R.layout.title_bar_generic, null);
 			getSupportActionBar().setCustomView(title_view);
 			getSupportActionBar().setDisplayShowCustomEnabled(true);
-			TextView tvhead = (TextView)title_view.findViewById(R.id.header_generic_title);
+			TextView tvhead = (TextView) title_view
+					.findViewById(R.id.header_generic_title);
 			tvhead.setText("Profile");
 		}
-		
-		
+
 		mAdapter = new UserProfileArrayAdapter(this, mProfileType,
 				mUserProfileArray);
 		setListAdapter(mAdapter);
@@ -137,9 +132,22 @@ public class UserProfileActivity extends SherlockListActivity implements
 	public void onResume() {
 		super.onResume();
 
-		WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(),
-				new ProfileInitiate(), true);
-		task.execute();
+		Intent i = getIntent();
+		Bundle b = i.getExtras();
+
+		if (b != null && b.containsKey("NOTIFICATION")
+				&& b.getString("NOTIFICATION").equals("alerts")) {
+
+			i.removeExtra("NOTIFICATION");
+			i = new Intent(getActivityContext(), AlertsActivity.class);
+			startActivity(i);
+
+		} else {
+
+			WhoochApiCallTask task = new WhoochApiCallTask(
+					getActivityContext(), new ProfileInitiate(), true);
+			task.execute();
+		}
 
 	}
 
@@ -277,5 +285,5 @@ public class UserProfileActivity extends SherlockListActivity implements
 		// TODO Auto-generated method stub
 
 	}
-	
+
 }

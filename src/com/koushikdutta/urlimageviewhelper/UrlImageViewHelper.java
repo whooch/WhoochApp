@@ -17,7 +17,6 @@ import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -38,7 +37,6 @@ import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 import android.widget.ImageView;
 
-@TargetApi(8)
 public final class UrlImageViewHelper {
 	public static int copyStream(InputStream input, OutputStream output)
 			throws IOException {

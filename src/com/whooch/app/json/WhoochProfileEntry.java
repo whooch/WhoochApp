@@ -181,6 +181,12 @@ public class WhoochProfileEntry {
 			e.printStackTrace();
 		}
 
+		try {
+			isStreaming = json.getString("isStreaming");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
 		// determine the URLs for the whooch image
 		if (whoochImage != null && whoochId != null) {
 			if (whoochImage.equals("defaultWhooch.png")) {
@@ -238,19 +244,31 @@ public class WhoochProfileEntry {
 		return new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				
 				Intent i = new Intent(v.getContext(),
 						WhoochSettingsActivity.class);
+				
+				if(isStreaming.equals("1") || isStreaming.equals("0"))
+				{
+					i.putExtra("HAS_STREAMING", true);
+				}
+				else
+				{
+					i.putExtra("HAS_STREAMING", false);
+				}
+				
+				if(type.equals("open") && isContributing.equals("1"))
+				{
+					i.putExtra("HAS_FEEDBACK", true);
+				}
+				else
+				{
+					i.putExtra("HAS_FEEDBACK", false);
+				}
+				
 				i.putExtra("WHOOCH_ID", whoochId);
 				i.putExtra("WHOOCH_NAME", whoochName);
-				if (isContributing.equals("1")) {
-					i.putExtra("FEEDBACK_PUSH", feedbackPush);
-					i.putExtra("FEEDBACK", true);
-				} else {
-					i.putExtra("FEEDBACK", false);
-				}
-
-				i.putExtra("UPDATE_PUSH", updatePush);
-
+				
 				v.getContext().startActivity(i);
 			}
 		};

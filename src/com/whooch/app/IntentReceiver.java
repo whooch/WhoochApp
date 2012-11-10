@@ -35,14 +35,27 @@ public class IntentReceiver extends BroadcastReceiver {
  
                         Log.i(logTag, "User clicked notification. Message: " + intent.getStringExtra(PushManager.EXTRA_ALERT));
  
-                        logPushExtras(intent);
- 
-                        Intent launch = new Intent(Intent.ACTION_MAIN);
+                        String activity = logPushExtras(intent);
+                        
+                    	Intent launch = new Intent(Intent.ACTION_MAIN);
                         launch.setClass(UAirship.shared().getApplicationContext(), LoginActivity.class);
+                        
+                        if(activity != null && activity.equals("alerts"))
+                        {
+                        	launch.putExtra("NOTIFICATION", "alerts");
+                        }
+                        else if(activity != null && activity.equals("reactions"))
+                        {
+                        	launch.putExtra("NOTIFICATION", "reactions");
+                        }
+                        else if(activity != null && activity.equals("feedback"))
+                        {
+                        	launch.putExtra("NOTIFICATION", "feedback");
+                        }
+
                         launch.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
- 
                         UAirship.shared().getApplicationContext().startActivity(launch);
- 
+
                 } else if (action.equals(PushManager.ACTION_REGISTRATION_FINISHED)) {
                         Log.i(logTag, "Registration complete. APID:" + intent.getStringExtra(PushManager.EXTRA_APID)
                                         + ". Valid: " + intent.getBooleanExtra(PushManager.EXTRA_REGISTRATION_VALID, false));
@@ -55,8 +68,9 @@ public class IntentReceiver extends BroadcastReceiver {
          *
          * @param intent A PushManager.ACTION_NOTIFICATION_OPENED or ACTION_PUSH_RECEIVED intent.
          */
-        private void logPushExtras(Intent intent) {
+        private String logPushExtras(Intent intent) {
                 Set<String> keys = intent.getExtras().keySet();
+                String activity = null;
                 for (String key : keys) {
  
                         //ignore standard extra keys (GCM + UA)
@@ -70,6 +84,13 @@ public class IntentReceiver extends BroadcastReceiver {
                                 continue;
                         }
                         Log.i(logTag, "Push Notification Extra: ["+key+" : " + intent.getStringExtra(key) + "]");
+                     
+                        if(key.equals("activity"))
+                        {
+                        	activity = intent.getStringExtra(key);
+                        }
                 }
+                
+                return activity;
         }
 }

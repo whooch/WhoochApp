@@ -2,10 +2,14 @@ package com.whooch.app;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -87,11 +91,46 @@ public class ViewPhotoActivity extends SherlockListActivity {
         
         ImageView ivMain = (ImageView) this.findViewById(R.id.viewAttachedImage);
 		UrlImageViewHelper.setUrlDrawable(ivMain, imageUri);
+		
+		ImageButton ib1 = (ImageButton) findViewById(R.id.photo_save_button);
+		
+		ib1.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	saveImage();
+            }
+        });
+		
+		ib1.setVisibility(View.VISIBLE);
     }
     
     @Override
     public void onResume() {
         super.onResume();
+
+    }
+    
+    private void saveImage()
+    {
+		
+    	ImageView ivMain = (ImageView) this.findViewById(R.id.viewAttachedImage);
+    	Bitmap bitmap = ((BitmapDrawable)ivMain.getDrawable()).getBitmap();
+
+    	Intent i = getIntent();
+    	Bundle b = i.getExtras();
+    	if(MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, b.getString("IMAGE_NAME") , b.getString("WHOOCH_NAME") + "-" + b.getString("USER_NAME")) == null)
+    	{
+			Toast.makeText(this,
+					"Something went wrong, please try again",
+					Toast.LENGTH_LONG).show();
+    	}
+    	else
+    	{
+			Toast.makeText(this,
+					"Image saved",
+					Toast.LENGTH_LONG).show();
+    	}
+
 
     }
 

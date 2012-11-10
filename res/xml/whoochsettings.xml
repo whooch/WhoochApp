@@ -3,10 +3,6 @@
 
     <PreferenceCategory 
         android:key="WhoochSettingsTitle" >
-        <CheckBoxPreference
-            android:key="updates"
-            android:title="Updates"
-            android:summary="Notify me when this whooch is updated" />
     </PreferenceCategory>
 
 </PreferenceScreen>

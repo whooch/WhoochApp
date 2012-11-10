@@ -82,5 +82,13 @@
         android:layout_alignParentRight="true"
         android:background="@drawable/title_button"
         android:visibility="gone" />
-
+    
+    <ImageButton
+        android:id="@+id/photo_save_button"
+        android:layout_width="50dip"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/title_button"
+        android:src="@android:drawable/ic_menu_save"
+        android:visibility="gone" />
 </RelativeLayout>

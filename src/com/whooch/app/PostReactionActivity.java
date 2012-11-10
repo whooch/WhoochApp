@@ -149,6 +149,11 @@ public class PostReactionActivity extends PostBaseActivity {
             if (statusCode == 202) {
                 finish();
             }
+			else if(statusCode == 409)
+			{
+				Toast.makeText(getApplicationContext(), "You already said that",
+						Toast.LENGTH_SHORT).show();
+			}
         }
     }
 

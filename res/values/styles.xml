@@ -10,6 +10,7 @@
         <item name="android:actionBarStyle">@style/ActionBarStyle</item>
         <item name="actionBarStyle">@style/ActionBarStyle</item>
         <item name="android:spinnerItemStyle">@style/SpinnerItem</item>
+        <item name="spinnerItemStyle">@style/SpinnerItem</item>
         <item name="android:actionDropDownStyle">@style/DropDownStyle</item>
         <item name="actionDropDownStyle">@style/DropDownStyle</item>
     </style>
@@ -20,6 +21,7 @@
         <item name="android:displayOptions">showHome|useLogo</item>
         <item name="displayOptions">showHome|useLogo</item>
         <item name="android:background">@drawable/actionbar_gradient</item>
+        <item name="background">@drawable/actionbar_gradient</item>
     </style>
 
     <style name="TabStyle" parent="@android:style/Widget.Holo.ActionBar.TabBar">
@@ -30,10 +32,7 @@
     </style>
 
     <style name="DropDownStyle" parent="@android:style/Widget.Holo.Light.Spinner">
-
-              <item name="android:popupBackground">@color/gray3</item>   
-		
-        
+        <item name="android:popupBackground">@color/gray3</item>
     </style>
 
 </resources>

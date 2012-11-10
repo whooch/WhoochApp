@@ -187,7 +187,8 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 				GCMFunctions.clearToken(a);
 			}
 
-		} else {
+		}
+		else {
 			// execute the post execute method for this task
 			mWhoochApiCall.postExecute(statusCode);
 		}

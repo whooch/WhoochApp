@@ -69,7 +69,7 @@ public class SearchActivity extends SherlockListActivity implements
 	private SearchEntry mShowConvoCurrentUpdate = null;
 	private int mLastSelectedPosition = -1;
 
-	private int mSearchNextPage = 1;
+	private int mSearchPage = 0;
 	private EditText mSearchQuery = null;
 	private String mSearchType = null;
 
@@ -95,9 +95,20 @@ public class SearchActivity extends SherlockListActivity implements
 		tvhead.setText("Search");
 
 		mSearchQuery = (EditText) findViewById(R.id.search_query);
+		
+		mListView = getListView();
+		mListView.setOnScrollListener(this);
+		
+		// Add and remove loading footer before setting adapter
+		// Footer won't show up unless one is present when adapter is set
+		mLoadingFooterView = this.getLayoutInflater().inflate(
+				R.layout.stream_loading_footer, null);
+		mListView.addFooterView(mLoadingFooterView);
 
 		mAdapter = new SearchArrayAdapter(this, mSearchArray);
 		setListAdapter(mAdapter);
+		
+		mListView.removeFooterView(mLoadingFooterView);
 
 		EditText et1 = (EditText) findViewById(R.id.search_query);
 		et1.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -128,18 +139,16 @@ public class SearchActivity extends SherlockListActivity implements
 
 		if (data != null) {
 			mSearchType = "hash";
-			mSearchSpinner.setSelection(2);
 
 			mSearchQuery.setText(data.toString().replaceAll(
 					"com.whooch.updatesearch://(.+)", "$1"));
 			mSearchQuery.setSelection(mSearchQuery.getText().length());
+			
+			//Setting the spinner will call SearchInitiate()
+			mSearchSpinner.setSelection(2);
 
-			WhoochApiCallTask task = new WhoochApiCallTask(
-					getActivityContext(), new SearchInitiate(), true);
-			task.execute();
 		} else {
 			mSearchType = "open";
-			mSearchSpinner.setSelection(0);
 		}
 
 		mSearchSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
@@ -177,6 +186,7 @@ public class SearchActivity extends SherlockListActivity implements
 		mSearchInitiated = false;
 		mSearchHasMoreUpdates = true;
 		mLoadMoreItemsInProgress = false;
+		mSearchPage = 0;
 	}
 
 	private Context getActivityContext() {
@@ -428,14 +438,22 @@ public class SearchActivity extends SherlockListActivity implements
 
 		public void preExecute() {
 
+			mSearchInitiated = false;
+			mSearchHasMoreUpdates = true;
+			mLoadMoreItemsInProgress = false;
+			mSearchPage = 0;
 			mSearchArray.clear();
+			TextView tvE1 = (TextView) findViewById(R.id.empty_text1);
+			tvE1.setText("");
 			mAdapter.notifyDataSetChanged();
 
 		}
 
 		public HttpRequestBase getHttpRequest() {
 			return new HttpGet(Settings.apiUrl
-					+ "/search/1?page=0&type="
+					+ "/search/1?page=" 
+					+ mSearchPage 
+					+"&type="
 					+ mSearchType
 					+ "&query="
 					+ URLEncoder.encode(mSearchQuery.getText().toString()
@@ -484,7 +502,7 @@ public class SearchActivity extends SherlockListActivity implements
 					// there
 				}
 
-				mSearchNextPage++;
+				mSearchPage++;
 
 				// if it is less than 25 then we should stop trying to get more
 				// updates
@@ -522,12 +540,20 @@ public class SearchActivity extends SherlockListActivity implements
 		private String mResponseString = null;
 
 		public void preExecute() {
+
 		}
 
 		public HttpRequestBase getHttpRequest() {
-			return new HttpGet(Settings.apiUrl + "/search/1?page="
-					+ mSearchNextPage + "&type=" + mSearchType + "&query="
-					+ mSearchQuery);
+
+			return new HttpGet(Settings.apiUrl
+					+ "/search/1?page=" 
+					+ mSearchPage 
+					+"&type="
+					+ mSearchType
+					+ "&query="
+					+ URLEncoder.encode(mSearchQuery.getText().toString()
+							.trim()));
+			
 		}
 
 		public void handleResponse(String responseString) {
@@ -539,7 +565,13 @@ public class SearchActivity extends SherlockListActivity implements
 			// parse the response as JSON and update the Content Array
 			if (!mResponseString.equals("null")) {
 				try {
-					JSONArray jsonArray = new JSONArray(mResponseString);
+					JSONObject jsonObject = new JSONObject(mResponseString);
+					JSONArray jsonArray = jsonObject
+							.getJSONArray(mSearchType);
+					
+					if (jsonArray.length() < 10) {
+						mSearchHasMoreUpdates = false;
+					}
 
 					// the newest updates are at the front of the array, so loop
 					// over forwards
@@ -552,10 +584,6 @@ public class SearchActivity extends SherlockListActivity implements
 								getWindowManager());
 						mSearchArray.add(entry);
 
-						// preload the image that will be displayed
-						// UrlImageViewHelper.loadUrlDrawable(getApplicationContext(),
-						// entry.whoochImageUriDefault,
-						// R.drawable.ic_whooch_transparent);
 					}
 
 				} catch (JSONException e) {
@@ -566,13 +594,7 @@ public class SearchActivity extends SherlockListActivity implements
 
 			}
 
-			mSearchNextPage++;
-
-			// if it is less than 10 then we should stop trying to get more
-			// updates
-			if (mSearchArray.size() < 10) {
-				mSearchHasMoreUpdates = false;
-			}
+			mSearchPage++;
 
 			mAdapter.notifyDataSetChanged();
 
