@@ -17,19 +17,23 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
-import android.app.ProgressDialog;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
+import com.whooch.app.helpers.GCMFunctions;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochHelperFunctions;
 
@@ -48,6 +52,16 @@ public class RegisterActivity extends SherlockActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.register);
+		
+		getSupportActionBar().setDisplayShowHomeEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		
+		LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View title_view = inflater.inflate(R.layout.title_bar_generic, null);
+		getSupportActionBar().setCustomView(title_view);
+		getSupportActionBar().setDisplayShowCustomEnabled(true);
+		TextView tvhead = (TextView)title_view.findViewById(R.id.header_generic_title);
+		tvhead.setText("Create an account");
 
 		UsernameText = (EditText) findViewById(R.id.reg_username);
 		FirstnameText = (EditText) findViewById(R.id.reg_firstname);
@@ -85,13 +99,26 @@ public class RegisterActivity extends SherlockActivity {
 		 
 	}
 
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+
+	    int itemId = item.getItemId();
+	    switch (itemId) {
+	    case android.R.id.home:
+	        finish();
+	        break;
+
+	    }
+
+	    return true;
+	}
+
+	
 	private Context getActivityContext() {
 		return this;
 	}
 
 	public class VerifyRegistrationTask extends AsyncTask<Void, Void, Integer> {
 
-		private ProgressDialog mProgressDialog;
 		private Context mActivityContext;
 		private String mUsername;
 		private String mFirstname;
@@ -124,8 +151,15 @@ public class RegisterActivity extends SherlockActivity {
 			if (cm.getActiveNetworkInfo() != null
 					&& cm.getActiveNetworkInfo().isConnectedOrConnecting()) {
 				
-				this.mProgressDialog = ProgressDialog.show(mActivityContext, null,
-						"loading", true);
+					View loader = findViewById(R.id.main_loader);
+					if (loader != null) {
+						loader.setVisibility(View.VISIBLE);
+					}
+					
+					loader = findViewById(R.id.main_action_icons);
+					if (loader != null) {
+						loader.setVisibility(View.GONE);
+					}
 				
 			} else {
 				this.cancel(true);
@@ -212,7 +246,14 @@ public class RegisterActivity extends SherlockActivity {
 		@Override
 		protected void onPostExecute(Integer result) {
 
-			this.mProgressDialog.cancel();
+			View loader = findViewById(R.id.main_loader);
+			if (loader != null) {
+				loader.setVisibility(View.GONE);
+			}
+			loader = findViewById(R.id.main_action_icons);
+			if (loader != null) {
+				loader.setVisibility(View.VISIBLE);
+			}
 
 			mRegistrationResponse = mRegistrationResponse.replace("\"", "");
 			if (mRegistrationResponse.equals("true")) {
@@ -230,7 +271,6 @@ public class RegisterActivity extends SherlockActivity {
 	
 	public class VerifyUserTask extends AsyncTask<Void, Void, Integer> {
 
-		private ProgressDialog mProgressDialog;
 		private Context mActivityContext;
 		private String mUsername;
 		private String mPassword;
@@ -246,8 +286,15 @@ public class RegisterActivity extends SherlockActivity {
 		@Override
 		protected void onPreExecute() {
 			
-			this.mProgressDialog = ProgressDialog.show(mActivityContext, null,
-					"loading", true);
+			View loader = findViewById(R.id.main_loader);
+			if (loader != null) {
+				loader.setVisibility(View.VISIBLE);
+			}
+			
+			loader = findViewById(R.id.main_action_icons);
+			if (loader != null) {
+				loader.setVisibility(View.GONE);
+			}
 		}
 
 		@Override
@@ -303,25 +350,21 @@ public class RegisterActivity extends SherlockActivity {
 		@Override
 		protected void onPostExecute(Integer result) {
 
-			this.mProgressDialog.cancel();
+			View loader = findViewById(R.id.main_loader);
+			if (loader != null) {
+				loader.setVisibility(View.GONE);
+			}
+			loader = findViewById(R.id.main_action_icons);
+			if (loader != null) {
+				loader.setVisibility(View.VISIBLE);
+			}
 
 			if ((mUserId != null) && (mUserId.length() > 0)) {
 
 				if (result == 200) {
-					// verification successful, store username and password in
-					// shared prefs, and start the stream activity
-					SharedPreferences settings = getSharedPreferences(
-							"whooch_preferences", 0);
-					SharedPreferences.Editor editor = settings.edit();
-					editor.putString("username", mUsername);
-					mUserId = mUserId.replace("\"", "");
-					editor.putString("userid", mUserId);
-					editor.putString("password", mPassword);
-					editor.commit();
 
-					Intent i = new Intent(getApplicationContext(),
-							StreamActivity.class);
-					startActivity(i);
+					GCMFunctions.setTokenLogin((Activity) getActivityContext(),
+							mUserId, mUsername, mPassword);
 				} else if (result == 401) {
 					Toast.makeText(getApplicationContext(),
 							"Registration failed", Toast.LENGTH_LONG)

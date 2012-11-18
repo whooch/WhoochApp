@@ -164,11 +164,6 @@ public class WhoochFeedbackActivity extends SherlockListActivity implements
 
 				try {
 
-					View loader = findViewById(R.id.main_loader);
-					if (loader != null) {
-						loader.setVisibility(View.GONE);
-					}
-
 					ObjectInputStream objectIn = new ObjectInputStream(
 							new ByteArrayInputStream(
 									savedState.getByteArray("FeedbackList")));
@@ -305,9 +300,15 @@ public class WhoochFeedbackActivity extends SherlockListActivity implements
 
 				AlertDialog.Builder builder = new AlertDialog.Builder(
 						getActivityContext());
-
-				builder.setTitle("Whooch");
-				builder.setMessage("Are you sure you want to remove this feedback?");
+				
+				LayoutInflater inflater = (LayoutInflater) getActivityContext()
+						.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				View titleView = inflater.inflate(R.layout.default_alert_title, null);
+				View contentView = inflater.inflate(R.layout.default_alert_message, null);
+				TextView tvDefAlert = (TextView)contentView.findViewById(R.id.default_alert_content);
+				tvDefAlert.setText("Are you sure you want to remove this feedback?");
+				builder.setCustomTitle(titleView);
+				builder.setView(contentView);
 
 				builder.setNegativeButton("No",
 						new DialogInterface.OnClickListener() {

@@ -18,6 +18,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -222,7 +223,6 @@ public class WhoochProfileEntry {
 					+ leaderImage;
 		}
 
-		Log.e("test", leaderImageUriDefault);
 	}
 
 	public OnClickListener getInviteUserClickListener() {
@@ -420,9 +420,17 @@ public class WhoochProfileEntry {
 				final Context context = v.getContext();
 				AlertDialog.Builder builder = new AlertDialog.Builder(
 						v.getContext());
-
-				builder.setTitle("Rate whooch");
-				builder.setMessage("Do you support this whooch?");
+				
+				LayoutInflater inflater = (LayoutInflater) v.getContext()
+						.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				View titleView = inflater.inflate(R.layout.default_alert_title, null);
+				View contentView = inflater.inflate(R.layout.default_alert_message, null);
+				TextView tvDefHeading = (TextView)titleView.findViewById(R.id.alert_title_whoochname);
+				tvDefHeading.setText("Rate whooch");
+				TextView tvDefAlert = (TextView)contentView.findViewById(R.id.default_alert_content);
+				tvDefAlert.setText("Do you support this whooch?");
+				builder.setCustomTitle(titleView);
+				builder.setView(contentView);
 
 				builder.setNegativeButton("No",
 						new DialogInterface.OnClickListener() {
@@ -502,6 +510,14 @@ public class WhoochProfileEntry {
 
 						if (trailStatus != null) {
 							Activity a = (Activity) mContext;
+							
+							//This will make sure the stream is re-initiated to reflect trail updates
+							SharedPreferences settings = a.getSharedPreferences(
+									"whooch_preferences", 0);
+							SharedPreferences.Editor editor = settings.edit();
+							editor.putBoolean("streaming_updated", true);
+							editor.commit();
+							
 							Intent intent = a.getIntent();
 							a.finish();
 							a.startActivity(intent);

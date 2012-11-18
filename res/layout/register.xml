@@ -1,127 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dip"
-        android:layout_marginRight="20dip"
-        android:layout_marginLeft="20dip" >
+    <TableLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:stretchColumns="1" >
 
-        <EditText
-            android:id="@+id/reg_username"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Username"
-            android:ems="10" >
+            android:layout_marginLeft="20dip"
+            android:layout_marginRight="20dip"
+            android:layout_marginTop="20dip" >
 
-            <requestFocus />
-        </EditText>
-    </LinearLayout>
+            <EditText
+                android:id="@+id/reg_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:singleLine="true"
+                android:hint="Username" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="20dip"
-        android:layout_marginLeft="20dip" >
+                <requestFocus />
+            </EditText>
+        </LinearLayout>
 
-        <EditText
-            android:id="@+id/reg_firstname"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:hint="First Name" />
-    </LinearLayout>
+            android:layout_marginLeft="20dip"
+            android:layout_marginRight="20dip" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="20dip"
-        android:layout_marginLeft="20dip" >
+            <EditText
+                android:id="@+id/reg_firstname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:singleLine="true"
+                android:hint="First Name" />
+        </LinearLayout>
 
-        <EditText
-            android:id="@+id/reg_lastname"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Last Name"
-            android:ems="10" />
-    </LinearLayout>
+            android:layout_marginLeft="20dip"
+            android:layout_marginRight="20dip" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="20dip"
-        android:layout_marginLeft="20dip" >
+            <EditText
+                android:id="@+id/reg_lastname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:singleLine="true"
+                android:hint="Last Name" />
+        </LinearLayout>
 
-        <EditText
-            android:id="@+id/reg_email"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Email"
-            android:ems="10" />
-    </LinearLayout>
+            android:layout_marginLeft="20dip"
+            android:layout_marginRight="20dip" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="20dip"
-        android:layout_marginLeft="20dip" >
+            <EditText
+                android:id="@+id/reg_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:singleLine="true"
+                android:hint="Email" />
+        </LinearLayout>
 
-        <EditText
-            android:id="@+id/reg_emailagain"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Email Again"
-            android:ems="10" />
-    </LinearLayout>
+            android:layout_marginLeft="20dip"
+            android:layout_marginRight="20dip" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dip"
-        android:layout_marginRight="20dip">
+            <EditText
+                android:id="@+id/reg_emailagain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:singleLine="true"
+                android:hint="Email Again" />
+        </LinearLayout>
 
-        <EditText
-            android:id="@+id/reg_password"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:inputType="textPassword"
-            android:hint="Password"
-            android:ems="10" />
-    </LinearLayout>
+            android:layout_marginLeft="20dip"
+            android:layout_marginRight="20dip" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dip"
-        android:layout_marginRight="20dip">
+            <EditText
+                android:id="@+id/reg_password"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="Password"
+                android:singleLine="true"
+                android:inputType="textPassword" />
+        </LinearLayout>
 
-        <EditText
-            android:id="@+id/reg_passwordagain"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:inputType="textPassword"
-            android:hint="Password Again"
-            android:ems="10" />
-    </LinearLayout>
+            android:layout_marginLeft="20dip"
+            android:layout_marginRight="20dip" >
 
-    <Button
-        android:id="@+id/register_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dip"
-        android:background="@drawable/lists_button_selector"
-        android:text="Register"
-        android:textColor="@color/white" />
+            <EditText
+                android:id="@+id/reg_passwordagain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="Password Again"
+                android:imeOptions="actionDone"
+                android:inputType="textPassword"
+                android:singleLine="true" />
+        </LinearLayout>
 
-</LinearLayout>
+        <Button
+            android:id="@+id/register_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dip"
+            android:background="@drawable/lists_button_selector"
+            android:text="Register"
+            android:textColor="@color/white" />
+    </TableLayout>
+
+</ScrollView>

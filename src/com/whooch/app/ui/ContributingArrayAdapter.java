@@ -77,7 +77,6 @@ public class ContributingArrayAdapter extends ArrayAdapter<ContributingEntry> {
 			UrlImageViewHelper.setUrlDrawable(iv1,
 					Settings.defaultWhoochImageUriLarge);
 			tv1.setText("");
-			tv1.setPadding(0, 25, 0, 0);
 			if (mData.size() == 1) {
 				tv1.setHint("You do not have any whooches to update");
 			} else {
@@ -86,7 +85,6 @@ public class ContributingArrayAdapter extends ArrayAdapter<ContributingEntry> {
 			iv2.setVisibility(View.GONE);
 			tv2.setVisibility(View.GONE);
 		} else {
-			tv1.setPadding(0, 0, 0, 0);
 			UrlImageViewHelper.setUrlDrawable(iv1,
 					contributingEntry.whoochImageUriLarge);
 			tv1.setText(contributingEntry.whoochName);

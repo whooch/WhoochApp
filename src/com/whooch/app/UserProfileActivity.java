@@ -70,7 +70,7 @@ public class UserProfileActivity extends SherlockListActivity implements
 		case 2:
 
 			// This function will sign out user
-			GCMFunctions.clearToken(this);
+			GCMFunctions.clearTokenLogout(this);
 
 			return true;
 		case android.R.id.home:
@@ -131,9 +131,19 @@ public class UserProfileActivity extends SherlockListActivity implements
 	@Override
 	public void onResume() {
 		super.onResume();
+		
+		SharedPreferences settings = getActivityContext().getSharedPreferences(
+				"whooch_preferences", 0);
+		String userId = settings.getString("userid", null);
 
 		Intent i = getIntent();
 		Bundle b = i.getExtras();
+		
+		if (mUserId.equals(userId)) {
+			if (!b.containsKey("FORCE_FOREIGN")) {
+				getSupportActionBar().setSelectedNavigationItem(4);
+			} 
+		}
 
 		if (b != null && b.containsKey("NOTIFICATION")
 				&& b.getString("NOTIFICATION").equals("alerts")) {

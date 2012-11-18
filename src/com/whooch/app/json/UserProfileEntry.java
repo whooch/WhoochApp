@@ -18,12 +18,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.whooch.app.AlertsActivity;
+import com.whooch.app.R;
 import com.whooch.app.UploadPhotoActivity;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
@@ -173,9 +176,15 @@ public class UserProfileEntry {
             	
     			AlertDialog.Builder builder = new AlertDialog.Builder(
     					v.getContext());
-
-    			builder.setTitle("Whooch");
-    			builder.setMessage("Are you sure you want to remove this friend?");
+    			
+				LayoutInflater inflater = (LayoutInflater) v.getContext()
+						.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				View titleView = inflater.inflate(R.layout.default_alert_title, null);
+				View contentView = inflater.inflate(R.layout.default_alert_message, null);
+				TextView tvDefAlert = (TextView)contentView.findViewById(R.id.default_alert_content);
+				tvDefAlert.setText("Are you sure you want to remove this friend?");
+				builder.setCustomTitle(titleView);
+				builder.setView(contentView);
 
     			builder.setNegativeButton("No",
     					new DialogInterface.OnClickListener() {

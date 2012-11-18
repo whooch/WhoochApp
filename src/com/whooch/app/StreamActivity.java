@@ -42,6 +42,7 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
+import com.urbanairship.push.PushManager;
 import com.whooch.app.helpers.ActionBarHelper;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
@@ -103,6 +104,13 @@ public class StreamActivity extends SherlockListActivity implements
 			WhoochApiCallTask task = new WhoochApiCallTask(
 					getActivityContext(), new StreamInitiate(), true);
 			task.execute();
+			
+			//reset streaming flag after every stream initiate call
+			SharedPreferences settings = getActivityContext().getSharedPreferences(
+					"whooch_preferences", 0);
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putBoolean("streaming_updated", false);
+			editor.commit();
 
 		}
 	}
@@ -141,11 +149,6 @@ public class StreamActivity extends SherlockListActivity implements
 			if (savedState.containsKey("StreamList")) {
 
 				try {
-
-					View loader = findViewById(R.id.main_loader);
-					if (loader != null) {
-						loader.setVisibility(View.GONE);
-					}
 
 					ObjectInputStream objectIn = new ObjectInputStream(
 							new ByteArrayInputStream(
@@ -202,12 +205,42 @@ public class StreamActivity extends SherlockListActivity implements
 	@Override
 	public void onResume() {
 		super.onResume();
+		
+		getSupportActionBar().setSelectedNavigationItem(0);
+		
+		//if no apid, then register for push
+		String apid = PushManager.shared().getAPID();
+		if(apid == null)
+		{
+			PushManager.enablePush();
+		}
 
 		if (mStreamInitiated) {
-			WhoochApiCallTask task = new WhoochApiCallTask(
-					getActivityContext(), new StreamGetNewUpdates(), true);
-			task.execute();
+			
+			SharedPreferences settings = getActivityContext().getSharedPreferences(
+					"whooch_preferences", 0);
+			Boolean streamingUpdated = settings.getBoolean("streaming_updated", false);
+			
+			if(streamingUpdated)
+			{
+				WhoochApiCallTask task = new WhoochApiCallTask(
+						getActivityContext(), new StreamInitiate(), true);
+				task.execute();
+				
+				//reset streaming flag after every stream initiate call
+				SharedPreferences.Editor editor = settings.edit();
+				editor.putBoolean("streaming_updated", false);
+				editor.commit();
+			}
+			else
+			{
+				WhoochApiCallTask task = new WhoochApiCallTask(
+						getActivityContext(), new StreamGetNewUpdates(), true);
+				task.execute();
+			}
+
 		}
+		
 		
 	}
 
@@ -355,8 +388,14 @@ public class StreamActivity extends SherlockListActivity implements
 					AlertDialog.Builder builder = new AlertDialog.Builder(
 							getActivityContext());
 
-					builder.setTitle("Whooch");
-					builder.setMessage("Are you sure you want to delete this update?");
+					LayoutInflater inflater = (LayoutInflater) getActivityContext()
+							.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+					View titleView = inflater.inflate(R.layout.default_alert_title, null);
+					View contentView = inflater.inflate(R.layout.default_alert_message, null);
+					TextView tvDefAlert = (TextView)contentView.findViewById(R.id.default_alert_content);
+					tvDefAlert.setText("Are you sure you want to delete this update?");
+					builder.setCustomTitle(titleView);
+					builder.setView(contentView);
 
 					builder.setNegativeButton("No",
 							new DialogInterface.OnClickListener() {

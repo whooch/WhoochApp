@@ -58,7 +58,7 @@
                         android:id="@+id/entry_feedback_content"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="feedback content" />
+                        android:text="Feedback content" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -71,7 +71,8 @@
                             android:id="@+id/feedbackImagePicture"
                             android:layout_width="16dip"
                             android:layout_height="16dip"
-                            android:layout_marginRight="5dip"
+                            android:layout_marginTop="3dip"
+                            android:layout_marginRight="3dip"
                             android:src="@drawable/ic_picture_gr" />
                     </LinearLayout>
                 </LinearLayout>
@@ -89,13 +90,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="3.57"
-                android:text="content goes here..." />
+                android:text="Content" />
         </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="3dip"
         android:layout_marginBottom="3dip"
         android:layout_marginLeft="3dip"
         android:orientation="horizontal" >

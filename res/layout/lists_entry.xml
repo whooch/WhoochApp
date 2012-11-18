@@ -24,6 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/lists_entry_whooch_image"
             android:layout_toLeftOf="@+id/lists_entry_open_closed_image"
+            android:layout_centerVertical="true"
             android:orientation="vertical"
             android:paddingLeft="10dip" >
             <TextView

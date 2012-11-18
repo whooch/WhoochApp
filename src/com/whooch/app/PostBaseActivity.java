@@ -87,6 +87,8 @@ public class PostBaseActivity extends SherlockActivity {
 	protected String mUpdateType = null;
 
 	protected String mSpinnerId = null;
+	
+	private boolean mDropDownEnabled = false;
 
 	protected ArrayList<String> mSearchUsersArray = new ArrayList<String>();
 	protected ArrayAdapter<String> mSearchUsersAdapter;
@@ -163,6 +165,7 @@ public class PostBaseActivity extends SherlockActivity {
 		mReactView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				mDropDownEnabled = true;
 
 				mWhoochSelectorLayout.setVisibility(View.GONE);
 				mReactLayout.setVisibility(View.GONE);
@@ -187,7 +190,8 @@ public class PostBaseActivity extends SherlockActivity {
 		mSearchUsersAutoText = (AutoCompleteTextView) findViewById(R.id.post_search_users);
 
 		mSearchUsersAdapter = new ArrayAdapter<String>(getActivityContext(),
-				android.R.layout.simple_dropdown_item_1line, mSearchUsersArray);
+				android.R.layout.select_dialog_item, mSearchUsersArray);
+		
 		mSearchUsersAutoText.setAdapter(mSearchUsersAdapter);
 		mSearchUsersAutoText
 				.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -427,7 +431,7 @@ public class PostBaseActivity extends SherlockActivity {
 
 				mSearchUsersAdapter = new ArrayAdapter<String>(
 						getActivityContext(),
-						android.R.layout.simple_dropdown_item_1line,
+						android.R.layout.select_dialog_item,
 						mSearchUsersArray);
 				mSearchUsersAutoText.setAdapter(mSearchUsersAdapter);
 
@@ -437,7 +441,10 @@ public class PostBaseActivity extends SherlockActivity {
 					// the user selected a name from the list, don't suggest it
 					// again
 				} else {
-					mSearchUsersAutoText.showDropDown();
+					if(mDropDownEnabled)
+					{
+						mSearchUsersAutoText.showDropDown();
+					}
 				}
 			}
 		}
@@ -553,8 +560,15 @@ public class PostBaseActivity extends SherlockActivity {
 		if (mImageBitmap != null) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(
 					view.getContext());
-
-			builder.setMessage("Remove image?").setTitle("Whooch");
+			
+			LayoutInflater inflater = (LayoutInflater) getActivityContext()
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			View titleView = inflater.inflate(R.layout.default_alert_title, null);
+			View contentView = inflater.inflate(R.layout.default_alert_message, null);
+			TextView tvDefAlert = (TextView)contentView.findViewById(R.id.default_alert_content);
+			tvDefAlert.setText("Remove image?");
+			builder.setCustomTitle(titleView);
+			builder.setView(contentView);
 
 			builder.setPositiveButton("Yes",
 					new DialogInterface.OnClickListener() {
@@ -584,8 +598,13 @@ public class PostBaseActivity extends SherlockActivity {
 	public void selectPhotoRetrievalType(Context context) {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-		builder.setTitle("Upload image");
+		
+		LayoutInflater inflater = (LayoutInflater) getActivityContext()
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View titleView = inflater.inflate(R.layout.default_alert_title, null);
+		TextView tvDefHeading = (TextView)titleView.findViewById(R.id.alert_title_whoochname);
+		tvDefHeading.setText("Upload image");
+		builder.setCustomTitle(titleView);
 
 		builder.setItems(R.array.image_retrieval_type,
 				new DialogInterface.OnClickListener() {
@@ -618,6 +637,8 @@ public class PostBaseActivity extends SherlockActivity {
 	}
 
 	public void restoreLayout() {
+		
+		mDropDownEnabled = false;
 
 		mUserSearchLayout.setVisibility(View.GONE);
 

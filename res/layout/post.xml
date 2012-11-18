@@ -2,8 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="3dip"
-    android:layout_marginRight="3dip"
     android:orientation="vertical" >
 
     <!-- Post, React -->
@@ -12,6 +10,8 @@
         android:id="@+id/post_user_search_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="3dip"
+        android:layout_marginRight="3dip"
         android:orientation="vertical"
         android:visibility="gone" >
 
@@ -22,12 +22,12 @@
             android:layout_margin="10dip"
             android:ems="10"
             android:hint="Search for a user to react to"
+            android:textColor="@color/black"
             android:singleLine="true"
             android:text="" />
 
         <ProgressBar
             android:id="@+id/post_searchuser_loader"
-            style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -40,6 +40,9 @@
         android:id="@+id/post_select_whooch_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dip"
+        android:layout_marginLeft="3dip"
+        android:layout_marginRight="3dip"
         android:orientation="vertical"
         android:visibility="gone" >
 
@@ -57,8 +60,6 @@
             android:visibility="gone" />
     </LinearLayout>
 
-
-
     <!-- React -->
 
     <RelativeLayout
@@ -66,6 +67,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dip"
+        android:layout_marginLeft="8dip"
+        android:layout_marginRight="8dip"
         android:visibility="gone" >
 
         <TextView
@@ -79,6 +82,8 @@
         android:id="@+id/post_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="3dip"
+        android:layout_marginRight="3dip"
         android:layout_marginTop="10dip"
         android:ems="10"
         android:inputType="textShortMessage|textMultiLine"
@@ -91,6 +96,8 @@
         android:id="@+id/post_action_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="3dip"
+        android:layout_marginRight="3dip"
         android:orientation="horizontal" >
 
         <!-- Post, Feedback -->
@@ -128,8 +135,8 @@
             android:layout_height="40dip"
             android:layout_alignParentRight="true"
             android:background="@drawable/lists_button_selector"
-            android:paddingLeft="4dip"
-            android:paddingRight="4dip"
+            android:paddingLeft="10dip"
+            android:paddingRight="10dip"
             android:textColor="@color/white"
             android:textSize="15sp" />
     </RelativeLayout>

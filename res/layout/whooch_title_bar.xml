@@ -33,13 +33,13 @@
             <TextView
                 android:id="@+id/wheader_whooch_title"
                 android:layout_width="wrap_content"
-                android:maxWidth="170dip"
                 android:layout_height="wrap_content"
-                android:text="Whooch Name"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:maxWidth="170dip"
                 android:scrollHorizontally="true"
-				android:ellipsize="end" 
-				android:maxLines="1"
-				android:textColor="@color/white"
+                android:text="Whooch Name"
+                android:textColor="@color/white"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
@@ -53,42 +53,58 @@
         </LinearLayout>
     </LinearLayout>
 
-    <ProgressBar
+    <RelativeLayout
         android:id="@+id/main_loader"
-        android:layout_width="35dip"
-        android:layout_height="35dip"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="5dip"
-        android:layout_toRightOf="@+id/wheader_whoochinfo"
-        android:visibility="gone" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="right"
+        android:orientation="horizontal"
+        android:visibility="gone" >
 
-    <Button
-        android:id="@+id/wheader_options_button"
-        android:layout_width="60dip"
-        android:layout_height="match_parent"
-        android:layout_toLeftOf="@+id/wheader_update_button"
-        android:layout_marginLeft="5dip"
-        android:background="@drawable/title_button"
-        android:text="Options"
-        android:textColor="@color/white"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        android:visibility="gone" />
+        <ProgressBar
+            android:layout_width="30dip"
+            android:layout_height="30dip"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dip" />
+    </RelativeLayout>
 
-    <ImageButton
-        android:id="@+id/wheader_update_button"
-        android:layout_width="50dip"
+    <RelativeLayout
+        android:id="@+id/main_action_icons"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
-        android:background="@drawable/title_button"
-        android:visibility="gone" />
-    
-    <ImageButton
-        android:id="@+id/photo_save_button"
-        android:layout_width="50dip"
-        android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
-        android:background="@drawable/title_button"
-        android:src="@android:drawable/ic_menu_save"
-        android:visibility="gone" />
+        android:gravity="right"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/wheader_options_button"
+            android:layout_width="48dip"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="5dip"
+            android:layout_toLeftOf="@+id/wheader_update_button"
+            android:background="@drawable/title_button"
+            android:text="Options"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/wheader_update_button"
+            android:layout_width="48dip"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/title_button"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/photo_save_button"
+            android:layout_width="48dip"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/title_button"
+            android:src="@android:drawable/ic_menu_save"
+            android:visibility="gone" />
+    </RelativeLayout>
+
 </RelativeLayout>

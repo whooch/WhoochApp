@@ -2,7 +2,10 @@ package com.whooch.app;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -13,22 +16,25 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.PreferenceActivity;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 
+import com.actionbarsherlock.app.SherlockPreferenceActivity;
+import com.actionbarsherlock.view.MenuItem;
 import com.urbanairship.push.PushManager;
+import com.whooch.app.helpers.GCMFunctions;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
 import com.whooch.app.helpers.WhoochApiCallTask;
 
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends SherlockPreferenceActivity {
 
 	View mLoadingFooterView;
 
@@ -41,82 +47,97 @@ public class SettingsActivity extends PreferenceActivity {
 
 		super.onCreate(savedInstanceState);
 
+		getSupportActionBar().setDisplayShowHomeEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View title_view = inflater.inflate(R.layout.title_bar_generic, null);
+		getSupportActionBar().setCustomView(title_view);
+		getSupportActionBar().setDisplayShowCustomEnabled(true);
+		TextView tvhead = (TextView) title_view
+				.findViewById(R.id.header_generic_title);
+		tvhead.setText("");
+
 		addPreferencesFromResource(R.xml.settings);
-		
-		CheckBoxPreference checkMain = (CheckBoxPreference) findPreference("mainNotifications");	
-		CheckBoxPreference checkInvite =  (CheckBoxPreference) findPreference("whoochInvitations");
+
+		CheckBoxPreference checkMain = (CheckBoxPreference) findPreference("mainNotifications");
+		CheckBoxPreference checkInvite = (CheckBoxPreference) findPreference("whoochInvitations");
 		CheckBoxPreference checkFriend = (CheckBoxPreference) findPreference("friendRequests");
 		CheckBoxPreference checkReactions = (CheckBoxPreference) findPreference("reactions");
-		
+
 		checkMain.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
-		    public boolean onPreferenceClick(Preference preference) {
-		    	
-		    	CheckBoxPreference cbp = (CheckBoxPreference)preference;
-		    	
-		    	if(cbp.isChecked())
-		    	{
-					SharedPreferences settings = getSharedPreferences("whooch_preferences", 0);
-					SharedPreferences.Editor editor = settings.edit();
-					editor.putString("pushenabled", "true");
-					editor.commit();
-					
-					Log.e("test", "yes");
-		    		PushManager.enablePush();
-		    	}
-		    	else
-		    	{
-					SharedPreferences settings = getSharedPreferences("whooch_preferences", 0);
-					SharedPreferences.Editor editor = settings.edit();
-					editor.putString("pushenabled", "false");
-					editor.commit();
-					
-					Log.e("test", "no");
-		    		PushManager.disablePush();
-		    	}
-		    	
-		        return true; 
-		    }
-		});
-		
-		checkInvite.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+			public boolean onPreferenceClick(Preference preference) {
 
-		    public boolean onPreferenceClick(Preference preference) {
-		    	
-		    	CheckBoxPreference cbp = (CheckBoxPreference)preference;
-				WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(),
-						new UpdateSetting("invitations", cbp.isChecked()), true);
-				task.execute();
-				
-		        return true; 
-		    }
-		});
-		
-		checkFriend.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+				CheckBoxPreference cbp = (CheckBoxPreference) preference;
 
-		    public boolean onPreferenceClick(Preference preference) {
-		    	
-		    	CheckBoxPreference cbp = (CheckBoxPreference)preference;
-				WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(),
-						new UpdateSetting("friendrequests", cbp.isChecked()), true);
-				task.execute();
-		    	
-		        return true; 
-		    }
-		});
-		
-		checkReactions.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+				if (cbp.isChecked()) {
+					GCMFunctions.setToken((Activity) getActivityContext());
+				} else {
+					GCMFunctions.clearToken((Activity) getActivityContext());
+				}
 
-		    public boolean onPreferenceClick(Preference preference) {
-		    	
-		    	CheckBoxPreference cbp = (CheckBoxPreference)preference;
-				WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(),
-						new UpdateSetting("reactions", cbp.isChecked()), true);
-				task.execute();
-		    	
-		        return true; 
-		    }
+				return true;
+			}
 		});
+
+		checkInvite
+				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+					public boolean onPreferenceClick(Preference preference) {
+
+						CheckBoxPreference cbp = (CheckBoxPreference) preference;
+						WhoochApiCallTask task = new WhoochApiCallTask(
+								getActivityContext(), new UpdateSetting(
+										"invitations", cbp.isChecked()), true);
+						task.execute();
+
+						return true;
+					}
+				});
+
+		checkFriend
+				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+					public boolean onPreferenceClick(Preference preference) {
+
+						CheckBoxPreference cbp = (CheckBoxPreference) preference;
+						WhoochApiCallTask task = new WhoochApiCallTask(
+								getActivityContext(), new UpdateSetting(
+										"friendrequests", cbp.isChecked()),
+								true);
+						task.execute();
+
+						return true;
+					}
+				});
+
+		checkReactions
+				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+					public boolean onPreferenceClick(Preference preference) {
+
+						CheckBoxPreference cbp = (CheckBoxPreference) preference;
+						WhoochApiCallTask task = new WhoochApiCallTask(
+								getActivityContext(), new UpdateSetting(
+										"reactions", cbp.isChecked()), true);
+						task.execute();
+
+						return true;
+					}
+				});
+
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			finish();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 
 	}
 
@@ -126,6 +147,10 @@ public class SettingsActivity extends PreferenceActivity {
 
 		WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(),
 				new SettingsInitiate(), true);
+		task.execute();
+
+		task = new WhoochApiCallTask(getActivityContext(),
+				new SetPushEnabled(), true);
 		task.execute();
 	}
 
@@ -156,10 +181,13 @@ public class SettingsActivity extends PreferenceActivity {
 				if (!mResponseString.equals("null")) {
 					try {
 						JSONObject jsonObject = new JSONObject(mResponseString);
-						mInvitations = (jsonObject.getString("invitations").equals("1") ? true : false);
-						mFriendRequests = (jsonObject.getString("friendrequests").equals("1") ? true : false);
-						mReactions = (jsonObject.getString("reactions").equals("1") ? true : false);
-						
+						mInvitations = (jsonObject.getString("invitations")
+								.equals("1") ? true : false);
+						mFriendRequests = (jsonObject.getString(
+								"friendrequests").equals("1") ? true : false);
+						mReactions = (jsonObject.getString("reactions").equals(
+								"1") ? true : false);
+
 						updatePreferences();
 
 					} catch (JSONException e) {
@@ -176,23 +204,87 @@ public class SettingsActivity extends PreferenceActivity {
 		}
 
 	}
-	
+
+	private class SetPushEnabled implements WhoochApiCallInterface {
+
+		private String mResponseString = null;
+
+		public void preExecute() {
+		}
+
+		public HttpRequestBase getHttpRequest() {
+			return new HttpGet(Settings.apiUrl
+					+ "/push/1?getTokens=true&&platform=android");
+		}
+
+		public void handleResponse(String responseString) {
+			mResponseString = responseString;
+		}
+
+		public void postExecute(int statusCode) {
+
+			boolean apidFound = false;
+			if (statusCode == 200) {
+
+				// parse the response as JSON and update the Content Array
+				if (!mResponseString.equals("null")) {
+					try {
+
+						String apid = PushManager.shared().getAPID();
+
+						JSONObject jsonObject = new JSONObject(mResponseString);
+
+						if (apid != null) {
+							Map<String, String> map = new HashMap<String, String>();
+							Iterator iter = jsonObject.keys();
+
+							while (iter.hasNext()) {
+								
+								String key = (String) iter.next();
+								String value = jsonObject.getString(key);
+
+								if (apid.equals(value)) {
+									apidFound = true;
+								}
+							}
+						}
+
+
+					} catch (JSONException e) {
+						e.printStackTrace();
+						// TODO: error handling
+					}
+				} else {
+					// if it is null we don't mind, there just wasn't anything
+					// there
+				}
+
+			}
+			
+			CheckBoxPreference check;
+			check = (CheckBoxPreference) findPreference("mainNotifications");
+			
+			if (apidFound) {
+				check.setChecked(true);
+			} else {
+				check.setChecked(false);
+			}
+
+		}
+	}
+
 	private class UpdateSetting implements WhoochApiCallInterface {
 
 		private String mResponseString = null;
 		private String mUpdateType = null;
 		private String mUpdateVal = null;
-		
-		public UpdateSetting(String updateType, boolean updateVal)
-		{
+
+		public UpdateSetting(String updateType, boolean updateVal) {
 			mUpdateType = updateType;
-			
-			if(updateVal)
-			{
+
+			if (updateVal) {
 				mUpdateVal = "1";
-			}
-			else
-			{
+			} else {
 				mUpdateVal = "0";
 			}
 		}
@@ -201,12 +293,12 @@ public class SettingsActivity extends PreferenceActivity {
 		}
 
 		public HttpRequestBase getHttpRequest() {
-			
-			HttpPost request = new HttpPost(Settings.apiUrl + "/push/" + mUpdateType);
-			
+
+			HttpPost request = new HttpPost(Settings.apiUrl + "/push/"
+					+ mUpdateType);
+
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-			nameValuePairs.add(new BasicNameValuePair("option",
-					mUpdateVal));
+			nameValuePairs.add(new BasicNameValuePair("option", mUpdateVal));
 
 			try {
 				request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
@@ -224,8 +316,6 @@ public class SettingsActivity extends PreferenceActivity {
 
 		public void postExecute(int statusCode) {
 
-
-
 		}
 
 	}
@@ -233,25 +323,13 @@ public class SettingsActivity extends PreferenceActivity {
 	private void updatePreferences() {
 
 		CheckBoxPreference check;
-		
-		check = (CheckBoxPreference) findPreference("mainNotifications");
-		SharedPreferences settings = getSharedPreferences("whooch_preferences", 0);
-		String pushEnabled = settings.getString("pushenabled", "false");
-		if(pushEnabled.equals("false"))
-		{
-			check.setChecked(false);
-		}
-		else
-		{
-			check.setChecked(true);
-		}
-		
+
 		check = (CheckBoxPreference) findPreference("whoochInvitations");
 		check.setChecked(mInvitations);
-		
+
 		check = (CheckBoxPreference) findPreference("friendRequests");
 		check.setChecked(mFriendRequests);
-		
+
 		check = (CheckBoxPreference) findPreference("reactions");
 		check.setChecked(mReactions);
 

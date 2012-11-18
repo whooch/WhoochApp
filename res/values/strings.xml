@@ -56,5 +56,6 @@
 	<string name="modal_whooch">Go to whooch</string>
 	<string name="modal_delete">Delete update</string>
 	<string name="modal_removefeedback">Remove feedback</string>
+	<string name="modal_removereaction">Remove reaction</string>
 
 </resources>

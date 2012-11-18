@@ -22,6 +22,8 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="whoochblue">#00639F</color> <!-- start button gradient -->
+    
+    <color name="light">#F5F9EC</color>
 
     <drawable name="white">#FFFFFF</drawable>
     <drawable name="whoochblue">#00639F</drawable>

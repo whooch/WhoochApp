@@ -153,6 +153,7 @@ public class ListsActivity extends SherlockListActivity {
 	public void onResume() {
 		super.onResume();
 
+		getSupportActionBar().setSelectedNavigationItem(1);
 	}
 
 	private Context getActivityContext() {

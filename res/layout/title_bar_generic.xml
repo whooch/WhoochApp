@@ -16,13 +16,20 @@
         android:textSize="18sp"
         android:textStyle="bold" />
 
-    <ProgressBar
+    <RelativeLayout
         android:id="@+id/main_loader"
-        android:layout_width="35dip"
-        android:layout_height="35dip"
-        android:layout_marginLeft="5dip"
-        android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/header_generic_title"
-        android:visibility="gone" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+
+        <ProgressBar
+            android:layout_width="30dip"
+            android:layout_height="30dip"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dip" />
+    </RelativeLayout>
 
 </RelativeLayout>

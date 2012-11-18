@@ -14,6 +14,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -24,8 +25,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.whooch.app.LoginActivity;
 import com.whooch.app.R;
+import com.whooch.app.VerifyActivity;
 
 public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 
@@ -60,6 +61,11 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 			if (loader != null) {
 				loader.setVisibility(View.VISIBLE);
 			}
+			
+			loader = a.findViewById(R.id.main_action_icons);
+			if (loader != null) {
+				loader.setVisibility(View.GONE);
+			}
 		}
 
 		ConnectivityManager cm = (ConnectivityManager) mActivityContext
@@ -85,6 +91,10 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 				View loader = a.findViewById(R.id.main_loader);
 				if (loader != null) {
 					loader.setVisibility(View.GONE);
+				}
+				loader = a.findViewById(R.id.main_action_icons);
+				if (loader != null) {
+					loader.setVisibility(View.VISIBLE);
 				}
 			}
 			
@@ -174,18 +184,18 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 			if (loader != null) {
 				loader.setVisibility(View.GONE);
 			}
+			loader = a.findViewById(R.id.main_action_icons);
+			if (loader != null) {
+				loader.setVisibility(View.VISIBLE);
+			}
 		}
 
 		// do error handling
 		if (statusCode == 407) {
 
-			if (!(mActivityContext instanceof LoginActivity)) {
-				Toast.makeText(mActivityContext,
-						"Login information is no longer valid",
-						Toast.LENGTH_LONG).show();
-				
-				GCMFunctions.clearToken(a);
-			}
+			Intent i = null;
+			i = new Intent(a, VerifyActivity.class);
+			a.startActivity(i);
 
 		}
 		else {

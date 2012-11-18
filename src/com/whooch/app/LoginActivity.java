@@ -18,16 +18,18 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
@@ -47,6 +49,16 @@ public class LoginActivity extends SherlockActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
+		
+		getSupportActionBar().setDisplayShowHomeEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+		
+		LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View title_view = inflater.inflate(R.layout.title_bar_generic, null);
+		getSupportActionBar().setCustomView(title_view);
+		getSupportActionBar().setDisplayShowCustomEnabled(true);
+		TextView tvhead = (TextView)title_view.findViewById(R.id.header_generic_title);
+		tvhead.setText("Welcome to Whooch");
 
 		UsernameText = (EditText) findViewById(R.id.login_username);
 		PasswordText = (EditText) findViewById(R.id.login_password);
@@ -94,7 +106,7 @@ public class LoginActivity extends SherlockActivity {
 			if (b != null) {
 				notification = b.getString("NOTIFICATION");
 			}
-
+			
 			if (notification == null) {
 				i = new Intent(getApplicationContext(), StreamActivity.class);
 				startActivity(i);
@@ -125,7 +137,6 @@ public class LoginActivity extends SherlockActivity {
 
 	public class VerifyUserTask extends AsyncTask<Void, Void, Integer> {
 
-		private ProgressDialog mProgressDialog;
 		private Context mActivityContext;
 		private String mUsername;
 		private String mPassword;
@@ -147,8 +158,15 @@ public class LoginActivity extends SherlockActivity {
 			if (cm.getActiveNetworkInfo() != null
 					&& cm.getActiveNetworkInfo().isConnectedOrConnecting()) {
 
-				this.mProgressDialog = ProgressDialog.show(mActivityContext,
-						null, "loading", true);
+				View loader = findViewById(R.id.main_loader);
+				if (loader != null) {
+					loader.setVisibility(View.VISIBLE);
+				}
+				
+				loader = findViewById(R.id.main_action_icons);
+				if (loader != null) {
+					loader.setVisibility(View.GONE);
+				}
 
 			} else {
 
@@ -211,13 +229,20 @@ public class LoginActivity extends SherlockActivity {
 		@Override
 		protected void onPostExecute(Integer result) {
 
-			this.mProgressDialog.cancel();
+			View loader = findViewById(R.id.main_loader);
+			if (loader != null) {
+				loader.setVisibility(View.GONE);
+			}
+			loader = findViewById(R.id.main_action_icons);
+			if (loader != null) {
+				loader.setVisibility(View.VISIBLE);
+			}
 
 			if ((mUserId != null) && (mUserId.length() > 0)) {
 
 				if (result == 200) {
 
-					GCMFunctions.setToken((Activity) getActivityContext(),
+					GCMFunctions.setTokenLogin((Activity) getActivityContext(),
 							mUserId, mUsername, mPassword);
 
 				} else if (result == 401) {
@@ -239,7 +264,6 @@ public class LoginActivity extends SherlockActivity {
 
 	public class VerifyActivationTask extends AsyncTask<Void, Void, Integer> {
 
-		private ProgressDialog mProgressDialog;
 		private Context mActivityContext;
 		private String mActivationCode;
 		private String mActivationResponse;
@@ -259,8 +283,15 @@ public class LoginActivity extends SherlockActivity {
 			if (cm.getActiveNetworkInfo() != null
 					&& cm.getActiveNetworkInfo().isConnectedOrConnecting()) {
 
-				this.mProgressDialog = ProgressDialog.show(mActivityContext,
-						null, "loading", true);
+				View loader = findViewById(R.id.main_loader);
+				if (loader != null) {
+					loader.setVisibility(View.VISIBLE);
+				}
+				
+				loader = findViewById(R.id.main_action_icons);
+				if (loader != null) {
+					loader.setVisibility(View.GONE);
+				}
 
 			} else {
 				this.cancel(true);
@@ -333,7 +364,14 @@ public class LoginActivity extends SherlockActivity {
 		@Override
 		protected void onPostExecute(Integer result) {
 
-			this.mProgressDialog.cancel();
+			View loader = findViewById(R.id.main_loader);
+			if (loader != null) {
+				loader.setVisibility(View.GONE);
+			}
+			loader = findViewById(R.id.main_action_icons);
+			if (loader != null) {
+				loader.setVisibility(View.VISIBLE);
+			}
 
 			mActivationResponse = mActivationResponse.replace("\"", "");
 			if (mActivationResponse.equals("true")) {

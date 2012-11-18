@@ -188,11 +188,6 @@ public class ReactionsActivity extends SherlockListActivity implements
 
 				try {
 
-					View loader = findViewById(R.id.main_loader);
-					if (loader != null) {
-						loader.setVisibility(View.GONE);
-					}
-
 					mReactionsType = savedState.getString("ReactionsType");
 
 					ObjectInputStream objectIn = new ObjectInputStream(
@@ -209,6 +204,19 @@ public class ReactionsActivity extends SherlockListActivity implements
 					if (mWhoochArray.size() < 25) {
 						mReactionsHasMoreUpdates = false;
 					}
+					
+					mReceivedButton = (Button) findViewById(R.id.received_action);
+					mSentButton = (Button) findViewById(R.id.sent_action);
+					if (mReactionsType.equals("sent")) {
+						mReceivedButton.setSelected(false);
+						mSentButton.setSelected(true);
+					}
+					else
+					{
+						mReceivedButton.setSelected(true);
+						mSentButton.setSelected(false);	
+					}
+					
 					
 					if(mWhoochArray.isEmpty())
 					{
@@ -250,6 +258,8 @@ public class ReactionsActivity extends SherlockListActivity implements
 	@Override
 	public void onResume() {
 		super.onResume();
+		
+		getSupportActionBar().setSelectedNavigationItem(3);
 
 		if (mReactionsInitiated) {
 			WhoochApiCallTask task = new WhoochApiCallTask(
@@ -425,8 +435,14 @@ public class ReactionsActivity extends SherlockListActivity implements
 					AlertDialog.Builder builder = new AlertDialog.Builder(
 							getActivityContext());
 
-					builder.setTitle("Whooch");
-					builder.setMessage("Are you sure you want to delete this update?");
+					LayoutInflater inflater = (LayoutInflater) getActivityContext()
+							.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+					View titleView = inflater.inflate(R.layout.default_alert_title, null);
+					View contentView = inflater.inflate(R.layout.default_alert_message, null);
+					TextView tvDefAlert = (TextView)contentView.findViewById(R.id.default_alert_content);
+					tvDefAlert.setText("Are you sure you want to delete this update?");
+					builder.setCustomTitle(titleView);
+					builder.setView(contentView);
 
 					builder.setNegativeButton("No",
 							new DialogInterface.OnClickListener() {
@@ -446,6 +462,53 @@ public class ReactionsActivity extends SherlockListActivity implements
 									WhoochApiCallTask task = new WhoochApiCallTask(
 											getActivityContext(),
 											new DeleteUpdate(), true);
+									task.execute();
+								}
+							});
+
+					AlertDialog dialog = builder.create();
+
+					dialog.show();
+				}
+			});
+		}
+		
+		if (!entry.userName.equalsIgnoreCase(currentUserName)) {
+			names.add(getResources().getString(R.string.modal_removereaction));
+			handlers.add(new Runnable() {
+				public void run() {
+					Log.d("StreamActivity", "Remove reaction");
+
+					AlertDialog.Builder builder = new AlertDialog.Builder(
+							getActivityContext());
+
+					LayoutInflater inflater = (LayoutInflater) getActivityContext()
+							.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+					View titleView = inflater.inflate(R.layout.default_alert_title, null);
+					View contentView = inflater.inflate(R.layout.default_alert_message, null);
+					TextView tvDefAlert = (TextView)contentView.findViewById(R.id.default_alert_content);
+					tvDefAlert.setText("Are you sure you want to remove this reaction?");
+					builder.setCustomTitle(titleView);
+					builder.setView(contentView);
+
+					builder.setNegativeButton("No",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+
+								}
+							});
+
+					builder.setPositiveButton("Yes",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									mDeleteWhoochId = entry.whoochId;
+									mDeleteWhoochNumber = entry.whoochNumber;
+
+									WhoochApiCallTask task = new WhoochApiCallTask(
+											getActivityContext(),
+											new RemoveReaction(), true);
 									task.execute();
 								}
 							});
@@ -869,6 +932,62 @@ public class ReactionsActivity extends SherlockListActivity implements
 
 		}
 	}
+	
+	private class RemoveReaction implements WhoochApiCallInterface {
+
+		public void preExecute() {
+		}
+
+		public HttpRequestBase getHttpRequest() {
+			HttpPost request = new HttpPost(Settings.apiUrl + "/reactions/remove");
+
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+			nameValuePairs.add(new BasicNameValuePair("whoochId",
+					mDeleteWhoochId));
+			nameValuePairs.add(new BasicNameValuePair("whoochNumber",
+					mDeleteWhoochNumber));
+
+			try {
+				request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+				// TODO error handling
+			}
+
+			return request;
+		}
+
+		public void handleResponse(String responseString) {
+
+		}
+
+		public void postExecute(int statusCode) {
+
+			if (statusCode == 200) {
+				mWhoochArray.remove(mLastSelectedPosition);
+				
+				if(mWhoochArray.isEmpty())
+				{
+					if (mReactionsType.equals("sent")) {
+						TextView tvE1 = (TextView) findViewById(R.id.empty_text1);
+						tvE1.setText("All reactions that you send to other users will appear here.");
+					}
+					else
+					{
+						TextView tvE1 = (TextView) findViewById(R.id.empty_text1);
+						tvE1.setText("All reactions that you receive from other users will appear here.");
+					}
+				}
+				
+				mAdapter.notifyDataSetChanged();
+			}
+
+			mDeleteWhoochId = null;
+			mDeleteWhoochNumber = null;
+
+		}
+	}
+	
 	
 	private class AddFan implements WhoochApiCallInterface {
 

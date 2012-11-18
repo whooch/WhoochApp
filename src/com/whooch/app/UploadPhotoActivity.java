@@ -295,8 +295,15 @@ public class UploadPhotoActivity extends SherlockActivity {
 		if (mImageBitmap != null) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(
 					view.getContext());
-
-			builder.setMessage("Remove image?").setTitle("Whooch");
+			
+			LayoutInflater inflater = (LayoutInflater) view.getContext()
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			View titleView = inflater.inflate(R.layout.default_alert_title, null);
+			View contentView = inflater.inflate(R.layout.default_alert_message, null);
+			TextView tvDefAlert = (TextView)contentView.findViewById(R.id.default_alert_content);
+			tvDefAlert.setText("Remove image?");
+			builder.setCustomTitle(titleView);
+			builder.setView(contentView);
 
 			builder.setPositiveButton("Yes",
 					new DialogInterface.OnClickListener() {
@@ -326,7 +333,12 @@ public class UploadPhotoActivity extends SherlockActivity {
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(context);
 			
-		    builder.setTitle("Upload image");
+			LayoutInflater inflater = (LayoutInflater) context
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			View titleView = inflater.inflate(R.layout.default_alert_title, null);
+			TextView tvDefHeading = (TextView)titleView.findViewById(R.id.alert_title_whoochname);
+			tvDefHeading.setText("Upload image");
+			builder.setCustomTitle(titleView);
 		    
 		    builder.setItems(R.array.image_retrieval_type, new DialogInterface.OnClickListener() {
 		               public void onClick(DialogInterface dialog, int which) {

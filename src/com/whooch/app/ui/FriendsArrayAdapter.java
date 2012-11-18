@@ -67,7 +67,13 @@ public class FriendsArrayAdapter extends ArrayAdapter<FriendsEntry> {
 
         if (getItemViewType(position) == TYPE_FIRST) {
             UrlImageViewHelper.setUrlDrawable(iv1, Settings.defaultWhoochImageUriLarge);
-            tv1.setText("Select a friend to invite");
+            
+            tv1.setText("");
+			if (mData.size() == 1) {
+				tv1.setHint("You have no friends to invite");
+			} else {
+	            tv1.setText("Select a friend to invite");
+			}
         } else {
             UrlImageViewHelper.setUrlDrawable(iv1, friendsEntry.userImageUriMedium);
             tv1.setText(friendsEntry.userName);

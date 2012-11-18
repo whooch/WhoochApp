@@ -5,14 +5,35 @@
     <style name="Theme.Styled" parent="Theme.Sherlock.Light">
         <item name="android:actionBarSize">48dip</item>
         <item name="actionBarSize">48dip</item>
+
+        <!-- styling for tabs (not in use) -->
+        <!--
         <item name="android:actionBarTabStyle">@style/TabStyle</item>
-        <item name="actionBarTabStyle">@style/TabStyle</item>
+        <item name="actionBarTabStyle">@style/TabStyle</item>
+        -->
+
         <item name="android:actionBarStyle">@style/ActionBarStyle</item>
         <item name="actionBarStyle">@style/ActionBarStyle</item>
         <item name="android:spinnerItemStyle">@style/SpinnerItem</item>
         <item name="spinnerItemStyle">@style/SpinnerItem</item>
         <item name="android:actionDropDownStyle">@style/DropDownStyle</item>
         <item name="actionDropDownStyle">@style/DropDownStyle</item>
+
+        <item name="android:buttonStyle">@style/WhoochButtonStyle</item>
+        <item name="android:alertDialogStyle">@style/CustomDialogTheme</item>
+    </style>
+
+    <style name="CustomDialogTheme" parent="@android:style/Theme.Dialog">
+        <item name="android:bottomBright">@color/white</item>
+        <item name="android:bottomDark">@color/white</item>
+        <item name="android:bottomMedium">@color/white</item>
+        <item name="android:centerBright">@color/white</item>
+        <item name="android:centerDark">@color/white</item>
+        <item name="android:centerMedium">@color/white</item>
+        <item name="android:fullBright">@color/white</item>
+        <item name="android:fullDark">@color/white</item>
+        <item name="android:topBright">@color/white</item>
+        <item name="android:topDark">@color/white</item>
     </style>
 
     <style name="SpinnerItem" parent="@android:style/Widget.TextView.SpinnerItem"></style>
@@ -31,8 +52,14 @@
         <item name="android:paddingRight">5dip</item>
     </style>
 
-    <style name="DropDownStyle" parent="@android:style/Widget.Holo.Light.Spinner">
+    <style name="DropDownStyle" parent="Widget.Sherlock.Light.Spinner.DropDown.ActionBar">
         <item name="android:popupBackground">@color/gray3</item>
+    </style>
+
+    <!-- style all buttons -->
+    <style name="WhoochButtonStyle" parent="android:Theme">
+        <item name="android:height">45dip</item>
+        <item name="android:gravity">center</item>
     </style>
 
 </resources>

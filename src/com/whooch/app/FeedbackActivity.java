@@ -183,11 +183,6 @@ public class FeedbackActivity extends SherlockListActivity implements
 
 				try {
 
-					View loader = findViewById(R.id.main_loader);
-					if (loader != null) {
-						loader.setVisibility(View.GONE);
-					}
-
 					mFeedbackType = savedState.getString("FeedbackType");
 
 					ObjectInputStream objectIn = new ObjectInputStream(
@@ -203,6 +198,18 @@ public class FeedbackActivity extends SherlockListActivity implements
 
 					if (mFeedbackArray.size() < 25) {
 						mFeedbackHasMoreUpdates = false;
+					}
+					
+					mReceivedButton = (Button) findViewById(R.id.received_action);
+					mSentButton = (Button) findViewById(R.id.sent_action);
+					if (mFeedbackType.equals("sent")) {
+						mReceivedButton.setSelected(false);
+						mSentButton.setSelected(true);
+					}
+					else
+					{
+						mReceivedButton.setSelected(true);
+						mSentButton.setSelected(false);	
 					}
 					
 					if(mFeedbackArray.isEmpty())
@@ -251,6 +258,8 @@ public class FeedbackActivity extends SherlockListActivity implements
 	@Override
 	public void onResume() {
 		super.onResume();
+		
+		getSupportActionBar().setSelectedNavigationItem(2);
 
 		if (mFeedbackInitiated) {
 			WhoochApiCallTask task = new WhoochApiCallTask(
@@ -352,9 +361,15 @@ public class FeedbackActivity extends SherlockListActivity implements
 
 				AlertDialog.Builder builder = new AlertDialog.Builder(
 						getActivityContext());
-
-				builder.setTitle("Whooch");
-				builder.setMessage("Are you sure you want to remove this feedback?");
+				
+				LayoutInflater inflater = (LayoutInflater) getActivityContext()
+						.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				View titleView = inflater.inflate(R.layout.default_alert_title, null);
+				View contentView = inflater.inflate(R.layout.default_alert_message, null);
+				TextView tvDefAlert = (TextView)contentView.findViewById(R.id.default_alert_content);
+				tvDefAlert.setText("Are you sure you want to remove this feedback?");
+				builder.setCustomTitle(titleView);
+				builder.setView(contentView);
 
 				builder.setNegativeButton("No",
 						new DialogInterface.OnClickListener() {

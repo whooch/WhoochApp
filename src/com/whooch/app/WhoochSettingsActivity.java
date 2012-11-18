@@ -13,27 +13,36 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.SherlockPreferenceActivity;
+import com.actionbarsherlock.view.MenuItem;
 import com.whooch.app.helpers.Settings;
 import com.whooch.app.helpers.WhoochApiCallInterface;
 import com.whooch.app.helpers.WhoochApiCallTask;
 import com.whooch.app.json.WhoochProfileEntry;
 
-public class WhoochSettingsActivity extends PreferenceActivity {
+public class WhoochSettingsActivity extends SherlockPreferenceActivity {
 
 	private String mWhoochId = null;
 	private String mWhoochName = null;
 	private boolean hasFeedback = false;
 	private boolean hasStreaming = false;
+	private CheckBoxPreference updatePref = null;
+	private CheckBoxPreference streamPref = null;
+	private CheckBoxPreference feedbackPref = null;
 
 	View mLoadingFooterView;
 
@@ -41,14 +50,37 @@ public class WhoochSettingsActivity extends PreferenceActivity {
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
+	
+		getSupportActionBar().setDisplayShowHomeEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View title_view = inflater
+				.inflate(R.layout.title_bar_generic, null);
+		getSupportActionBar().setCustomView(title_view);
+		getSupportActionBar().setDisplayShowCustomEnabled(true);
+		TextView tvhead = (TextView) title_view
+				.findViewById(R.id.header_generic_title);
+		tvhead.setText("");
+
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			finish();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		
+
 		Intent i = getIntent();
 		Bundle b = i.getExtras();
 		mWhoochId = b.getString("WHOOCH_ID");
@@ -68,13 +100,12 @@ public class WhoochSettingsActivity extends PreferenceActivity {
 		PreferenceCategory pc = (PreferenceCategory) findPreference("WhoochSettingsTitle");
 		pc.setTitle(mWhoochName + " Settings");
 
-		CheckBoxPreference checkboxPref = new CheckBoxPreference(
-				getActivityContext());
-		checkboxPref.setTitle("Updates");
-		checkboxPref.setKey("wpupdates");
-		checkboxPref.setSummary("Notify me when this whooch is updated");
+		updatePref = new CheckBoxPreference(getActivityContext());
+		updatePref.setTitle("Updates");
+		updatePref.setKey("wpupdates");
+		updatePref.setSummary("Notify me when this whooch is updated");
 
-		checkboxPref
+		updatePref
 				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
 					public boolean onPreferenceClick(Preference preference) {
@@ -89,16 +120,14 @@ public class WhoochSettingsActivity extends PreferenceActivity {
 					}
 				});
 
-		getActivityContext().getPreferenceScreen().addPreference(checkboxPref);
-
 		if (hasFeedback) {
-			checkboxPref = new CheckBoxPreference(getActivityContext());
-			checkboxPref.setTitle("Feedback");
-			checkboxPref.setKey("wpfeedback");
-			checkboxPref
+			feedbackPref = new CheckBoxPreference(getActivityContext());
+			feedbackPref.setTitle("Feedback");
+			feedbackPref.setKey("wpfeedback");
+			feedbackPref
 					.setSummary("Notify me when this whooch receives new feedback");
 
-			checkboxPref
+			feedbackPref
 					.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
 						public boolean onPreferenceClick(Preference preference) {
@@ -113,19 +142,16 @@ public class WhoochSettingsActivity extends PreferenceActivity {
 							return true;
 						}
 					});
-
-			getActivityContext().getPreferenceScreen().addPreference(
-					checkboxPref);
 		}
 
 		if (hasStreaming) {
-			checkboxPref = new CheckBoxPreference(getActivityContext());
-			checkboxPref.setTitle("Streaming");
-			checkboxPref.setKey("wpstreaming");
-			checkboxPref
+			streamPref = new CheckBoxPreference(getActivityContext());
+			streamPref.setTitle("Streaming");
+			streamPref.setKey("wpstreaming");
+			streamPref
 					.setSummary("I want updates from this whooch to appear in my stream");
 
-			checkboxPref
+			streamPref
 					.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
 						public boolean onPreferenceClick(Preference preference) {
@@ -148,8 +174,6 @@ public class WhoochSettingsActivity extends PreferenceActivity {
 						}
 					});
 
-			getActivityContext().getPreferenceScreen().addPreference(
-					checkboxPref);
 		}
 
 		WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(),
@@ -247,7 +271,12 @@ public class WhoochSettingsActivity extends PreferenceActivity {
 		}
 
 		public void postExecute(int statusCode) {
-
+			SharedPreferences settings = getSharedPreferences(
+					"whooch_preferences", 0);
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putBoolean("streaming_updated", true);
+			editor.commit();
+			
 		}
 
 	}
@@ -293,6 +322,10 @@ public class WhoochSettingsActivity extends PreferenceActivity {
 						WhoochProfileEntry entry = new WhoochProfileEntry(
 								jsonObject, getWindowManager());
 
+						if (findPreference("wpupdates") == null) {
+						getActivityContext().getPreferenceScreen()
+								.addPreference(updatePref);
+						}
 						CheckBoxPreference check = (CheckBoxPreference) findPreference("wpupdates");
 						if (entry.updatePush.equals("1")) {
 							check.setChecked(true);
@@ -300,8 +333,12 @@ public class WhoochSettingsActivity extends PreferenceActivity {
 							check.setChecked(false);
 						}
 
-						check = (CheckBoxPreference) findPreference("wpfeedback");
 						if (hasFeedback) {
+							if (findPreference("wpfeedback") == null) {
+							getActivityContext().getPreferenceScreen()
+									.addPreference(feedbackPref);
+							}
+							check = (CheckBoxPreference) findPreference("wpfeedback");
 							if (entry.feedbackPush.equals("1")) {
 								check.setChecked(true);
 							} else {
@@ -309,15 +346,19 @@ public class WhoochSettingsActivity extends PreferenceActivity {
 							}
 						}
 
-						check = (CheckBoxPreference) findPreference("wpstreaming");
 						if (hasStreaming) {
+							if (findPreference("wpstreaming") == null) {
+								getActivityContext().getPreferenceScreen()
+										.addPreference(streamPref);
+							}
+							check = (CheckBoxPreference) findPreference("wpstreaming");
 							if (entry.isStreaming.equals("1")) {
 								check.setChecked(true);
 							} else {
 								check.setChecked(false);
 							}
 						}
-						
+
 					} catch (JSONException e) {
 						e.printStackTrace();
 						// TODO: error handling
