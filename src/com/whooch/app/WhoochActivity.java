@@ -102,7 +102,7 @@ public class WhoochActivity extends SherlockListActivity implements
 
 		View whoochTitle = inflater.inflate(R.layout.whooch_title_bar, null);
 		getSupportActionBar().setCustomView(whoochTitle);
-
+		
 		getSupportActionBar().setDisplayShowHomeEnabled(false);
 
 		LinearLayout ll1 = (LinearLayout) findViewById(R.id.wheader_whoochinfo);
@@ -145,7 +145,6 @@ public class WhoochActivity extends SherlockListActivity implements
 			task = new WhoochApiCallTask(getActivityContext(),
 					new GetWhoochInfo(), false);
 			task.execute();
-
 		}
 
 	}
@@ -255,6 +254,9 @@ public class WhoochActivity extends SherlockListActivity implements
 		if (mWhoochInitiated) {
 			WhoochApiCallTask task = new WhoochApiCallTask(
 					getActivityContext(), new WhoochGetNewUpdates(), true);
+			task.execute();
+			task = new WhoochApiCallTask(getActivityContext(),
+					new GetWhoochInfo(), false);
 			task.execute();
 		}
 
@@ -585,6 +587,7 @@ public class WhoochActivity extends SherlockListActivity implements
 				}
 			}
 
+
 			if (mWhoochArray.isEmpty()) {
 				TextView tvE1 = (TextView) findViewById(R.id.empty_text1);
 				tvE1.setText("No updates have been shared yet.");
@@ -613,6 +616,8 @@ public class WhoochActivity extends SherlockListActivity implements
 		}
 
 		public void postExecute(int statusCode) {
+			
+			if (statusCode == 200) {
 
 			// parse the response as JSON and update the Content Array
 			if (!mResponseString.equals("null")) {
@@ -639,7 +644,9 @@ public class WhoochActivity extends SherlockListActivity implements
 			} else {
 				// if it is null we don't mind, there just wasn't anything there
 			}
+			}
 
+			
 			if (mWhoochArray.size() > 0) {
 				mLatestWhoochNum = mWhoochArray.get(0).whoochNumber;
 				mOldestWhoochNum = mWhoochArray.get(mWhoochArray.size() - 1).whoochNumber;
@@ -984,6 +991,8 @@ public class WhoochActivity extends SherlockListActivity implements
 									.getLayoutParams();
 							params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 							b1.setLayoutParams(params);
+			
+							
 						}
 
 						ib1.setOnClickListener(new OnClickListener() {
@@ -1045,6 +1054,7 @@ public class WhoochActivity extends SherlockListActivity implements
 				}
 
 			}
+
 
 		}
 

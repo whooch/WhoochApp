@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.whooch.app.R;
+import com.whooch.app.StreamActivity;
 import com.whooch.app.VerifyActivity;
 
 public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
@@ -198,9 +199,25 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 			a.startActivity(i);
 
 		}
-		else {
+		else if(statusCode == 401)
+		{
+			Intent i = null;
+			i = new Intent(a, StreamActivity.class);
+			a.startActivity(i);
+			
+			Toast.makeText(mActivityContext,
+					"You no longer have access to this whooch",
+					Toast.LENGTH_LONG).show();
+		}
+		else if((statusCode == 200) || (statusCode == 201) || (statusCode == 202))
+		{
 			// execute the post execute method for this task
 			mWhoochApiCall.postExecute(statusCode);
+		}
+		else {
+			Toast.makeText(mActivityContext,
+					"Something went wrong, please try again", Toast.LENGTH_SHORT)
+					.show();
 		}
 	}
 

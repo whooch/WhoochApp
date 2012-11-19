@@ -78,7 +78,7 @@
 
         <Button
             android:id="@+id/wheader_options_button"
-            android:layout_width="48dip"
+            android:layout_width="58dip"
             android:layout_height="match_parent"
             android:layout_marginLeft="5dip"
             android:layout_toLeftOf="@+id/wheader_update_button"

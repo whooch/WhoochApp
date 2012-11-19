@@ -32,7 +32,7 @@ public class MainApplication extends Application {
         nb.layoutMessageId = R.id.notification_message; // The id for the 'message' field
 
         //set this ID to a value > 0 if you want a new notification to replace the previous one
-        nb.constantNotificationId = 1;
+        nb.constantNotificationId = 0;
 
         // Set the builder
         PushManager.shared().setNotificationBuilder(nb);

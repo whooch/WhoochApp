@@ -88,17 +88,14 @@ public class WhoochHelperFunctions {
 	public static Spanned getSpannedFromHtmlContent(String content,
 			TextView tv, Context ctx) {
 
-		String strippedContent = content.replaceAll(">\\s+<", "><");
-		String styledContent = strippedContent
+		String styledContent = content
 				.replaceAll("<a class=\"highlightedUser\"(.+?)</a>",
 						"<font color=\"#00639F\"><a class=\"highlightedUser\"$1</a></font>");
 		
-		String hashUrl = styledContent.replaceAll(">\\s+<", "><");
-		String hashContent = hashUrl
+		String hashContent = styledContent
 				.replaceAll("<a class=\"whoochhash\" href=\"/search\\?type=hash&query=%23(.+?)\">(.+?)</a>",
 						"<a class=\"whoochhash\" href=\"com.whooch.updatesearch://#$1\">$2</a>");
 		
-		UrlImageGetter imageGetter = new UrlImageGetter(tv, ctx);
-		return Html.fromHtml(hashContent, imageGetter, null);
+		return Html.fromHtml(hashContent, null, null);
 	}
 }
