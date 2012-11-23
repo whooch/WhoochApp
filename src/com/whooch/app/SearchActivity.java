@@ -198,7 +198,7 @@ public class SearchActivity extends SherlockListActivity implements
 			int visibleItemCount, int totalItemCount) {
 
 		if (mSearchInitiated && mSearchHasMoreUpdates
-				&& !mLoadMoreItemsInProgress) {
+				&& !mLoadMoreItemsInProgress && !mSearchArray.isEmpty()) {
 
 			int numPaddingItems = 0;
 			if (firstVisibleItem + visibleItemCount + numPaddingItems >= totalItemCount) {

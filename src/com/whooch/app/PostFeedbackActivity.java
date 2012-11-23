@@ -42,7 +42,7 @@ public class PostFeedbackActivity extends PostBaseActivity {
 							.show();
 				} else {
 					WhoochApiCallTask task = new WhoochApiCallTask(
-							getActivityContext(), new Submit(), true);
+							getActivityContext(), new Submit(), true, true);
 					task.execute();
 				}
 			}
@@ -118,12 +118,21 @@ public class PostFeedbackActivity extends PostBaseActivity {
 
 		public void postExecute(int statusCode) {
 			if (statusCode == 202) {
+				Intent i = new Intent(getApplicationContext(),
+						FeedbackActivity.class);
+				i.putExtra("SENT", true);
+				startActivity(i);
 				finish();
 			}
 			else if(statusCode == 409)
 			{
 				Toast.makeText(getApplicationContext(), "You already said that",
 						Toast.LENGTH_SHORT).show();
+			}
+			else {
+				Toast.makeText(getActivityContext(),
+						"Something went wrong, please try again", Toast.LENGTH_LONG)
+						.show();
 			}
 		}
 	}

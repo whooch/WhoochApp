@@ -496,7 +496,7 @@ public class StreamActivity extends SherlockListActivity implements
 		// the onScroll method is called A LOT. make sure we don't fire off the
 		// same update multiple times.
 		if (mStreamInitiated && mStreamHasMoreUpdates
-				&& !mLoadMoreItemsInProgress) {
+				&& !mLoadMoreItemsInProgress && !mStreamArray.isEmpty()) {
 
 			// numPaddingItems is used to determine how early we should start
 			// loading more items
@@ -694,6 +694,7 @@ public class StreamActivity extends SherlockListActivity implements
 		public void postExecute(int statusCode) {
 
 			// parse the response as JSON and update the Content Array
+			// if the stream is empty, this request should never have been fired
 			if (!mResponseString.equals("null")) {
 				try {
 					JSONArray jsonArray = new JSONArray(mResponseString);

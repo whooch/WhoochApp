@@ -39,7 +39,7 @@ public class StreamArrayAdapter extends ArrayAdapter<StreamEntry> {
 
 	@Override
 	public int getItemViewType(int position) {
-		if (mData.get(position).reactionType.equals("feedback")) {
+		if ((mData.get(position).reactionType.equals("feedback")) && (mData.get(position).feedbackInfo != null)) {
 			return TYPE_FEEDBACK;
 		} else {
 			return TYPE_REGULAR;
@@ -89,6 +89,8 @@ public class StreamArrayAdapter extends ArrayAdapter<StreamEntry> {
 
 		if (getItemViewType(position) == TYPE_FEEDBACK) {
 
+			if(whoochEntry.feedbackInfo != null)
+			{
 			TextView tv5 = (TextView) view
 					.findViewById(R.id.entry_feedback_content);
 			tv5.setText(WhoochHelperFunctions.getSpannedFromHtmlContent(
@@ -109,6 +111,7 @@ public class StreamArrayAdapter extends ArrayAdapter<StreamEntry> {
 			} else {
 				ImageView iv6 = (ImageView) view.findViewById(R.id.imagePicture);
 				iv6.setVisibility(View.VISIBLE);
+			}
 			}
 		}
 

@@ -115,7 +115,7 @@ public class PostStandardActivity extends PostBaseActivity {
 							.show();
 				} else {
 					WhoochApiCallTask task = new WhoochApiCallTask(
-							getActivityContext(), new Submit(), true);
+							getActivityContext(), new Submit(), true, true);
 					task.execute();
 				}
 			}
@@ -257,6 +257,11 @@ public class PostStandardActivity extends PostBaseActivity {
 			{
 				Toast.makeText(getApplicationContext(), "You already said that",
 						Toast.LENGTH_SHORT).show();
+			}
+			else {
+				Toast.makeText(getActivityContext(),
+						"Something went wrong, please try again", Toast.LENGTH_LONG)
+						.show();
 			}
 
 		}

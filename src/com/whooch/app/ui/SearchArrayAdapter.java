@@ -42,7 +42,7 @@ public class SearchArrayAdapter extends ArrayAdapter<SearchEntry> {
 			return TYPE_WHOOCH;
 		} else if (mData.get(position).searchType.equals("user")) {
 			return TYPE_USER;
-		} else if (mData.get(position).reactionType.equals("feedback")) {
+		} else if ((mData.get(position).reactionType.equals("feedback")) && (mData.get(position).feedbackInfo != null)) {
 			return TYPE_FEEDBACK;
 		} else {
 			return TYPE_UPDATE;
@@ -123,6 +123,8 @@ public class SearchArrayAdapter extends ArrayAdapter<SearchEntry> {
 
 			if (getItemViewType(position) == TYPE_FEEDBACK) {
 
+				if(searchEntry.feedbackInfo != null)
+				{
 				TextView tv5 = (TextView) view
 						.findViewById(R.id.entry_feedback_content);
 				tv5.setText(WhoochHelperFunctions.getSpannedFromHtmlContent(
@@ -136,6 +138,7 @@ public class SearchArrayAdapter extends ArrayAdapter<SearchEntry> {
 				// R.drawable.ic_whooch_transparent);
 				UrlImageViewHelper.setUrlDrawable(iv2,
 						searchEntry.feedbackInfo.userImageUriMedium);
+				}
 			}
 
 			TextView tv4 = (TextView) view.findViewById(R.id.entry_whooch_foot);

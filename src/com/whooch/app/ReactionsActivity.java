@@ -115,10 +115,11 @@ public class ReactionsActivity extends SherlockListActivity implements
 			@Override
 			public void onClick(View v) {
 				
-				if (mReactionsType == "sent") {
+				if (!mReceivedButton.isSelected()) {
 					mReceivedButton.setSelected(true);
 		            mSentButton.setSelected(false);
 		            
+		            mReactionsInitiated = false;
 					mReactionsType = "received";
 					mWhoochArray.clear();
 					mAdapter.notifyDataSetChanged();
@@ -137,10 +138,11 @@ public class ReactionsActivity extends SherlockListActivity implements
 			@Override
 			public void onClick(View v) {
 				
-				if (mReactionsType == "received") {
+				if (!mSentButton.isSelected()) {
 					mSentButton.setSelected(true);
 		            mReceivedButton.setSelected(false);
 		            
+		            mReactionsInitiated = false;
 					mReactionsType = "sent";
 					mWhoochArray.clear();
 					mAdapter.notifyDataSetChanged();
@@ -277,7 +279,7 @@ public class ReactionsActivity extends SherlockListActivity implements
 			int visibleItemCount, int totalItemCount) {
 
 		if (mReactionsInitiated && mReactionsHasMoreUpdates
-				&& !mLoadMoreItemsInProgress) {
+				&& !mLoadMoreItemsInProgress && !mWhoochArray.isEmpty()) {
 
 			int numPaddingItems = 0;
 			if (firstVisibleItem + visibleItemCount + numPaddingItems >= totalItemCount) {

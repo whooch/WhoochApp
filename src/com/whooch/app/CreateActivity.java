@@ -64,7 +64,7 @@ public class CreateActivity extends SherlockActivity {
 							Toast.LENGTH_SHORT).show();
 				} else {
 					WhoochApiCallTask task = new WhoochApiCallTask(
-							getActivityContext(), new CreateWhooch(), true);
+							getActivityContext(), new CreateWhooch(), true, true);
 					task.execute();
 				}
 			}
@@ -127,6 +127,11 @@ public class CreateActivity extends SherlockActivity {
 						"Whooch names can only contain letters, numbers, and whitespace",
 						Toast.LENGTH_LONG).show();
 				return;
+			}
+			else if (statusCode == 400){
+				Toast.makeText(getActivityContext(),
+						"Something went wrong, please try again", Toast.LENGTH_LONG)
+						.show();
 			}
 
 			if (!mResponseString.equals("null")) {

@@ -13,6 +13,7 @@ import org.apache.http.entity.mime.content.StringBody;
 import android.content.Intent;
 import android.graphics.Bitmap.CompressFormat;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,7 +56,7 @@ public class PostReactionActivity extends PostBaseActivity {
 				}
 				else
 				{
-					WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new Submit(), true);
+					WhoochApiCallTask task = new WhoochApiCallTask(getActivityContext(), new Submit(), true, true);
 					task.execute();
 				}
             }
@@ -147,12 +148,40 @@ public class PostReactionActivity extends PostBaseActivity {
         
         public void postExecute(int statusCode) {
             if (statusCode == 202) {
-                finish();
+            	
+                Intent i = getIntent();
+                Bundle b = i.getExtras();
+                boolean fromWhooch = false; 
+                
+                if (b != null) {
+                       if(b.containsKey("FROM_WHOOCH"))
+                       {
+                    	   fromWhooch = true;
+                       }
+                }
+            	
+				if (fromWhooch) {
+					i = new Intent(getApplicationContext(),
+							WhoochActivity.class);
+					i.putExtra("WHOOCH_ID", mWhoochIdExtra);
+					startActivity(i);
+					finish();
+				} else {
+					i = new Intent(getApplicationContext(),
+							StreamActivity.class);
+					startActivity(i);
+					finish();
+				}
             }
 			else if(statusCode == 409)
 			{
 				Toast.makeText(getApplicationContext(), "You already said that",
 						Toast.LENGTH_SHORT).show();
+			}
+			else {
+				Toast.makeText(getActivityContext(),
+						"Something went wrong, please try again", Toast.LENGTH_LONG)
+						.show();
 			}
         }
     }

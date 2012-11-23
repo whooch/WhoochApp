@@ -38,6 +38,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
@@ -112,10 +113,12 @@ public class FeedbackActivity extends SherlockListActivity implements
 			@Override
 			public void onClick(View v) {
 
-				if (mFeedbackType == "sent") {
+				if (!mReceivedButton.isSelected()) {
+					
 					mReceivedButton.setSelected(true);
 					mSentButton.setSelected(false);
 
+					mFeedbackInitiated = false;
 					mFeedbackType = "received";
 					mFeedbackArray.clear();
 					mAdapter.notifyDataSetChanged();
@@ -133,10 +136,12 @@ public class FeedbackActivity extends SherlockListActivity implements
 			@Override
 			public void onClick(View v) {
 
-				if (mFeedbackType == "received") {
+				if (!mSentButton.isSelected()) {
+
 					mSentButton.setSelected(true);
 					mReceivedButton.setSelected(false);
 
+					mFeedbackInitiated = false;
 					mFeedbackType = "sent";
 					mFeedbackArray.clear();
 					mAdapter.notifyDataSetChanged();
@@ -149,7 +154,21 @@ public class FeedbackActivity extends SherlockListActivity implements
 
 		});
 
-		mReceivedButton.setSelected(true);
+        Intent i = getIntent();
+        Bundle b = i.getExtras();
+        
+        if (b != null && b.containsKey("SENT")) {
+			mReceivedButton.setSelected(false);
+			mSentButton.setSelected(true);
+			mFeedbackType = "sent";
+		}
+		else
+		{
+			mReceivedButton.setSelected(true);
+			mSentButton.setSelected(false);
+			mFeedbackType = "received";
+		}
+
 	}
 
 	@Override
@@ -277,7 +296,7 @@ public class FeedbackActivity extends SherlockListActivity implements
 			int visibleItemCount, int totalItemCount) {
 
 		if (mFeedbackInitiated && mFeedbackHasMoreUpdates
-				&& !mLoadMoreItemsInProgress) {
+				&& !mLoadMoreItemsInProgress && !mFeedbackArray.isEmpty()) {
 
 			int numPaddingItems = 0;
 			if (firstVisibleItem + visibleItemCount + numPaddingItems >= totalItemCount) {

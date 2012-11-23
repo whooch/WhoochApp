@@ -271,6 +271,7 @@ public class WhoochFeedbackActivity extends SherlockListActivity implements
 					i.putExtra("USER_NAME", entry.userName);
 					i.putExtra("WHOOCH_NAME", entry.whoochName);
 					i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriLarge);
+					i.putExtra("FROM_WHOOCH", true); 
 					startActivity(i);
 				}
 			});

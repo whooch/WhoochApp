@@ -271,7 +271,7 @@ public class WhoochActivity extends SherlockListActivity implements
 			int visibleItemCount, int totalItemCount) {
 
 		if (mWhoochInitiated && mWhoochHasMoreUpdates
-				&& !mLoadMoreItemsInProgress) {
+				&& !mLoadMoreItemsInProgress && !mWhoochArray.isEmpty()) {
 
 			int numPaddingItems = 0;
 			if (firstVisibleItem + visibleItemCount + numPaddingItems >= totalItemCount) {
@@ -319,6 +319,7 @@ public class WhoochActivity extends SherlockListActivity implements
 					i.putExtra("USER_NAME", entry.userName);
 					i.putExtra("WHOOCH_NAME", entry.whoochName);
 					i.putExtra("WHOOCH_IMAGE", entry.whoochImageUriLarge);
+					i.putExtra("FROM_WHOOCH", true);
 
 					startActivity(i);
 				}

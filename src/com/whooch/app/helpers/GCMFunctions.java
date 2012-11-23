@@ -13,7 +13,6 @@ import org.apache.http.message.BasicNameValuePair;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.widget.Toast;
 
 import com.urbanairship.push.PushManager;
 import com.whooch.app.LoginActivity;
@@ -22,7 +21,7 @@ import com.whooch.app.StreamActivity;
 public class GCMFunctions {
 
 	public static void setTokenLogin(Activity a, String userId, String userName, String password) {
-		WhoochApiCallTask task = new WhoochApiCallTask(a, new SetTokenLogin(a, userId, userName, password), true);
+		WhoochApiCallTask task = new WhoochApiCallTask(a, new SetTokenLogin(a, userId, userName, password), true, true);
 		task.execute();
 	}
 
@@ -62,7 +61,7 @@ public class GCMFunctions {
 			editor.putString("userid", mUserId);
 			editor.putString("password", mPassword);
 			editor.commit();
-
+			
 		}
 		
 		SetTokenLogin(Activity a, String userId, String userName, String password)
@@ -71,7 +70,7 @@ public class GCMFunctions {
 			mUsername = userName;
 			mUserId = userId;
 			mPassword = password;
-		}
+		} 
 
 		public HttpRequestBase getHttpRequest() {
 			HttpPost request = new HttpPost(Settings.apiUrl + "/push");
@@ -159,12 +158,6 @@ public class GCMFunctions {
 				i = new Intent(mActivity, LoginActivity.class);
 				mActivity.startActivity(i);
 			}
-			else
-			{
-				Toast.makeText(mActivity,
-						"Something went wrong, please try again", Toast.LENGTH_SHORT)
-						.show();
-			}
 
 		}
 	}
@@ -209,12 +202,6 @@ public class GCMFunctions {
 
 		public void postExecute(int statusCode) {
 			
-			if(statusCode != 200)
-			{				
-				Toast.makeText(mActivity,
-						"Something went wrong, please try again", Toast.LENGTH_SHORT)
-						.show();
-			}
 
 		}
 	}
@@ -258,11 +245,6 @@ public class GCMFunctions {
 
 		public void postExecute(int statusCode) {
 
-			if (statusCode != 200) {
-				Toast.makeText(mActivity,
-						"Something went wrong, please try again", Toast.LENGTH_SHORT)
-						.show();
-			}
 
 		}
 	}

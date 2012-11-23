@@ -34,6 +34,7 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 	private Context mActivityContext;
 	private WhoochApiCallInterface mWhoochApiCall;
 	private boolean mShowProgressDialog;
+	private boolean mBypassPostExecute = false;
 
 	public WhoochApiCallTask(Context ctx, WhoochApiCallInterface whoochApiCall,
 			boolean showProgressDialog) {
@@ -43,6 +44,15 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 		mShowProgressDialog = showProgressDialog;
 	}
 
+	public WhoochApiCallTask(Context ctx, WhoochApiCallInterface whoochApiCall,
+			boolean showProgressDialog, boolean bypassPostExecute) {
+		super();
+		mActivityContext = ctx;
+		mWhoochApiCall = whoochApiCall;
+		mShowProgressDialog = showProgressDialog;
+		mBypassPostExecute = bypassPostExecute;
+	}
+	
 	@Override
 	protected void onPreExecute() {
 		
@@ -192,7 +202,12 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 		}
 
 		// do error handling
-		if (statusCode == 407) {
+		if(mBypassPostExecute)
+		{
+			//let the child class handle error handling
+			mWhoochApiCall.postExecute(statusCode);
+		}
+		else if (statusCode == 407) {
 
 			Intent i = null;
 			i = new Intent(a, VerifyActivity.class);
@@ -216,7 +231,7 @@ public class WhoochApiCallTask extends AsyncTask<Void, Void, Integer> {
 		}
 		else {
 			Toast.makeText(mActivityContext,
-					"Something went wrong, please try again", Toast.LENGTH_SHORT)
+					"Something went wrong, please try again", Toast.LENGTH_LONG)
 					.show();
 		}
 	}
